@@ -94,7 +94,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -108,7 +108,7 @@
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,7 +121,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
     </ClCompile>
@@ -138,7 +138,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -147,7 +147,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -166,7 +166,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -177,7 +177,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>FBXSDK_SHARED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -202,7 +202,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
-xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
