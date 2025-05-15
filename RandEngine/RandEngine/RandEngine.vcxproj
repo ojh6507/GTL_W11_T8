@@ -1,0 +1,1225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{59a9c47a-6a98-4bc3-b529-aec7bcb32238}</ProjectGuid>
+    <RootNamespace>RandEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)Binaries\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\DirectXTK\Lib\$(PlatformTarget)\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\lib\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(PlatformTarget);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\lib\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>FBXSDK_SHARED;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\DirectXTK\Lib\$(PlatformTarget)\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\lib\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(PlatformTarget);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\lib\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile />
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\DirectXTK\Lib\$(PlatformTarget)\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\lib\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(PlatformTarget);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\lib\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>FBXSDK_SHARED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine\Source;$(ProjectDir)Engine\Source\Editor;$(ProjectDir)Engine\Source\Runtime;$(ProjectDir)Engine\Source\Runtime\Core;$(ProjectDir)Engine\Source\Runtime\CoreUObject;$(ProjectDir)Engine\Source\Runtime\Engine;$(ProjectDir)Engine\Source\Runtime\Engine\Classes;$(ProjectDir)Engine\Source\Runtime\InputCore;$(ProjectDir)Engine\Source\Runtime\Physics;$(ProjectDir)Engine\Source\Runtime\InteractiveToolsFramework;$(ProjectDir)Engine\Source\Runtime\Launch;$(ProjectDir)Engine\Source\Runtime\Renderer;$(ProjectDir)Engine\Source\Runtime\Serialization;$(ProjectDir)Engine\Source\Runtime\Slate;$(ProjectDir)Engine\Source\Runtime\SlateCore;$(ProjectDir)Engine\Source\Runtime\Windows;$(ProjectDir)Engine\Source\ThirdParty\tinyfiledialogs\include;$(ProjectDir)Engine\Source\ThirdParty\Json\include;$(ProjectDir)Engine\Source\ThirdParty\DirectXTK\Include;$(ProjectDir)Engine\Source\ThirdParty\ImGui\include;$(ProjectDir)Engine\Source\ThirdParty\Lua\include;$(ProjectDir)Engine\Source\ThirdParty\sol2\include;$(ProjectDir)Engine\Source\ThirdParty\fmod\inc;$(ProjectDir)Engine\Source\ThirdParty\FBX\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile />
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\DirectXTK\Lib\$(PlatformTarget)\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\lib\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration);$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(PlatformTarget);C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\lib\x64\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXTK.lib;lua.lib;fmod_vc.lib;fmodL_vc.lib;alembic.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\Lua\bin\$(Configuration)\lua.pdb" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Platform)\fmodL.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\FBX\lib\x64\$(Configuration)\libfbxsdk.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\Source\Contents\Actors\ARandCharacter.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\AnimationRuntime.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalDetailPanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSingleNodeInstance.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimInstance.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelinePanel.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Actors\Fish.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Actors\GoalPlatformActor.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Actors\ItemActor.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Actors\PlatformActor.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Actors\TriggerBox.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Components\FishBodyComponent.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Components\FishTailComponent.cpp" />
+    <ClCompile Include="Engine\Source\Contents\Objects\DamageCameraShake.cpp" />
+    <ClCompile Include="Engine\Source\Developer\LuaTypes\LuaUserTypes.cpp" />
+    <ClCompile Include="Engine\Source\Editor\LevelEditor\SlateAppMessageHandler.cpp" />
+    <ClCompile Include="Engine\Source\Editor\LevelEditor\SLevelEditor.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\ControlEditorPanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\OutlinerEditorPanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\PropertyEditorPanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\ShowFlags.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalViewerPanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\ViewportTypePanel.cpp" />
+    <ClCompile Include="Engine\Source\Editor\UnrealEd\EditorViewportClient.cpp" />
+    <ClCompile Include="Engine\Source\Editor\UnrealEd\ImGuiWidget.cpp" />
+    <ClCompile Include="Engine\Source\Editor\UnrealEd\PrimitiveDrawBatch.cpp" />
+    <ClCompile Include="Engine\Source\Editor\UnrealEd\SceneManager.cpp" />
+    <ClCompile Include="Engine\Source\Editor\UnrealEd\UnrealEd.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\Casts.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\Class.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\NameTypes.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\Object.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectFactory.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectGlobals.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectUtils.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\Property.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\UObjectArray.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\UObject\UObjectHash.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Container\String.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\EngineStatics.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\HAL\PlatformMemory.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Color.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Define.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\JungleMath.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\MathUtility.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Matrix.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Plane.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Quat.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Rotator.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Transform.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Vector.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Math\Vector4.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Misc\FrameNumber.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Misc\FrameRate.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Misc\FrameTime.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Misc\Parse.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Serialization\Archive.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Serialization\MemoryArchive.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Stats\GPUTimingManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Stats\ProfilerStatsManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Stats\Stats.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\ActorEditor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\AmbientLightActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\CapsuleActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Cube.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\CubeActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\DirectionalLightActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\FireballActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\HeightFogActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\LightActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\Player.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\PointLightActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\SphereActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Actors\SpotLightActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimationAsset.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimCurveTypes.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimData\AnimDataModel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimData\IAnimationDataModel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSequence.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSequenceBase.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimTypes.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraModifier.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraShakeBase.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\PerlinNoiseCameraShakePattern.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\PlayerCameraManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\Shakes\SimpleCameraShakePattern.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Camera\Shakes\WaveOscillatorCameraShakePattern.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ActorComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\BillboardComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\BoxComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\CapsuleComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\CubeComp.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\HeightFogComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\InputComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Light\AmbientLightComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Light\DirectionalLightComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Light\LightComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Light\PointLightComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Light\SpotLightComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Material\Material.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\MeshComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkinnedMeshComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\StaticMeshRenderData.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ParticleSubUVComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ProjectileMovementComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\SceneComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\ShapeComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkeletalMeshComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\SkySphereComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\SphereComp.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\SphereComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\StaticMeshComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\TextComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\UTextUUID.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Curves\KeyHandle.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Curves\IndexedCurve.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Curves\RealCurve.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Curves\RichCurve.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\AssetManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\EditorEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\Engine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\FObjLoader.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\HitResult.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\FbxLoader.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\ResourceMgr.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\SkeletalMeshActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Engine\StaticMeshActor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Actor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\GameFramework\GameMode.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerController.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\GameFramework\SpringArmComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Level.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\UnrealClient.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\UserInterface\Console.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\UserInterface\Drawer.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\World\World.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InputCore\InputCoreTypes.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoArrowComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoBaseComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoCircleComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoRectangleComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\TransformGizmo.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Launch\EngineLoop.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Launch\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Launch\Launch.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Physics\CollisionManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\BillboardRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\CameraEffectRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\CompositingPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\DepthPrePass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\EditorBillboardRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\EditorRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\FogRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\GizmoRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\LightHeatMapRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\LineRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\PostProcessCompositingPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\Renderer.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\ShadowManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\ShadowRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\SlateRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\StaticMeshRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\StaticMeshRenderPassBase.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\TileLightCullingPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\UpdateLightBufferPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\WorldBillboardRenderPass.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\SlateCore\Input\Events.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\SlateCore\Widgets\SWindow.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Slate\Widgets\Layout\SSplitter.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\D3D11RHI\DXDBufferManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\D3D11RHI\DXDShaderManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\D3D11RHI\GraphicDevice.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\RawInput.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\AnimationSubEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SubEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SkeletalSubEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SubRenderer.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\WindowsCursor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\WindowsPlatformTime.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\GraphEditor.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImCurveEdit.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImGradient.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImGuizmo.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_bezier.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_curve.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_neo_internal.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_neo_sequencer.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImSequencer.cpp" />
+    <ClCompile Include="Engine\Source\ThirdParty\tinyfiledialogs\include\tinyfiledialogs.cpp" />
+    <ClCompile Include="LuaScripts\LuaScriptComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\SkeletalMeshDebugger.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\Skeleton.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkeletalMesh.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\SkeletalMeshRenderPass.cpp" />
+    <ClCompile Include="MyAnimInstance.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\StateMachine.cpp" />
+    <ClCompile Include="StateMachineAnimInstance.cpp" />
+    <None Include="Shaders\CompositingShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\ComputeDefine.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\DepthBufferPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\DepthBufferVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\EditorShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\FogQuadPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\FogShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\GizmoPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\GizmoVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\Light.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\PixelBillBoardShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\PostProcessCompositingShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\ShaderLine.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\ShaderRegisters.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\ShaderW0.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\SlateShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\StaticMeshPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\StaticMeshPixelShaderDepth.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\StaticMeshPixelShaderWorldNormal.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\StaticMeshVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\TileLightCullingComputeShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\VertexBillBoardShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\Source\Contents\Actors\ARandCharacter.h" />
+    <ClInclude Include="Engine\Source\Developer\AnimationUtils\AnimationUtils.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelineCommon.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\AnimationRuntime.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalDetailPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSingleNodeInstance.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimInstance.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelinePanel.h" />
+    <ClInclude Include="Engine\Source\Contents\Actors\Fish.h" />
+    <ClInclude Include="Engine\Source\Contents\Actors\GoalPlatformActor.h" />
+    <ClInclude Include="Engine\Source\Contents\Actors\ItemActor.h" />
+    <ClInclude Include="Engine\Source\Contents\Actors\PlatformActor.h" />
+    <ClInclude Include="Engine\Source\Contents\Actors\TriggerBox.h" />
+    <ClInclude Include="Engine\Source\Contents\Components\FishBodyComponent.h" />
+    <ClInclude Include="Engine\Source\Contents\Components\FishTailComponent.h" />
+    <ClInclude Include="Engine\Source\Contents\Objects\DamageCameraShake.h" />
+    <ClInclude Include="Engine\Source\Developer\LuaTypes\LuaUserTypes.h" />
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaBindMacros.h" />
+    <ClInclude Include="Engine\Source\Developer\LuaUtils\LuaBindUtils.h" />
+    <ClInclude Include="Engine\Source\Editor\LevelEditor\SlateAppMessageHandler.h" />
+    <ClInclude Include="Engine\Source\Editor\LevelEditor\SLevelEditor.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\ControlEditorPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\IWindowToggleable.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\OutlinerEditorPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\PropertyEditorPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\ShowFlags.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalViewerPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\ViewportTypePanel.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\EditorPanel.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\EditorViewportClient.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\ImGuiWidget.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\PrimitiveDrawBatch.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\SceneManager.h" />
+    <ClInclude Include="Engine\Source\Editor\UnrealEd\UnrealEd.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Template\SubclassOf.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\Casts.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\Class.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\NameTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\Object.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectFactory.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectGlobals.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectMacros.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\ObjectUtils.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\Property.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\UObjectArray.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\UObjectHash.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\UObjectIterator.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\UObject\WeakObjectPtr.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\Array.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\ContainerAllocator.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\CString.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\Map.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\Pair.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\Queue.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\Set.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\String.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Container\StringConv.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\CoreMiscDefines.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Delegates\Delegate.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Delegates\DelegateCombination.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\EngineStatics.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\HAL\PlatformMemory.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\HAL\PlatformType.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Axis.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Color.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\JungleMath.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\MathFwd.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\MathSSE.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\MathUtility.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Matrix.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Plane.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Quat.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Rotator.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Transform.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Vector.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Math\Vector4.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\Char.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\CoreMiscDefines.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\FrameNumber.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\FrameRate.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\FrameTime.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Misc\Parse.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Serialization\Archive.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Serialization\MemoryArchive.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Stats\GPUTimingManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Stats\ProfilerStatsManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Stats\StatDefine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Stats\Stats.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Traits\IsCharType.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\AmbientLightActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\CapsuleActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Cube.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\CubeActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\DirectionalLightActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\FireballActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\HeightFogActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\LightActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\Player.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\PointLightActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\SphereActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Actors\SpotLightActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimationAsset.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimCurveTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimData\AnimDataModel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimData\IAnimationDataModel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSequence.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimSequenceBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraModifier.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraModifier_CameraShake.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraShakeBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\CameraTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\PerlinNoiseCameraShakePattern.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\PlayerCameraManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\Shakes\SimpleCameraShakePattern.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\Shakes\WaveOscillatorCameraShakePattern.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ActorComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\BillboardComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\BoxComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\CapsuleComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\CubeComp.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\HeightFogComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\InputComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Light\AmbientLightComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Light\DirectionalLightComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Light\LightComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Light\PointLightComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Light\SpotLightComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Material\Material.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\MeshComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkinnedMeshComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\StaticMeshRenderData.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ParticleSubUVComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\PrimitiveComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ProjectileMovementComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Quad.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\SceneComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ShapeComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkeletalMeshComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\SkySphereComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\SphereComp.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\SphereComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\StaticMeshComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\TextComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\UTextUUID.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Curves\KeyHandle.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Curves\IndexedCurve.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Curves\RealCurve.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Curves\RichCurve.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\AssetManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Asset\StaticMeshAsset.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Asset\SkeletalMeshAsset.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\EditorEngine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Engine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\EngineTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\EventManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\FObjLoader.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\HitResult.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\FbxLoader.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\OverlapInfo.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\OverlapResult.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ResourceMgr.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\SkeletalMeshActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\StaticMeshActor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Texture.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Actor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\GameMode.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerController.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\SpringArmComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Level.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\UnrealClient.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\UserInterface\Console.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\UserInterface\Drawer.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\ViewportClient.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\World\World.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\World\WorldContext.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\World\WorldType.h" />
+    <ClInclude Include="Engine\Source\Runtime\InputCore\InputCoreTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoArrowComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoBaseComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoCircleComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\GizmoRectangleComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\InteractiveToolsFramework\BaseGizmos\TransformGizmo.h" />
+    <ClInclude Include="Engine\Source\Runtime\Launch\Define.h" />
+    <ClInclude Include="Engine\Source\Runtime\Launch\EngineBaseTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Launch\EngineLoop.h" />
+    <ClInclude Include="Engine\Source\Runtime\Launch\ImGuiManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Launch\LightDefine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Physics\CollisionManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\BillboardRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\CameraEffectRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\CompositingPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\DepthPrePass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\EditorBillboardRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\EditorRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\FogRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\GizmoRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\IRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\LightHeatMapRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\LineRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\PostProcessCompositingPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\Renderer.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\RendererHelpers.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\RenderResources.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\ShaderConstants.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\ShadowManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\ShadowRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\SlateRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\StaticMeshRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\StaticMeshRenderPassBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\TileLightCullingPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\UpdateLightBufferPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\WorldBillboardRenderPass.h" />
+    <ClInclude Include="Engine\Source\Runtime\Serialization\Serializer.h" />
+    <ClInclude Include="Engine\Source\Runtime\SlateCore\Input\Events.h" />
+    <ClInclude Include="Engine\Source\Runtime\SlateCore\Widgets\SWindow.h" />
+    <ClInclude Include="Engine\Source\Runtime\Slate\Widgets\Layout\SSplitter.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\D3D11RHI\DXDBufferManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\D3D11RHI\DXDShaderManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\D3D11RHI\GraphicDevice.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\RawInput.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\AnimationSubEngine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\SubEngine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ImGuiSubWindow.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\SkeletalSubEngine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\SubRenderer.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\WindowsCursor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\WindowsPlatformTime.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\Audio.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\BufferHelpers.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\CommonStates.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\DDSTextureLoader.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\DirectXHelpers.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\Effects.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\GamePad.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\GeometricPrimitive.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\GraphicsMemory.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\Keyboard.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\Model.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\Mouse.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\PostProcess.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\PrimitiveBatch.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\ScreenGrab.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\SimpleMath.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\SimpleMath.inl" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\SpriteBatch.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\SpriteFont.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\VertexTypes.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\WICTextureLoader.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\DirectXTK\Include\DirectXTK\XboxDDSTextureLoader.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxalloc.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxarch.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxdebug.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxnew.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxstdcompliant.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\arch\fbxtypes.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxarray.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxbitset.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxcharptrset.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxcontainerallocators.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxdynamicarray.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxfile.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxfolder.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxhashmap.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxintrusivelist.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxmap.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxmemorypool.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxmultimap.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxpair.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxredblacktree.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxset.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxstatus.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxstring.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxstringlist.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxtime.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxtimecode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\base\fbxutils.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxclassid.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxconnectionpoint.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxdatatypes.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxemitter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxevent.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxeventhandler.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxlistener.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxloadingstrategy.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxmanager.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxmodule.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxobject.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxperipheral.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxplugin.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxplugincontainer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxproperty.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxpropertydef.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxpropertyhandle.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxpropertypage.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxpropertytypes.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxquery.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxqueryevent.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxscopedloadingdirectory.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxscopedloadingfilename.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxstream.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxsymbol.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxsystemunit.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\fbxxref.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxaffinematrix.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxdualquaternion.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxmath.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxmatrix.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxquaternion.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxtransforms.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxvector2.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\math\fbxvector4.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\sync\fbxatomic.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\sync\fbxclock.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\sync\fbxsync.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\core\sync\fbxthread.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fbxsdk_def.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fbxsdk_nsbegin.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fbxsdk_nsend.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fbxsdk_version.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladaanimationelement.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladaelement.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladaiostream.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladanamespace.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladatokens.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxcolladautils.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxreadercollada14.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\collada\fbxwritercollada14.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxbase64coder.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxcallbacks.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxexporter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxexternaldocreflistener.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxfiletokens.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxglobalcamerasettings.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxgloballightsettings.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxglobalsettings.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxgobo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbximporter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxiobase.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxiopluginregistry.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxiosettings.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxiosettingspath.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxprogress.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxreader.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxstatistics.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxstatisticsfbx.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbxwriter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxio.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxreaderfbx5.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxreaderfbx6.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxreaderfbx7.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxwriterfbx5.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxwriterfbx6.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\fileio\fbx\fbxwriterfbx7.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimcurve.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimcurvebase.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimcurvefilters.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimcurvenode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimevalclassic.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimevalstate.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimevaluator.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimlayer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimstack.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\animation\fbxanimutilities.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxcharacter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxcharacternodename.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxcharacterpose.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraint.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintaim.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintcustom.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintparent.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintposition.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintrotation.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintscale.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintsinglechainik.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxconstraintutils.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxcontrolset.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\constraint\fbxhik2fbxcharacter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxaudio.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxaudiolayer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxaxissystem.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxcollection.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxcollectionexclusive.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxcontainer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxcontainertemplate.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxdisplaylayer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxdocument.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxdocumentinfo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxenvironment.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxgroupname.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxlibrary.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxmediaclip.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxobjectfilter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxobjectmetadata.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxobjectscontainer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxpose.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxreference.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxscene.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxselectionnode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxselectionset.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxtakeinfo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxthumbnail.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\fbxvideo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxblendshape.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxblendshapechannel.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcache.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcachedeffect.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcamera.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcamerastereo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcameraswitcher.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxcluster.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxdeformer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxgenericnode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxgeometry.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxgeometrybase.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxgeometryweightedmap.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxlayer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxlayercontainer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxlight.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxlimitsutilities.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxline.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxlodgroup.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxmarker.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxmesh.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnodeattribute.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnull.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnurbs.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnurbscurve.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxnurbssurface.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxopticalreference.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxpatch.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxproceduralgeometry.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxshape.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxskeleton.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxskin.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxsubdeformer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxsubdiv.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxtrimnurbssurface.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxvertexcachedeformer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\geometry\fbxweightedmapping.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxbindingoperator.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxbindingsentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxbindingtable.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxbindingtablebase.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxbindingtableentry.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxconstantentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxfiletexture.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbximplementation.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbximplementationfilter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbximplementationutils.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxlayeredtexture.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxlayerentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxoperatorentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxproceduraltexture.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxpropertyentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxsemanticentryview.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxshadingconventions.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxsurfacelambert.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxsurfacematerial.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxsurfacematerialutils.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxsurfacephong.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\scene\shading\fbxtexture.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxclonemanager.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxdeformationsevaluator.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxembeddedfilesaccumulator.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxgeometryconverter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxmanipulators.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxmaterialconverter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxnamehandler.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxprocessor.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxprocessorshaderdependency.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxprocessorxref.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxprocessorxrefuserlib.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategy.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategybase.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategyfbx5.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategyfbx6.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategyfbx7.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrenamingstrategyutilities.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxrootnodeutility.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxscenecheckutility.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\fbxsdk\utils\fbxusernotification.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\c14n.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\catalog.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\chvalid.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\debugXML.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\dict.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\encoding.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\entities.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\globals.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\hash.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\HTMLparser.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\HTMLtree.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\list.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\nanoftp.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\nanohttp.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\parser.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\parserInternals.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\pattern.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\relaxng.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\SAX.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\SAX2.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\schemasInternals.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\schematron.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\threads.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\tree.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\uri.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\valid.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xinclude.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xlink.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlautomata.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlerror.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlexports.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlIO.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlmemory.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlmodule.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlreader.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlregexp.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlsave.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlschemas.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlschemastypes.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlstring.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlunicode.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlversion.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xmlwriter.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xpath.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xpathInternals.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\FBX\include\libxml2\libxml\xpointer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_codec.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_common.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_dsp.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_dsp_effects.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_errors.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\fmod\inc\fmod_output.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\GraphEditor.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imconfig.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImCurveEdit.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImGradient.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImGuizmo.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_bezier.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_curve.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_internal.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_neo_internal.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imgui_neo_sequencer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\ImSequencer.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\ImGui\include\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\Json\include\Json\json.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\Lua\include\lauxlib.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\Lua\include\lua.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\Lua\include\lua.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\Lua\include\luaconf.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\Lua\include\lualib.h" />
+    <ClInclude Include="Engine\Source\ThirdParty\sol2\include\sol\config.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\sol2\include\sol\forward.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\sol2\include\sol\sol.hpp" />
+    <ClInclude Include="Engine\Source\ThirdParty\tinyfiledialogs\include\tinyfiledialogs.h" />
+    <ClInclude Include="LuaScripts\LuaBindingHelpers.h" />
+    <ClInclude Include="LuaScripts\LuaScriptComponent.h" />
+    <ClInclude Include="LuaScripts\LuaScriptFileUtils.h" />
+    <ClInclude Include="MyAnimInstance.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\SkeletalMeshDebugger.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\Skeleton.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\Mesh\SkeletalMesh.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\SkeletalMeshRenderPass.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\StateMachine.h" />
+    <ClInclude Include="StateMachineAnimInstance.h" />
+    <None Include="Shaders\EditorShaderConstants.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Shaders\ShaderConstants.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Font\IconDefs.h" />
+    <ClInclude Include="Font\RawFonts.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".editorconfig" />
+    <Content Include="Engine\Source\ThirdParty\DirectXTK\Lib\x64\Debug\DirectXTK.lib" />
+    <Content Include="Engine\Source\ThirdParty\DirectXTK\Lib\x64\Release\DirectXTK.lib" />
+    <Content Include="Engine\Source\ThirdParty\DirectXTK\Lib\x86\Debug\DirectXTK.lib" />
+    <Content Include="Engine\Source\ThirdParty\DirectXTK\Lib\x86\Release\DirectXTK.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\FBX_SDK_Online_Documentation.html" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Debug\alembic.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Debug\libfbxsdk.dll" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Debug\libfbxsdk.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Debug\libxml2.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Debug\zlib.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Release\alembic.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Release\libfbxsdk.dll" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Release\libfbxsdk.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Release\libxml2.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\lib\x64\Release\zlib.lib" />
+    <Content Include="Engine\Source\ThirdParty\FBX\License.rtf" />
+    <Content Include="Engine\Source\ThirdParty\FBX\readme.txt" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x64\fmod.dll" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x64\fmodL.dll" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x64\fmodL_vc.lib" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x64\fmod_vc.lib" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x86\fmod.dll" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x86\fmodL.dll" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x86\fmodL_vc.lib" />
+    <Content Include="Engine\Source\ThirdParty\fmod\lib\x86\fmod_vc.lib" />
+    <Content Include="Engine\Source\ThirdParty\Lua\bin\Debug\lua.dll" />
+    <Content Include="Engine\Source\ThirdParty\Lua\bin\Debug\lua.pdb" />
+    <Content Include="Engine\Source\ThirdParty\Lua\bin\Release\lua.dll" />
+    <Content Include="Engine\Source\ThirdParty\Lua\bin\Release\lua.pdb" />
+    <Content Include="Engine\Source\ThirdParty\Lua\lib\Debug\lua.lib" />
+    <Content Include="Engine\Source\ThirdParty\Lua\lib\Release\lua.lib" />
+    <Content Include="Engine\Source\ThirdParty\tinyfiledialogs\include\README.txt" />
+    <Content Include="LuaScripts\template.lua" />
+    <Natvis Include="RandEngine.natvis" />
+    <Natvis Include="Engine\Source\ThirdParty\sol2\sol2.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LightGridGenerator.cpp" />
+    <ClInclude Include="LightGridGenerator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\SkeletalMeshVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mainVS</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mainVS</EntryPointName>
+    </FxCompile>
+    <None Include="Shaders\CameraEffectShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <FxCompile Include="Shaders\CascadedShadowMap.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\DepthCubeMapVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\DepthOnlyVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\LightPBR.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\PointLightCubemapGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <None Include="Shaders\StaticMeshPixelShaderWorldTangent.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Engine\Source\ThirdParty\fmod\inc\fmod.cs" />
+    <Compile Include="Engine\Source\ThirdParty\fmod\inc\fmod_dsp.cs" />
+    <Compile Include="Engine\Source\ThirdParty\fmod\inc\fmod_errors.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RandEngine.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Editor\Icon\RandEngine.ico" />
+    <Image Include="Assets\Editor\Icon\RandEngine1.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

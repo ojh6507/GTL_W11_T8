@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <!-- FString Visualizer -->
+    <!--<Type Name="FString">
+        <Intrinsic Name="Num" Expression="PrivateString._Mypair._Myval2._Mysize" />
+        <Intrinsic Name="Len" Expression="PrivateString._Mypair._Myval2._Myres" />
+        <DisplayString Condition="Num() == 0 &amp;&amp; Len() == 0">Empty</DisplayString>
+        <DisplayString Condition="Num() == 0 &amp;&amp; Len() &gt; 0">Empty, Max={Len()}</DisplayString>
+        <DisplayString Condition="Num() &lt; 0">Invalid</DisplayString>
+        <DisplayString Condition="Len() &lt; Num()">Invalid</DisplayString>
+        <DisplayString Condition="Len() &gt;= Num()">{PrivateString._Mypair._Myval2._Bx._Alias}</DisplayString>
+        <StringView Condition="Len() &gt;= Num()">PrivateString._Mypair._Myval2._Bx._Alias</StringView>
+    </Type>-->
+
+    <!-- FName Visualizer -->
+    <Type Name="FName">
+        <Intrinsic Name="GetDisplayName" Expression="GDebugNamePool.DisplayPool.ContainerPrivate">
+            <Parameter Name="Hash" Type="int" />
+        </Intrinsic>
+        <DisplayString Condition="DisplayIndex == 0">"None"</DisplayString>
+        <DisplayString Condition="DisplayIndex != 0">{*ToString()}</DisplayString>
+        <Expand>
+            <Item Name="DisplayIndex">DisplayIndex</Item>
+            <Item Name="ComparisonIndex">ComparisonIndex</Item>
+        </Expand>
+    </Type>
+
+    <!-- TArray Visualizer -->
+    <Type Name="TArray&lt;*,*&gt;">
+        <Intrinsic Name="Num" Expression="ContainerPrivate._Mypair._Myval2._Mylast - ContainerPrivate._Mypair._Myval2._Myfirst"/>
+        <Intrinsic Name="Max" Expression="ContainerPrivate.capacity()"/>
+        <DisplayString Condition="Num() == 0 &amp;&amp; Max() == 0">Empty</DisplayString>
+        <DisplayString Condition="Num() == 0 &amp;&amp; Max() &gt; 0">Empty, Max={Max()}</DisplayString>
+        <DisplayString Condition="Num() &lt; 0">Invalid</DisplayString>
+        <DisplayString Condition="Max() &lt; Num()">Invalid</DisplayString>
+        <DisplayString Condition="Max() &gt;= Num()">Num={Num()}, Max={Max()}</DisplayString>
+        <Expand>
+        <ArrayItems>
+            <Size>(Num() &lt;= Max()) ? Num() : 0</Size>
+            <ValuePointer>(TArray&lt;$T1,$T2&gt;::ElementType*)ContainerPrivate._Mypair._Myval2._Myfirst</ValuePointer>
+        </ArrayItems>
+        </Expand>
+    </Type>
+
+    <!-- TSet Visualizer -->
+    <Type Name="TSet&lt;*,*,*&gt;">
+        <Intrinsic Name="Num" Expression="ContainerPrivate._List._Mypair._Myval2._Mysize"/>
+        <DisplayString Condition="Num() == 0">Empty</DisplayString>
+        <DisplayString Condition="Num() &gt; 0">Num={Num()}</DisplayString>
+    </Type>
+
+    <!-- FVector Visualizer -->
+    <Type Name="FVector">
+        <DisplayString>{{X={X} Y={Y} Z={Z}}}</DisplayString>
+        <Expand>
+        <Item Name="X">X</Item>
+        <Item Name="Y">Y</Item>
+        <Item Name="Z">Z</Item>
+        <Item Name="||V||&#xB2;">X*X + Y*Y + Z*Z</Item>
+        </Expand>
+    </Type>
+
+    <!-- FVector4 Visualizer -->
+    <Type Name="FVector4">
+        <DisplayString>{{X={X} Y={Y} Z={Z} W={W}}}</DisplayString>
+        <Expand>
+        <Item Name="X">X</Item>
+        <Item Name="Y">Y</Item>
+        <Item Name="Z">Z</Item>
+        <Item Name="W">W</Item>
+        <Item Name="||V||&#xB2;">X*X + Y*Y + Z*Z + W*W</Item>
+        </Expand>
+    </Type>
+
+    <!-- FQuat Visualizer -->
+    <Type Name="FQuat">
+        <DisplayString>{{X={X} Y={Y} Z={Z} W={W}}}</DisplayString>
+        <Expand>
+        <Item Name="X">X</Item>
+        <Item Name="Y">Y</Item>
+        <Item Name="Z">Z</Item>
+        <Item Name="W">W</Item>
+        <Item Name="||Q||&#xB2;">X*X + Y*Y + Z*Z + W*W</Item>
+        </Expand>
+    </Type>
+
+    <!-- UObject Visualizer -->
+    <Type Name="UObject">
+        <DisplayString>(Name={NamePrivate}, UUID={UUID})</DisplayString>
+    </Type>
+
+    <!-- AActor Visualizer -->
+    <Type Name="AActor">
+        <DisplayString Condition="ActorLabel.PrivateString.size() != 0">(ActorLabel={ActorLabel}, Name={NamePrivate}, UUID={UUID})</DisplayString>
+        <DisplayString>(Name={NamePrivate}, UUID={UUID})</DisplayString>
+    </Type>
+
+    <!-- UActorComponent Visualizer -->
+    <Type Name="UActorComponent">
+        <DisplayString>(Name={NamePrivate}, UUID={UUID}, Owner={OwnerPrivate})</DisplayString>
+    </Type>
+
+</AutoVisualizer>
