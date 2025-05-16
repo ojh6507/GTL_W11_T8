@@ -24,14 +24,14 @@ void FSpriteParticleRenderPass::Initialize(FDXDBufferManager* InBufferManager, F
 
 void FSpriteParticleRenderPass::PrepareRenderArr()
 {
-    /*ParticleComps.Empty();
+    ParticleComps.Empty();
     for (const auto iter : TObjectRange<UParticleSystemComponent>())
     {
-        if (iter->GetWorld() == GEngine->ActiveWorld)
+        if (iter->GetWorld() == GEngine->ActiveWorld) //TODO: Sprite 조건 추가
         {
             ParticleComps.Add(iter);
         }
-    }*/
+    }
 }
 
 void FSpriteParticleRenderPass::UpdateCameraConstant(const FVector& CameraUp, const FVector& CameraRight) const
@@ -53,12 +53,15 @@ void FSpriteParticleRenderPass::PrepareRender()
 void FSpriteParticleRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     PrepareRender();
-
+    for (const auto& Particle : ParticleComps)
+    {
+        //Render
+    }
 }
 
 void FSpriteParticleRenderPass::ClearRenderArr()
 {
-    //ParticleComps.Empty();
+    ParticleComps.Empty();
 }
 
 void FSpriteParticleRenderPass::PrepareShader() const

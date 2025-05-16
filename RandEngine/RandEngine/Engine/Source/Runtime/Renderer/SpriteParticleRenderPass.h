@@ -3,6 +3,7 @@
 #include "Define.h"
 #include "IRenderPass.h"
 #include "EngineBaseTypes.h"
+#include "Classes/Particle/ParticleSystemComponent.h"
 
 struct FSpriteParticleCameraConstants
 {
@@ -35,7 +36,7 @@ public:
     void CreateShader();
 
 protected:
-    //TArray<UParticleSystemComponent*> ParticleComps;
+    TArray<UParticleSystemComponent*> ParticleComps;
 
 private:
     FDXDBufferManager* BufferManager;
