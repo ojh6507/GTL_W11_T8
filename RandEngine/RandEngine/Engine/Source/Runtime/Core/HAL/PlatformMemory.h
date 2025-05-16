@@ -30,6 +30,16 @@ private:
     static void DecrementStats(size_t Size);
 
 public:
+    static void* Memset(void* Dest, uint8 Char, uint64 Length)
+    {
+        return std::memset(Dest, Char, Length);
+    }
+
+    static void* MemZero(void* Dest, uint64 Length)
+    {
+        return std::memset(Dest, 0, Length);
+    }
+
     static void* Memcpy(void* Dest, const void* Src, uint64 Length)
     {
         return std::memcpy(Dest, Src, Length);
