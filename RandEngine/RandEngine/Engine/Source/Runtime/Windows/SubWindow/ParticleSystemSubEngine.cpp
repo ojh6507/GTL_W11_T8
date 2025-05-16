@@ -5,6 +5,7 @@
 #include "UnrealClient.h"
 #include "Actors/Cube.h"
 #include "Animation/Skeleton.h"
+#include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
 UParticleSystemSubEngine::UParticleSystemSubEngine()
 {
@@ -111,16 +112,17 @@ void UParticleSystemSubEngine::Render()
 
         SubRenderer->PrepareRender(ViewportClient);
         SubRenderer->Render();
-        SubRenderer->ClearRender();
 
         // Sub window rendering
         SubUI->BeginFrame();
 
-        UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
+        reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get())->PrepareRender(ViewportClient);
 
+        UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
         SubUI->EndFrame();
 
         // Sub swap
+        SubRenderer->ClearRender();
         Graphics->SwapBuffer();
     }
 }
