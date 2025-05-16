@@ -1665,6 +1665,14 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ParticleSystemViewerPanel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleEmitterInstances.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleLODLevel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleColor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSize.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleVelocity.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="RandEngine.natvis" />
@@ -2027,6 +2035,16 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ParticleSystemViewerPanel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleEmitter.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleEmitterInstances.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleHelper.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleLODLevel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleColor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSize.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleVelocity.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystemComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />
