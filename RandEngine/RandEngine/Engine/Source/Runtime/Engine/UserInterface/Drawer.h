@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "GameFramework/Actor.h"
 #include "PropertyEditor/IWindowToggleable.h"
 #include "UnrealEd/EditorPanel.h"
@@ -24,7 +24,8 @@ public:
     void Render(float DeltaTime);
     void OnResize(HWND hWnd) override;
 
-    void RenderContentDrawer();
+    void RenderSkeletalMeshContentDrawer();
+    void RenderParticleSytemContentDrawer();
 private:
     bool bIsOpen = false;
 
