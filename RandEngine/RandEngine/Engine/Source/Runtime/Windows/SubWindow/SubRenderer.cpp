@@ -283,10 +283,12 @@ void FSubRenderer::PrepareStaticRenderArr(FEditorViewportClient* Viewport)
     //         StaticMeshComponents.Add(iter);
     // }
     if (Cast<USkeletalSubEngine>(Engine))
+    {
         StaticMeshComponents.Add(Cast<USkeletalSubEngine>(Engine)->BasePlane->GetStaticMeshComponent());
+        StaticMeshComponents.Add(Cast<USkeletalSubEngine>(Engine)->UnrealSphereComponent);
+    }
     else if (Cast<UAnimationSubEngine>(Engine))
         StaticMeshComponents.Add(Cast<UAnimationSubEngine>(Engine)->BasePlane->GetStaticMeshComponent());
-    StaticMeshComponents.Add(Cast<USkeletalSubEngine>(Engine)->UnrealSphereComponent);
 }
 
 void FSubRenderer::RenderStaticMesh()

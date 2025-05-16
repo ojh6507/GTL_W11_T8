@@ -21,19 +21,9 @@ USkeletalSubEngine::~USkeletalSubEngine()
 void USkeletalSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphics, FDXDBufferManager* InBufferManager, UImGuiManager* InSubWindow,
                                     UnrealEd* InUnrealEd)
 {
-    Graphics = InGraphics;
-    BufferManager = InBufferManager;
-    Wnd = &hWnd;
-    SubRenderer = new FSubRenderer;
-    UnrealEditor = InUnrealEd;
-    SubUI = new FImGuiSubWindow(hWnd, InGraphics->Device, InGraphics->DeviceContext);
-    UImGuiManager::ApplySharedStyle(InSubWindow->GetContext(), SubUI->Context);
-    SubRenderer->Initialize(InGraphics, InBufferManager, this);
+    Super::Initialize(hWnd, InGraphics, InBufferManager, InSubWindow, InUnrealEd);
 
-    ViewportClient = new FEditorViewportClient();
-    ViewportClient->Initialize(EViewScreenLocation::EVL_MAX, FRect(0,0,800,600),this);
-    ViewportClient->CameraReset();
-    ViewportClient->FarClip = 1000000;
+    
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL); 
     SkeletalMeshActor = FObjectFactory::ConstructObject<ASkeletalMeshActor>(this);

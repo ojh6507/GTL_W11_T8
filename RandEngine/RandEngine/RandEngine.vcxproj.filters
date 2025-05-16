@@ -1658,6 +1658,7 @@
     <ClCompile Include="StateMachineAnimInstance.cpp" />
     <ClCompile Include="Engine\Source\Contents\Actors\ARandCharacter.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="RandEngine.natvis" />
@@ -2013,6 +2014,7 @@
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelineCommon.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\ARandCharacter.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

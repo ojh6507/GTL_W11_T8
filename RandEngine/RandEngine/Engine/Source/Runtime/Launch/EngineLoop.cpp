@@ -13,10 +13,14 @@
 #include "Renderer/TileLightCullingPass.h"
 #include "resource.h"
 #include "SoundManager.h"
-#include "SubWindow/AnimationSubEngine.h"
+
 #include "SubWindow/SubEngine.h"
 #include "SubWindow/ImGuiSubWindow.h"
 #include "SubWindow/SkeletalSubEngine.h"
+#include "SubWindow/AnimationSubEngine.h"
+#include "SubWindow/ParticleSystemSubEngine.h"
+
+
 #include "UserInterface/Drawer.h"
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -24,6 +28,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 FGraphicsDevice FEngineLoop::GraphicDevice;
 FGraphicsDevice FEngineLoop::SkeletalViewerGD;
 FGraphicsDevice FEngineLoop::AnimationViewerGD;
+FGraphicsDevice FEngineLoop::ParticleSystemViewerGD;
 FRenderer FEngineLoop::Renderer;
 UPrimitiveDrawBatch FEngineLoop::PrimitiveDrawBatch;
 FResourceMgr FEngineLoop::ResourceManager;
@@ -102,6 +107,7 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
 
     SkeletalSubWindowInit(hInstance);
     AnimationSubWindowInit(hInstance);
+    ParticleSystemSubWindowInit(hInstance);
     if (SkeletalViewerWnd)
     {
         SkeletalViewerGD.Initialize(SkeletalViewerWnd, GraphicDevice.Device);
@@ -116,11 +122,22 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
         AnimationViewerGD.ClearColor[1] = 0.025f;
         AnimationViewerGD.ClearColor[2] = 0.025f;
     }
-    SkeletalViewerSubEngine = FObjectFactory::ConstructObject<USkeletalSubEngine>(nullptr);
-    SkeletalViewerSubEngine->Initialize(SkeletalViewerWnd, &SkeletalViewerGD, BufferManager,FUIManager,UnrealEditor);
-    AnimationViewerSubEngine =  FObjectFactory::ConstructObject<UAnimationSubEngine>(nullptr);
-    AnimationViewerSubEngine->Initialize(AnimationViewerWnd, &AnimationViewerGD, BufferManager,FUIManager,UnrealEditor);
+    if (ParticleSystemViewerWnd)
+    {
+        ParticleSystemViewerGD.Initialize(ParticleSystemViewerWnd, GraphicDevice.Device);
+        ParticleSystemViewerGD.ClearColor[0] = 0.025f;
+        ParticleSystemViewerGD.ClearColor[1] = 0.025f;
+        ParticleSystemViewerGD.ClearColor[2] = 0.025f;
+    }
     
+    SkeletalViewerSubEngine = FObjectFactory::ConstructObject<USkeletalSubEngine>(nullptr);
+    AnimationViewerSubEngine =  FObjectFactory::ConstructObject<UAnimationSubEngine>(nullptr);
+    ParticleSystemViewerSubEngine = FObjectFactory::ConstructObject<UParticleSystemSubEngine>(nullptr);
+
+    SkeletalViewerSubEngine->Initialize(SkeletalViewerWnd, &SkeletalViewerGD, BufferManager,FUIManager,UnrealEditor);
+    AnimationViewerSubEngine->Initialize(AnimationViewerWnd, &AnimationViewerGD, BufferManager,FUIManager,UnrealEditor);
+    ParticleSystemViewerSubEngine->Initialize(ParticleSystemViewerWnd, &ParticleSystemViewerGD, BufferManager, FUIManager, UnrealEditor);
+
     FSoundManager::GetInstance().Initialize();
     FSoundManager::GetInstance().LoadSound("rifle-gunshot", "Contents/Sounds/rifle-gunshot.mp3");
     FSoundManager::GetInstance().LoadSound("FootStep", "Contents/Sounds/Player_Footstep_08.wav");
@@ -194,10 +211,23 @@ void FEngineLoop::OpenSkeletalViewer()
     }
 }
 
+void FEngineLoop::OpenParticleSystemViewer()
+{
+    if( ParticleSystemViewerSubEngine->bIsShowSubWindow)
+    {
+        if (ParticleSystemViewerWnd)
+        {
+            ::ShowWindow(ParticleSystemViewerWnd, SW_SHOW);
+        }
+        ParticleSystemViewerSubEngine->bIsShowSubWindow = false;
+    }
+}
+
 void FEngineLoop::SubEngineControl()
 {
     OpenSkeletalViewer();
     OpenAnimationViewer();
+    OpenParticleSystemViewer();
     if (bRepositionAnimWindow)
     {
         AnimationViewerSubEngine->RequestShowWindow(true);
@@ -298,6 +328,14 @@ void FEngineLoop::Tick()
                 DispatchMessage(&Msg);
             }
         }
+        if (!bIsExit && ParticleSystemViewerWnd && IsWindowVisible(ParticleSystemViewerWnd))
+        {
+            while (PeekMessage(&Msg, ParticleSystemViewerWnd, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&Msg);
+                DispatchMessage(&Msg);
+            }
+        }
         // Engine loop Break
         if (bIsExit) break;
 
@@ -313,6 +351,8 @@ void FEngineLoop::Tick()
             AnimationViewerSubEngine->Tick(DeltaTime);
         if (SkeletalViewerSubEngine->bIsShowing)
             SkeletalViewerSubEngine->Tick(DeltaTime);
+        if (ParticleSystemViewerSubEngine->bIsShowing)
+            ParticleSystemViewerSubEngine->Tick(DeltaTime);
         /** Sub window render */
         // RenderSubWindow();
 
@@ -358,6 +398,7 @@ void FEngineLoop::Exit()
 {
     SkeletalViewerSubEngine->Release();
     AnimationViewerSubEngine->Release();
+    ParticleSystemViewerSubEngine->Release();
     CleanupSubWindow();
     
     LevelEditor->Release();
@@ -398,7 +439,8 @@ void FEngineLoop::CleanupSubWindow()
     
     if (AnimationViewerGD.Device)
         AnimationViewerGD.Release();
-    
+    if (ParticleSystemViewerGD.Device)
+        ParticleSystemViewerGD.Release();
 }
 
 void FEngineLoop::WindowInit(HINSTANCE hInstance)
@@ -512,6 +554,49 @@ void FEngineLoop::AnimationSubWindowInit(HINSTANCE hInstance)
     }
 }
 
+void FEngineLoop::ParticleSystemSubWindowInit(HINSTANCE hInstance)
+{
+    WCHAR SubWindowClass[] = L"JungleParticleWindowClass";
+    WCHAR SubTitle[] = L"Viewer";
+
+    WNDCLASSEXW wcexSub = {}; // WNDCLASSEXW 사용 권장
+    wcexSub.cbSize = sizeof(WNDCLASSEX);
+    wcexSub.style = CS_HREDRAW | CS_VREDRAW; // | CS_DBLCLKS 등 필요시 추가
+    wcexSub.lpfnWndProc = AppWndProc; // 서브 윈도우 프로시저 지정
+    wcexSub.cbClsExtra = 0;
+    wcexSub.cbWndExtra = 0;
+    wcexSub.hInstance = hInstance;
+    wcexSub.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcexSub.lpszMenuName = nullptr;
+    wcexSub.lpszClassName = SubWindowClass;
+    wcexSub.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
+    if (!RegisterClassExW(&wcexSub))
+    {
+        // 오류 처리
+        UE_LOG(ELogLevel::Error, TEXT("Failed to register sub window class!"));
+        return;
+    }
+
+    // 서브 윈도우 생성 (크기, 위치, 스타일 조정 필요)
+    // WS_OVERLAPPEDWINDOW 는 타이틀 바, 메뉴, 크기 조절 등이 포함된 일반적인 창
+    // WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME 등으로 커스텀 가능
+    ParticleSystemViewerWnd = CreateWindowExW(
+        0, SubWindowClass, SubTitle, WS_OVERLAPPEDWINDOW, // WS_VISIBLE 제거 (초기에는 숨김)
+        CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, // 원하는 크기
+        nullptr, // 부모 윈도우를 메인 윈도우로 설정 (선택 사항)
+        nullptr, hInstance, nullptr
+    );
+
+    if (!ParticleSystemViewerWnd)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("Failed to create sub window!"));
+    }
+    else
+    {
+
+    }
+}
+
 LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, LPARAM lParam)
 {
     if (hWnd == GEngineLoop.AppWnd)
@@ -602,7 +687,47 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             return DefWindowProc(hWnd, Msg, wParam, lParam);
         }
     }
+    else if (hWnd == GEngineLoop.ParticleSystemViewerWnd)
+    {
+        ImGui::SetCurrentContext(GEngineLoop.ParticleSystemViewerSubEngine->SubUI->Context);
 
+        if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam)) return true;
+
+        /** SubWindow Msg */
+        switch (Msg)
+        {
+        case WM_SIZE:
+            if (wParam != SIZE_MINIMIZED)
+            {
+                RECT ClientRect;
+                GetClientRect(hWnd, &ClientRect);
+
+                float FullWidth = static_cast<float>(ClientRect.right - ClientRect.left);
+                float FullHeight = static_cast<float>(ClientRect.bottom - ClientRect.top);
+
+                if (GEngineLoop.GetUnrealEditor())
+                {
+                    ParticleSystemViewerGD.Resize(hWnd, FullWidth, FullHeight);
+                    GEngineLoop.GetUnrealEditor()->OnResize(hWnd, EWindowType::WT_ParticleSubWindow);
+                }
+                GEngineLoop.ParticleSystemViewerSubEngine->ViewportClient->AspectRatio = (FullWidth * 0.75f) / FullHeight;
+            }
+            return 0;
+        case WM_CLOSE:
+            GEngineLoop.ParticleSystemViewerSubEngine->ViewportClient->CameraReset();
+            GEngineLoop.ParticleSystemViewerSubEngine->RequestShowWindow(false);
+            ::ShowWindow(hWnd, SW_HIDE);
+            return 0;
+
+        case WM_ACTIVATE:
+            if (ImGui::GetCurrentContext() == nullptr) break;
+            ImGui::SetCurrentContext(GEngineLoop.ParticleSystemViewerSubEngine->SubUI->Context);
+            GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
+            return 0;
+        default:
+            return DefWindowProc(hWnd, Msg, wParam, lParam);
+        }
+    }
     /** Main Window Msg */
     switch (Msg)
         {
