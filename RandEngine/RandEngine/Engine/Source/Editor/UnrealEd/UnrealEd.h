@@ -20,10 +20,12 @@ public:
     std::shared_ptr<UEditorPanel> GetEditorPanel(const FString& PanelId);
     std::shared_ptr<UEditorPanel> GetSubSkeletalPanel(const FString& PanelId);
     std::shared_ptr<UEditorPanel> GetSubAnimationPanel(const FString& PanelId);
+    std::shared_ptr<UEditorPanel> GetSubParticlePanel(const FString& PanelId);
 
 private:
     TMap<FString, std::shared_ptr<UEditorPanel>> Panels;
     TMap<FString, std::shared_ptr<UEditorPanel>> SkeletalSubPanels;
     TMap<FString, std::shared_ptr<UEditorPanel>> AnimationSubPanels;
+    TMap<FString, std::shared_ptr<UEditorPanel>> ParticleSubPanels;
 };
 

@@ -207,6 +207,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Source\Contents\Actors\ARandCharacter.cpp" />
+    <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ParticleSystemViewerPanel.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\AnimationRuntime.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalDetailPanel.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.cpp" />
@@ -515,6 +516,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
     <ClInclude Include="Engine\Source\Contents\Actors\ARandCharacter.h" />
     <ClInclude Include="Engine\Source\Developer\AnimationUtils\AnimationUtils.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelineCommon.h" />
+    <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ParticleSystemViewerPanel.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\AnimationRuntime.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\SkeletalDetailPanel.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.h" />
