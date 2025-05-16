@@ -22,13 +22,8 @@
 void AEditorPlayer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    if (GetOuter() == GEngine)
-        ActiveViewport = GEngineLoop.GetLevelEditor()->GetActiveViewportClient().get();
-    else
-    {
-        UObject* Outer = GetOuter();
-        ActiveViewport = Cast<USubEngine>(Outer)->ViewportClient;
-    }
+    ActiveViewport = GEngineLoop.GetLevelEditor()->GetActiveViewportClient().get();
+
     Input();
 }
 
@@ -41,7 +36,7 @@ void AEditorPlayer::Input()
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
     {
         if (!bLeftMouseDown)
-        {   
+        {
             bLeftMouseDown = true;
 
             POINT mousePos;
@@ -109,20 +104,27 @@ void AEditorPlayer::ProcessGizmoIntersection(UStaticMeshComponent* Component, co
             InActiveViewport->SetPickedGizmoComponent(Component);
             bIsPickedGizmo = true;
         }
+        else if (currentIntersectCount > 0)
+        {
+            maxIntersect = currentIntersectCount;
+            //GetWorld()->SetPickingGizmo(iter);
+            InActiveViewport->SetPickedGizmoComponent(Component);
+            bIsPickedGizmo = true;
+        }
     }
 }
 
 bool AEditorPlayer::PickGizmo(FVector& pickPosition, FEditorViewportClient* InActiveViewport)
 {
     bool isPickedGizmo = false;
-    AActor*  SelectedActor = nullptr;
+    AActor* SelectedActor = nullptr;
+    SelectedActor = Cast<UEditorEngine>(GEngine)->GetSelectedActor();
     if (GEngine == GetOuter())
     {
-        SelectedActor = Cast<UEditorEngine>(GEngine)->GetSelectedActor();
     }
     else
     {
-        SelectedActor = Cast<USkeletalSubEngine>(GetOuter())->SkeletalMeshActor;
+        //SelectedActor = Cast<USkeletalSubEngine>(GetOuter())->SkeletalMeshActor;
     }
     if (SelectedActor)
     {
@@ -162,7 +164,7 @@ void AEditorPlayer::PickActor(const FVector& pickPosition)
     float minDistance = FLT_MAX;
     for (const auto iter : TObjectRange<UPrimitiveComponent>())
     {
-        if(iter->GetWorld() != GEngine->ActiveWorld->GetWorld())
+        if (iter->GetWorld() != GEngine->ActiveWorld->GetWorld())
             continue;
         UPrimitiveComponent* pObj;
         if (iter->IsA<UPrimitiveComponent>() || iter->IsA<ULightComponentBase>())
@@ -203,8 +205,8 @@ void AEditorPlayer::PickActor(const FVector& pickPosition)
         }
         else
         {
-            Cast<USubEngine>(GetOuter())->SelectedActor=Possible->GetOwner();
-            Cast<USubEngine>(GetOuter())->SelectedComponent=Possible;
+            Cast<USubEngine>(GetOuter())->SelectedActor = Possible->GetOwner();
+            Cast<USubEngine>(GetOuter())->SelectedComponent = Possible;
         }
     }
     else
@@ -216,8 +218,8 @@ void AEditorPlayer::PickActor(const FVector& pickPosition)
         }
         else
         {
-            Cast<USubEngine>(GetOuter())->SelectedActor=nullptr;
-            Cast<USubEngine>(GetOuter())->SelectedComponent= nullptr;
+            Cast<USubEngine>(GetOuter())->SelectedActor = nullptr;
+            Cast<USubEngine>(GetOuter())->SelectedComponent = nullptr;
         }
     }
 }
@@ -235,15 +237,15 @@ void AEditorPlayer::AddCoordiMode()
 void AEditorPlayer::ScreenToViewSpace(int32 ScreenX, int32 ScreenY, FEditorViewportClient* ActiveViewport, FVector& RayOrigin)
 {
     FRect Rect = ActiveViewport->GetViewport()->GetRect();
-    
+
     float ViewportX = static_cast<float>(ScreenX) - Rect.TopLeftX;
     float ViewportY = static_cast<float>(ScreenY) - Rect.TopLeftY;
 
     FMatrix ProjectionMatrix = ActiveViewport->GetProjectionMatrix();
-    
+
     RayOrigin.X = ((2.0f * ViewportX / Rect.Width) - 1) / ProjectionMatrix[0][0];
     RayOrigin.Y = -((2.0f * ViewportY / Rect.Height) - 1) / ProjectionMatrix[1][1];
-    
+
     if (ActiveViewport->IsOrthographic())
     {
         RayOrigin.Z = 0.0f;  // 오쏘 모드에서는 unproject 시 near plane 위치를 기준
@@ -254,20 +256,20 @@ void AEditorPlayer::ScreenToViewSpace(int32 ScreenX, int32 ScreenY, FEditorViewp
     }
 }
 
-int AEditorPlayer::RayIntersectsObject(const FVector& PickPosition, USceneComponent* Component, float& HitDistance, int& IntersectCount)
+int AEditorPlayer::RayIntersectsObject(const FVector& PickPosition, const USceneComponent* Component, float& HitDistance, int& IntersectCount)
 {
     FMatrix WorldMatrix = Component->GetWorldMatrix();
     FMatrix ViewMatrix = ActiveViewport->GetViewMatrix();
-    
+
     bool bIsOrtho = ActiveViewport->IsOrthographic();
-    
+
 
     if (bIsOrtho)
     {
         // 오쏘 모드: ScreenToViewSpace()에서 계산된 pickPosition이 클립/뷰 좌표라고 가정
         FMatrix inverseView = FMatrix::Inverse(ViewMatrix);
         // pickPosition을 월드 좌표로 변환
-        FVector worldPickPos = inverseView.TransformPosition(PickPosition);  
+        FVector worldPickPos = inverseView.TransformPosition(PickPosition);
         // 오쏘에서는 픽킹 원점은 unproject된 픽셀의 위치
         FVector rayOrigin = worldPickPos;
         // 레이 방향은 카메라의 정면 방향 (평행)
@@ -277,7 +279,7 @@ int AEditorPlayer::RayIntersectsObject(const FVector& PickPosition, USceneCompon
         FMatrix LocalMatrix = FMatrix::Inverse(WorldMatrix);
         FVector LocalRayOrigin = LocalMatrix.TransformPosition(rayOrigin);
         FVector LocalRayDir = (LocalMatrix.TransformPosition(rayOrigin + orthoRayDir) - LocalRayOrigin).GetSafeNormal();
-        
+
         IntersectCount = Component->CheckRayIntersection(LocalRayOrigin, LocalRayDir, HitDistance);
         return IntersectCount;
     }
@@ -289,7 +291,7 @@ int AEditorPlayer::RayIntersectsObject(const FVector& PickPosition, USceneCompon
         // 퍼스펙티브 모드의 기존 로직 사용
         FVector transformedPick = inverseMatrix.TransformPosition(PickPosition);
         FVector rayDirection = (transformedPick - pickRayOrigin).GetSafeNormal();
-        
+
         IntersectCount = Component->CheckRayIntersection(pickRayOrigin, rayDirection, HitDistance);
 
         if (IntersectCount > 0)
@@ -317,8 +319,8 @@ void AEditorPlayer::PickedObjControl()
     if (GetOuter() == GEngine)
         SelectedActor = Engine->GetSelectedActor();
     else
-        SelectedActor =Cast<USubEngine>(GetOuter())->SelectedActor;
-    
+        SelectedActor = Cast<USubEngine>(GetOuter())->SelectedActor;
+
     // FEditorViewportClient* ActiveViewport = GEngineLoop.GetLevelEditor()->GetActiveViewportClient().get();
     if (SelectedActor && ActiveViewport->GetPickedGizmoComponent())
     {
@@ -327,12 +329,12 @@ void AEditorPlayer::PickedObjControl()
         const float DeltaX = static_cast<float>(CurrentMousePos.x - m_LastMousePos.x);
         const float DeltaY = static_cast<float>(CurrentMousePos.y - m_LastMousePos.y);
 
-        
+
         USceneComponent* TargetComponent;
         if (GEngine == GetOuter())
             TargetComponent = Engine->GetSelectedComponent();
         else
-            TargetComponent =  Cast<USubEngine>(GetOuter())->SelectedComponent;
+            TargetComponent = Cast<USubEngine>(GetOuter())->SelectedComponent;
         if (!TargetComponent)
         {
             if (AActor* SelectedActor = Engine->GetSelectedActor())
@@ -344,7 +346,7 @@ void AEditorPlayer::PickedObjControl()
                 return;
             }
         }
-        
+
         UGizmoBaseComponent* Gizmo = Cast<UGizmoBaseComponent>(ActiveViewport->GetPickedGizmoComponent());
         switch (ControlMode)
         {
@@ -369,8 +371,8 @@ void AEditorPlayer::ControlRotation(USceneComponent* Component, UGizmoBaseCompon
 {
     // const auto ActiveViewport = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
     const FViewportCamera* ViewTransform = ActiveViewport->GetViewportType() == LVT_Perspective
-                                                        ? &ActiveViewport->PerspectiveCamera
-                                                        : &ActiveViewport->OrthogonalCamera;
+        ? &ActiveViewport->PerspectiveCamera
+        : &ActiveViewport->OrthogonalCamera;
 
     FVector CameraForward = ViewTransform->GetForwardVector();
     FVector CameraRight = ViewTransform->GetRightVector();
@@ -415,7 +417,7 @@ void AEditorPlayer::ControlRotation(USceneComponent* Component, UGizmoBaseCompon
         {
             Axis = Component->GetUpVector();
         }
-        
+
         RotationDelta = FQuat(Axis, RotationAmount);
     }
 
@@ -439,7 +441,7 @@ void AEditorPlayer::ControlRotation(USceneComponent* Component, UGizmoBaseCompon
 
         int32 BoneIndex = SkeletalMeshActor->BoneGizmoSceneComponents.Find(Component);
 
-        if (BoneIndex == -1) 
+        if (BoneIndex == -1)
         {
             Component->SetWorldRotation(RotationDelta * CurrentRotation);
             return;
@@ -459,25 +461,25 @@ void AEditorPlayer::ControlRotation(USceneComponent* Component, UGizmoBaseCompon
         {
             SkeletalMesh->UpdateWorldTransforms();
             SkeletalMesh->UpdateAndApplySkinning();
-        } 
+        }
         //Component->SetWorldRotation(RotationDelta * CurrentRotation);
         Component->SetRelativeRotation(LocalRot);
         return;
     }
 
     // 쿼터니언의 곱 순서는 delta * current 가 맞음.
-    Component->SetWorldRotation(RotationDelta * CurrentRotation); 
+    Component->SetWorldRotation(RotationDelta * CurrentRotation);
 }
 
 void AEditorPlayer::ControlScale(USceneComponent* Component, UGizmoBaseComponent* Gizmo, float DeltaX, float DeltaY)
 {
     // const auto ActiveViewport = GEngineLoop.GetLevelEditor()->GetActiveViewportClient();
     const FViewportCamera* ViewTransform = ActiveViewport->GetViewportType() == LVT_Perspective
-                                                        ? &ActiveViewport->PerspectiveCamera
-                                                        : &ActiveViewport->OrthogonalCamera;
+        ? &ActiveViewport->PerspectiveCamera
+        : &ActiveViewport->OrthogonalCamera;
     FVector CameraRight = ViewTransform->GetRightVector();
     FVector CameraUp = ViewTransform->GetUpVector();
-    
+
     // 월드 좌표계에서 카메라 방향을 고려한 이동
     if (Gizmo->GetGizmoType() == UGizmoBaseComponent::ScaleX)
     {
