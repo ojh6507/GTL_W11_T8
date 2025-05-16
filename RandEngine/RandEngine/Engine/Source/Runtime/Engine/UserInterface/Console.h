@@ -6,23 +6,18 @@
 #include "ImGui/imgui.h"
 #include "PropertyEditor/IWindowToggleable.h"
 
-static consteval const char* GetFileName(const char* Path)
+static consteval std::string_view GetFileName(std::string_view PathView)
 {
-    const char* Name = Path;
-    while (*Path)
+    const size_t LastSlash = PathView.find_last_of("/\\");
+    if (LastSlash == std::string_view::npos)
     {
-        if (*Path == '/' || *Path == '\\')
-        {
-            Name = Path + 1;
-        }
-        Path++;
+        return PathView;
     }
-    return Name;
+    return PathView.substr(LastSlash + 1);
 }
 
 #define FILENAME GetFileName(__FILE__)
-#define UE_LOG(Level, Fmt, ...) FConsole::GetInstance().AddLog(Level, "[%s:%d] " Fmt, FILENAME, __LINE__, __VA_ARGS__)
-
+#define UE_LOG(Level, Fmt, ...) FConsole::GetInstance().AddLog(Level, "[%s:%d] " Fmt, FILENAME.data(), __LINE__, __VA_ARGS__)
 
 enum class ELogLevel : uint8
 {

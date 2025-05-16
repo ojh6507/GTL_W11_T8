@@ -38,7 +38,7 @@ public: \
             static_cast<uint32>(alignof(TClass)), \
             TSuperClass::StaticClass(), \
             []() -> UObject* { \
-                void* RawMemory = FPlatformMemory::Malloc<EAT_Object>(sizeof(TClass)); \
+                void* RawMemory = FPlatformMemory::AlignedMalloc<EAT_Object>(sizeof(TClass), alignof(TClass)); \
                 ::new (RawMemory) TClass; \
                 return static_cast<UObject*>(RawMemory); \
             } \
