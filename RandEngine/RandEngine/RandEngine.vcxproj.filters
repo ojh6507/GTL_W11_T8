@@ -1658,6 +1658,12 @@
     <ClCompile Include="StateMachineAnimInstance.cpp" />
     <ClCompile Include="Engine\Source\Contents\Actors\ARandCharacter.cpp" />
     <ClCompile Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModule.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimStateMachineTypes.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleRequired.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSpawn.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -2014,6 +2020,12 @@
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\AnimationTimelineCommon.h" />
     <ClInclude Include="Engine\Source\Contents\Actors\ARandCharacter.h" />
     <ClInclude Include="Engine\Source\Editor\PropertyEditor\Sub\ViewerControlPanel.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModule.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Animation\AnimStateMachineTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleRequired.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSpawn.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.h" />
   </ItemGroup>
   <ItemGroup>
