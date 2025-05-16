@@ -1664,6 +1664,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSpawn.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="RandEngine.natvis" />
@@ -2025,6 +2026,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleSpawn.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLifetime.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleLocation.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

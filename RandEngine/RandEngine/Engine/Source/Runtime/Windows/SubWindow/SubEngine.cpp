@@ -24,7 +24,19 @@ USubEngine::~USubEngine()
 
 void USubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphics, FDXDBufferManager* InBufferManager, UImGuiManager* InSubWindow,UnrealEd* InUnrealEd)
 {
+    Graphics = InGraphics;
+    BufferManager = InBufferManager;
+    Wnd = &hWnd;
+    SubRenderer = new FSubRenderer;
+    UnrealEditor = InUnrealEd;
+    SubUI = new FImGuiSubWindow(hWnd, InGraphics->Device, InGraphics->DeviceContext);
+    UImGuiManager::ApplySharedStyle(InSubWindow->GetContext(), SubUI->Context);
+    SubRenderer->Initialize(InGraphics, InBufferManager, this);
 
+    ViewportClient = new FEditorViewportClient();
+    ViewportClient->Initialize(EViewScreenLocation::EVL_MAX, FRect(0, 0, 800, 600), this);
+    ViewportClient->CameraReset();
+    ViewportClient->FarClip = 1000000;
  
 }
 

@@ -187,7 +187,7 @@ int UStaticMeshComponent::CheckRayIntersection(const FVector& InRayOrigin, const
         FVector v2 = FVector(Vertices[Idx2].X, Vertices[Idx2].Y, Vertices[Idx2].Z);
 
         float HitDistance = FLT_MAX;
-        if (IntersectRayTriangle(InRayOrigin, InRayDirection, v0, v1, v2, HitDistance))
+        if (IntersectRayTriangle(InRayOrigin, InRayDirection, v0, v2, v1, HitDistance))
         {
             OutHitDistance = FMath::Min(HitDistance, OutHitDistance);
             IntersectionNum++;

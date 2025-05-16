@@ -390,6 +390,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
     <ClCompile Include="Engine\Source\Runtime\Windows\D3D11RHI\GraphicDevice.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\RawInput.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\AnimationSubEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SubEngine.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SkeletalSubEngine.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Windows\SubWindow\SubRenderer.cpp" />
@@ -742,6 +743,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
     <ClInclude Include="Engine\Source\Runtime\Windows\D3D11RHI\GraphicDevice.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\RawInput.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\AnimationSubEngine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ParticleSystemSubEngine.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\SubEngine.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\ImGuiSubWindow.h" />
     <ClInclude Include="Engine\Source\Runtime\Windows\SubWindow\SkeletalSubEngine.h" />

@@ -34,6 +34,7 @@ public:
     void Render(float DeltaTime);
     void OpenAnimationViewer();
     void OpenSkeletalViewer();
+    void OpenParticleSystemViewer();
     void SubEngineControl();
     void Tick();
     void Exit();
@@ -62,13 +63,17 @@ public:
     HWND SkeletalViewerWnd;
     static FGraphicsDevice AnimationViewerGD;
     HWND AnimationViewerWnd;
+    static FGraphicsDevice ParticleSystemViewerGD;
+    HWND ParticleSystemViewerWnd;
     void SkeletalSubWindowInit(HINSTANCE hInstance);
     void AnimationSubWindowInit(HINSTANCE hInstance);
+    void ParticleSystemSubWindowInit(HINSTANCE hInstance);
     void CleanupSubWindow();
 
     
     USubEngine* SkeletalViewerSubEngine;
     USubEngine* AnimationViewerSubEngine;
+    USubEngine* ParticleSystemViewerSubEngine;
 private:
     UImGuiManager* FUIManager;
     ImGuiContext* CurrentImGuiContext;

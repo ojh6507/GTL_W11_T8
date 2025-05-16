@@ -87,7 +87,7 @@ void ATransformGizmo::Tick(float DeltaTime)
     {
         return;
     }
-    
+
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
     if (!Engine)
     {
@@ -99,24 +99,27 @@ void ATransformGizmo::Tick(float DeltaTime)
         EditorPlayer = Engine->GetEditorPlayer();
     else
     {
-        EditorPlayer = Cast<USkeletalSubEngine>(GetOuter())->EditorPlayer;
+        if (USkeletalSubEngine* SkeletalSubEngine = Cast<USkeletalSubEngine>(GetOuter()))
+        {
+            EditorPlayer = SkeletalSubEngine->EditorPlayer;
+        }
     }
     if (!EditorPlayer)
     {
         return;
     }
-    
+
     USceneComponent* SelectedComponent = nullptr;
     AActor* SelectedActor = nullptr;
     if (GEngine == GetOuter())
     {
-        SelectedComponent =  Engine->GetSelectedComponent();
+        SelectedComponent = Engine->GetSelectedComponent();
         SelectedActor = Engine->GetSelectedActor();
     }
     else
     {
         SelectedComponent = Cast<USkeletalSubEngine>(GetOuter())->SelectedComponent;
-        SelectedActor =  Cast<USkeletalSubEngine>(GetOuter())->SelectedActor;
+        SelectedActor = Cast<USkeletalSubEngine>(GetOuter())->SelectedActor;
     }
     USceneComponent* TargetComponent = nullptr;
 
