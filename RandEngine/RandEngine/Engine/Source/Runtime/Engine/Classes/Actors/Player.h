@@ -28,7 +28,7 @@ class AEditorPlayer : public AActor
     void AddCoordiMode();
 
 private:
-    int RayIntersectsObject(const FVector& PickPosition, USceneComponent* Component, float& HitDistance, int& IntersectCount);
+    int RayIntersectsObject(const FVector& PickPosition, const USceneComponent* Component, float& HitDistance, int& IntersectCount);
     void ScreenToViewSpace(int32 ScreenX, int32 ScreenY, FEditorViewportClient* ActiveViewport, FVector& RayOrigin);
     void PickedObjControl();
     void ControlRotation(USceneComponent* Component, UGizmoBaseComponent* Gizmo, float DeltaX, float DeltaY);

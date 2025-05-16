@@ -83,23 +83,101 @@ int USkeletalMeshComponent::CheckRayIntersection(const FVector& InRayOrigin, con
         return 0;
     }
 
-     if (!AABB.Intersect(InRayOrigin, InRayDirection, OutHitDistance))
-     {
-         return 0;
-     }
+    if (!AABB.Intersect(InRayOrigin, InRayDirection, OutHitDistance))
+    {
+        return 0;
+    }
 
     const auto* RenderData = SkeletalMesh->GetRenderData();
-    const auto& Vertices = RenderData->Vertices;
+    const auto BindVertices = RenderData->Vertices;
+    TArray<FSkeletalMeshVertex> SkinnedVertices;
     const auto& Indices = RenderData->Indices;
+
+    USkeleton* Skeleton = SkeletalMesh->Skeleton;
+    SkinnedVertices.SetNum(BindVertices.Num());
+    for (int32 i = 0; i < BindVertices.Num(); ++i)
+    {
+        const FSkeletalMeshVertex& BindVertex = BindVertices[i];
+        FSkeletalMeshVertex& SkinnedVertex = SkinnedVertices[i];
+        SkinnedVertex = BindVertex;
+
+        // 해당 정점에 영향을 주는 본이 없으면 바인드 포즈 그대로 사용
+        bool bHasInfluence = false;
+        for (int32 j = 0; j < MAX_BONE_INFLUENCES; ++j)
+        {
+            if (BindVertex.BoneWeights[j] > KINDA_SMALL_NUMBER &&
+                Skeleton->BoneTree.IsValidIndex(static_cast<int32>(BindVertex.BoneIndices[j])))
+            {
+                bHasInfluence = true;
+                break;
+            }
+        }
+
+        if (!bHasInfluence) continue;
+
+        // 가중 합산을 위한 초기화
+        FVector SkinnedPosition = FVector::ZeroVector;
+        FVector SkinnedNormal = FVector::ZeroVector;
+
+        // 각 본의 영향력을 합산
+        float TotalWeight = 0.0f;
+        for (int32 j = 0; j < MAX_BONE_INFLUENCES; ++j)
+        {
+            float Weight = BindVertex.BoneWeights[j];
+            if (Weight <= KINDA_SMALL_NUMBER) continue;
+
+            int32 BoneIndex = static_cast<int32>(BindVertex.BoneIndices[j]);
+            if (!Skeleton->BoneTree.IsValidIndex(BoneIndex)) continue;
+
+            TotalWeight += Weight;
+
+            // 스키닝 행렬 적용
+            const FMatrix& SkinMatrix = Skeleton->CurrentPose.SkinningMatrices[BoneIndex];
+
+            // 위치 변환
+            SkinnedPosition += SkinMatrix.TransformPosition(BindVertex.Position) * Weight;
+
+            // 법선 변환 (위치 변환과 다름)
+            FMatrix NormalMatrix = SkinMatrix;
+            NormalMatrix.RemoveTranslation();
+
+            if (FMath::Abs(NormalMatrix.Determinant()) > SMALL_NUMBER)
+            {
+                // 법선 벡터 변환을 위한 역전치(inverse transpose) 행렬 계산
+                FMatrix InvTranspose = FMatrix::Transpose(FMatrix::Inverse(NormalMatrix));
+                SkinnedNormal += FMatrix::TransformVector(BindVertex.Normal, InvTranspose) * Weight;
+            }
+            else
+            {
+                SkinnedNormal += BindVertex.Normal * Weight;
+            }
+        }
+
+        // 가중치 합이 1에 가까워야 함 (부동소수점 오차 허용)
+        if (TotalWeight > KINDA_SMALL_NUMBER)
+        {
+            if (!FMath::IsNearlyEqual(TotalWeight, 1.0f))
+            {
+                // 가중치 합이 1이 아니면 정규화
+                float InvWeight = 1.0f / TotalWeight;
+                SkinnedPosition *= InvWeight;
+                SkinnedNormal *= InvWeight;
+            }
+
+            // 최종 결과 적용
+            SkinnedVertex.Position = SkinnedPosition;
+            SkinnedVertex.Normal = SkinnedNormal.GetSafeNormal();
+        }
+    }
 
     OutHitDistance = FLT_MAX;
     int HitCount = 0;
 
     for (int i = 0; i + 2 < Indices.Num(); i += 3)
     {
-        const FVector v0(Vertices[Indices[i + 0]].Position.X, Vertices[Indices[i + 0]].Position.Y, Vertices[Indices[i + 0]].Position.Z);
-        const FVector v1(Vertices[Indices[i + 1]].Position.X, Vertices[Indices[i + 1]].Position.Y, Vertices[Indices[i + 1]].Position.Z);
-        const FVector v2(Vertices[Indices[i + 2]].Position.X, Vertices[Indices[i + 2]].Position.Y, Vertices[Indices[i + 2]].Position.Z);
+        const FVector v0(SkinnedVertices[Indices[i + 0]].Position.X, SkinnedVertices[Indices[i + 0]].Position.Y, SkinnedVertices[Indices[i + 0]].Position.Z);
+        const FVector v1(SkinnedVertices[Indices[i + 1]].Position.X, SkinnedVertices[Indices[i + 1]].Position.Y, SkinnedVertices[Indices[i + 1]].Position.Z);
+        const FVector v2(SkinnedVertices[Indices[i + 2]].Position.X, SkinnedVertices[Indices[i + 2]].Position.Y, SkinnedVertices[Indices[i + 2]].Position.Z);
 
         float HitDistance = 0.f;
         if (IntersectRayTriangle(InRayOrigin, InRayDirection, v0, v1, v2, HitDistance))
@@ -201,7 +279,7 @@ void USkeletalMeshComponent::Play(bool bLooping)
         UE_LOG(ELogLevel::Warning, TEXT("Play: Animation is currently disabled"));
         return;
     }
-    
+
     // [TEST] Animation blending test
     UAnimSingleNodeInstance* SingleNodeInstance = GetSingleNodeInstance();
     UMyAnimInstance* MyAnimInstance = GetMyAnimInstance();
@@ -219,11 +297,11 @@ void USkeletalMeshComponent::Play(bool bLooping)
         const double PlayLength = CurrentSequence->GetDataModel()->GetPlayLength();
 
         // [TEMP] 확인 편의를 위해 Play시 CurrentTime 초기화
-        if (SingleNodeInstance->PlayRate >= 0.0f) 
+        if (SingleNodeInstance->PlayRate >= 0.0f)
         {
             SingleNodeInstance->CurrentTime = 0.0f;
         }
-        else 
+        else
         {
             SingleNodeInstance->CurrentTime = PlayLength;
         }
@@ -262,7 +340,7 @@ void USkeletalMeshComponent::Stop()
     // [TEST] Animation blending test
     UAnimSingleNodeInstance* SingleNodeInstance = GetSingleNodeInstance();
     UMyAnimInstance* MyAnimInstance = GetMyAnimInstance();
-    
+
     if (SingleNodeInstance)
     {
         SingleNodeInstance->SetPlaying(false);
@@ -343,7 +421,7 @@ void USkeletalMeshComponent::TickAnimInstances(float DeltaTime, bool bNeedsValid
     //    LinkedInstance->UpdateAnimation(DeltaTime * GlobalAnimRateScale, false, UAnimInstance::EUpdateAnimationFlag::ForceParallelUpdate);
     //}
     // [TEMP] FSM test - earky return if state machine exist
-    if (AnimSMInstance != nullptr) 
+    if (AnimSMInstance != nullptr)
     {
         AnimSMInstance->UpdateAnimation(DeltaTime, bNeedsValidRootMotion);
         return;
