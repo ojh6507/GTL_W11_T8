@@ -3,6 +3,7 @@
 #include "AnimationSubEngine.h"
 #include "RendererHelpers.h"
 #include "SkeletalSubEngine.h"
+#include "ParticleSystemSubEngine.h"
 #include "StaticMeshRenderPass.h"
 #include "Actors/Cube.h"
 #include "BaseGizmos/TransformGizmo.h"
@@ -146,16 +147,31 @@ void FSubRenderer::PrepareRender(FEditorViewportClient* Viewport)
     // Set RTV + DSV
 
     // Clear RenderTarget
+
+    //========= FOR ParticleViewr Test =============
+    // 파티클 렌더패스 생겼을 시 제거
     Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-    Graphics->DeviceContext->ClearRenderTargetView(Graphics->BackBufferRTV, Graphics->ClearColor);
+    if (Cast<UParticleSystemSubEngine>(Engine))
+    {
+        Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
+    }
+    else
+    {
+        Graphics->DeviceContext->ClearRenderTargetView(Graphics->BackBufferRTV, Graphics->ClearColor);
+    }
     Graphics->DeviceContext->ClearDepthStencilView(Graphics->DeviceDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-    // Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
-    // Graphics->DeviceContext->ClearDepthStencilView(DepthStencilRHI->DSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    Graphics->DeviceContext->OMSetRenderTargets(1, &Graphics->BackBufferRTV, Graphics->DeviceDSV);
-    // Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
+    if (Cast<UParticleSystemSubEngine>(Engine))
+    {
+        Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
+    }
+    else
+    {
+        Graphics->DeviceContext->OMSetRenderTargets(1, &Graphics->BackBufferRTV, Graphics->DeviceDSV);
+    }
 
-    // Set Viewport
+    // -----------------------------파티클 렌더패스 생겼을 때 RenderTargetRHI->RTV 다 주석처리 
+     // Set Viewport
     if (ViewMode == EViewModeIndex::VMI_Wireframe)
     {
         Graphics->DeviceContext->RSSetState(Graphics->RasterizerWireframeBack);
@@ -173,6 +189,41 @@ void FSubRenderer::Render()
 {
     if (PreviewSkeletalMesh == nullptr)
     {
+        //========= FOR ParticleViewr Test =============
+        // 파티클 렌더패스 생겼을 시 제거
+        D3D11_RECT scissorRect;
+        scissorRect.left = 0;
+        scissorRect.top = 0;
+        scissorRect.right = 1024;  // 현재 렌더 타겟의 너비
+        scissorRect.bottom = 1024; // 현재 렌더 타겟의 높이
+        
+        Graphics->DeviceContext->RSSetScissorRects(1, &scissorRect);
+
+        ID3D11VertexShader* vertexShader = nullptr;
+        ID3D11InputLayout* inputLayout = nullptr;
+        
+        vertexShader = ShaderManager->GetVertexShaderByKey(L"StaticMeshVertexShader");
+        inputLayout = ShaderManager->GetInputLayoutByKey(L"StaticMeshVertexShader"); // VS와 함께 생성했으므로 같은 키 사용
+        
+        Graphics->DeviceContext->VSSetShader(vertexShader, nullptr, 0);
+
+        ID3D11PixelShader* pixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShader");
+
+        Graphics->DeviceContext->PSSetShader(pixelShader, nullptr, 0);
+
+        Graphics->DeviceContext->IASetInputLayout(inputLayout);
+
+        Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        UpdateObjectConstant(FMatrix::Identity, FVector4(), false);
+
+        UpdateConstants();
+
+        RenderStaticMesh();
+
+        Graphics->DeviceContext->OMSetRenderTargets(1, &Graphics->BackBufferRTV, Graphics->DeviceDSV);
+
+        //=================================================
         return;
     }
     // 셰이더 설정
@@ -289,6 +340,8 @@ void FSubRenderer::PrepareStaticRenderArr(FEditorViewportClient* Viewport)
     }
     else if (Cast<UAnimationSubEngine>(Engine))
         StaticMeshComponents.Add(Cast<UAnimationSubEngine>(Engine)->BasePlane->GetStaticMeshComponent());
+    else if (Cast<UParticleSystemSubEngine>(Engine))
+        StaticMeshComponents.Add(Cast<UParticleSystemSubEngine>(Engine)->UnrealSphereComponent);
 }
 
 void FSubRenderer::RenderStaticMesh()

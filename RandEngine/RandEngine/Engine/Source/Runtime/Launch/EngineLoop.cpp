@@ -125,9 +125,9 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     if (ParticleSystemViewerWnd)
     {
         ParticleSystemViewerGD.Initialize(ParticleSystemViewerWnd, GraphicDevice.Device);
-        ParticleSystemViewerGD.ClearColor[0] = 0.0f;
-        ParticleSystemViewerGD.ClearColor[1] = 0.0f;
-        ParticleSystemViewerGD.ClearColor[2] = 0.0f;
+        ParticleSystemViewerGD.ClearColor[0] = 0.03f;
+        ParticleSystemViewerGD.ClearColor[1] = 0.03f;
+        ParticleSystemViewerGD.ClearColor[2] = 0.03f;
     }
     
     SkeletalViewerSubEngine = FObjectFactory::ConstructObject<USkeletalSubEngine>(nullptr);
@@ -641,6 +641,11 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             ImGui::SetCurrentContext(GEngineLoop.SkeletalViewerSubEngine->SubUI->Context);
             GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
             return 0;
+        case WM_KEYDOWN:
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+            ::SetFocus(hWnd);
+            break;
         default:
             return DefWindowProc(hWnd, Msg, wParam, lParam);
         }
@@ -683,6 +688,11 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             ImGui::SetCurrentContext(GEngineLoop.AnimationViewerSubEngine->SubUI->Context);
             GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
             return 0;
+        case WM_KEYDOWN:
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+            ::SetFocus(hWnd);
+            break;
         default:
             return DefWindowProc(hWnd, Msg, wParam, lParam);
         }
@@ -724,6 +734,11 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             ImGui::SetCurrentContext(GEngineLoop.ParticleSystemViewerSubEngine->SubUI->Context);
             GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
             return 0;
+        case WM_KEYDOWN:
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+            ::SetFocus(hWnd);
+            break;
         default:
             return DefWindowProc(hWnd, Msg, wParam, lParam);
         }

@@ -1,7 +1,7 @@
 #pragma once
-#include "SkeletalSubEngine.h"
-#include "SubEngine.h"
 
+#include "SubEngine.h"
+class UStaticMeshComponent;
 class UParticleSystemSubEngine : public USubEngine
 {
     DECLARE_CLASS(UParticleSystemSubEngine, USubEngine)
@@ -14,5 +14,5 @@ public:
     virtual void Input(float DeltaTime);
     virtual void Render();
     virtual void Release();
-    
+    UStaticMeshComponent* UnrealSphereComponent = nullptr;
 };

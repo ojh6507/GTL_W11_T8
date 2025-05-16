@@ -5,6 +5,8 @@
 #include "UnrealClient.h"
 #include "Actors/Cube.h"
 #include "Animation/Skeleton.h"
+#include "Actors/Cube.h"
+#include "Engine/AssetManager.h"
 #include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
 UParticleSystemSubEngine::UParticleSystemSubEngine()
@@ -24,6 +26,11 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL);
 
+    UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
+    UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
+    UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
+    UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
+    ViewportClient->ViewFOV = 60.f;
 }
 
 void UParticleSystemSubEngine::Tick(float DeltaTime)
@@ -35,7 +42,7 @@ void UParticleSystemSubEngine::Tick(float DeltaTime)
 
 void UParticleSystemSubEngine::Input(float DeltaTime)
 {
-    if (::GetForegroundWindow() != *Wnd)
+    if (::GetFocus() != *Wnd)
         return;
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
     {
@@ -111,18 +118,21 @@ void UParticleSystemSubEngine::Render()
         Graphics->Prepare();
 
         SubRenderer->PrepareRender(ViewportClient);
-        SubRenderer->Render();
 
+        SubRenderer->Render();
         // Sub window rendering
         SubUI->BeginFrame();
 
-        reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get())->PrepareRender(ViewportClient);
-
+        ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
+        if (particlePanel) 
+        {
+            particlePanel->PrepareRender(ViewportClient); // 내부적으로 멤버 변수 RenderTargetRHI 설정
+        }
         UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
         SubUI->EndFrame();
 
-        // Sub swap
         SubRenderer->ClearRender();
+        // Sub swap
         Graphics->SwapBuffer();
     }
 }
