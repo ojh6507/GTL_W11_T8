@@ -143,6 +143,11 @@ void ParticleSystemViewerPanel::RenderRightPane(const ImVec2& panelSize)
 void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImTextureID textureId, float originalImageWidth, float originalImageHeight)
 {
 
+    ImGui::BeginTabBar("##Viewport");
+    ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.05f, 0.05f, 0.08f, 0.80f));         // 비활성 탭
+    ImGui::PushStyleColor(ImGuiCol_TabActive, ImVec4(0.14f, 0.14f, 0.14f, 1.00f));   // 활성 탭
+
+    ImGui::BeginTabItem("Viewport");
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     bool childVisible = ImGui::BeginChild("ViewportPanel_TopLeft", panelSize, ImGuiChildFlags_Border);
     if (childVisible)
@@ -177,7 +182,9 @@ void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImT
         }
     }
     ImGui::EndChild(); // ViewportPanel_TopLeft
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(3);
+    ImGui::EndTabItem();
+    ImGui::EndTabBar();
 }
 
 void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, const MyEmitterData* emitterPtr, MyModuleData* modulePtr)
@@ -190,9 +197,13 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, c
     bool childVisible = ImGui::BeginChild("PropertiesPanel_BottomLeft", actualPanelSize, ImGuiChildFlags_Border);
     if (childVisible)
     {
+        ImGui::BeginTabBar("##Details");
+        ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.05f, 0.05f, 0.08f, 0.80f));         // 비활성 탭
+        ImGui::PushStyleColor(ImGuiCol_TabActive, ImVec4(0.14f, 0.14f, 0.14f, 1.00f));   // 활성 탭
+
+        ImGui::BeginTabItem("Details");
         if (modulePtr)
         {
-            ImGui::Text("모듈 속성: %s (이미터: %s)", modulePtr->name.c_str(), emitterPtr ? emitterPtr->name.c_str() : "N/A");
             ImGui::Separator();
             // modulePtr이 const MyModuleData* 이므로, 값을 변경하려면 const_cast 필요
             ImGui::InputFloat("Value Param 1", &const_cast<MyModuleData*>(modulePtr)->value_param1);
@@ -200,7 +211,6 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, c
         }
         else if (emitterPtr)
         {
-            ImGui::Text("이미터 속성: %s", emitterPtr->name.c_str());
             ImGui::Separator();
             ImGui::Checkbox("활성화", &const_cast<MyEmitterData*>(emitterPtr)->is_enabled);
         }
@@ -208,12 +218,16 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, c
         {
             ImGui::Text("선택된 항목 없음");
         }
+        ImGui::PopStyleColor(2);
+        ImGui::EndTabItem();
+        ImGui::EndTabBar();
     }
     ImGui::EndChild(); // PropertiesPanel_BottomLeft
 }
 
 void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx, TArray<MyEmitterData>& localEmittersData)
 {
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.007, 0.007, 0.007, 1));
     bool systemHierarchyVisible = ImGui::BeginChild("SystemHierarchyPanel_Right", panelSize, ImGuiChildFlags_None);
     if (systemHierarchyVisible)
     {
@@ -249,8 +263,19 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
                 ImGui::PushID(i); // 각 이미터 블록에 고유 ID 부여
 
                 bool isEmitterSelectedForFrame = (currentSelectedEmitterIdx == i && currentSelectedModuleIdx == -1);
-                ImVec4 childBgColor = isEmitterSelectedForFrame ? ImGui::GetStyleColorVec4(ImGuiCol_HeaderHovered) : ImVec4(0.2f, 0.2f, 0.22f, 1.0f);
-                ImU32 childBorderColorU32 = isEmitterSelectedForFrame ? ImGui::GetColorU32(ImVec4(0.9f, 0.9f, 0.2f, 1.0f)) : ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+                ImVec4 childBgColor;
+                ImVec4 childBorderColorVec4;
+                if (isEmitterSelectedForFrame)
+                {
+                    childBgColor = ImVec4(0.05f, 0.14f, 0.24f, 1.0f);
+                    childBorderColorVec4 = ImVec4(0.1f, 0.7f, 0.6f, 1.0f);     // 청록
+                }
+                else
+                {
+                    childBgColor = ImVec4(0.078f, 0.078f, 0.098f, 1.0f);      // 매우 어두운 배경
+                    childBorderColorVec4 = ImVec4(0.25f, 0.25f, 0.26f, 1.0f);   // 미묘하게 밝은 테두리
+                }
+                ImU32 childBorderColorU32 = ImGui::GetColorU32(childBorderColorVec4);;
 
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
                 ImGui::PushStyleColor(ImGuiCol_Border, ImGui::ColorConvertU32ToFloat4(childBorderColorU32));
@@ -275,6 +300,7 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
         ImGui::PopStyleVar(); // WindowPadding
     }
     ImGui::EndChild(); // SystemHierarchyPanel_Right
+    ImGui::PopStyleColor();
 }
 
 void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmitterData& emitterData, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx)
@@ -310,23 +336,65 @@ void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmi
     ImGui::SetItemAllowOverlap();
 
     ImGui::Separator();
-    ImGui::Text("모듈:");
-    ImGui::Indent();
+  
     for (int moduleIdxLoop = 0; moduleIdxLoop < emitterData.modules.Num(); ++moduleIdxLoop)
     {
         MyModuleData& module = emitterData.modules[moduleIdxLoop];
+        
         ImGui::PushID(moduleIdxLoop); // 각 모듈에 대해 고유 ID 스택 생성
 
         bool isThisModuleSelected = (currentSelectedEmitterIdx == emitterIdx && currentSelectedModuleIdx == moduleIdxLoop);
+        
         // Selectable의 레이블이 중복될 수 있으므로, PushID로 구분하거나 레이블 자체를 고유하게 만듦
-        if (ImGui::Selectable(module.name.c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups))
+        
+        // --- 배경색 변경 시작 ---
+        ImVec4 moduleRegularBgColor = ImVec4(0.15f, 0.15f, 0.19f, 1.0f);
+        
+        ImVec4 moduleSelectedBgColor = ImVec4(1.0f, 0.39f, 0.0f, 1.0f);   
+
+        ImVec4 moduleHoveredColor = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
+
+        ImVec4 moduleSelectedHoveredColor = ImVec4(moduleSelectedBgColor.x * 1.1f, 
+                                                   moduleSelectedBgColor.y * 1.1f, moduleSelectedBgColor.z * 1.1f, 1.0f);
+        
+        ImVec4 moduleActiveColor = moduleSelectedBgColor;
+
+        if (isThisModuleSelected)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, moduleSelectedBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, moduleSelectedBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, moduleSelectedBgColor);
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, moduleRegularBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, moduleRegularBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, moduleActiveColor);
+        }
+
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 itemTopLeft = ImGui::GetCursorScreenPos();
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float itemHeight = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f; // 표준 아이템 높이
+
+        ImVec2 itemBottomRight = ImVec2(itemTopLeft.x + availableWidth, itemTopLeft.y + itemHeight);
+
+        // 3. 가로로 꽉 차는 배경 사각형 그리기
+        ImVec4 currentBgColorForRect = isThisModuleSelected ? moduleSelectedBgColor : moduleRegularBgColor;
+        ImU32 currentBgColorForRectU32 = ImGui::GetColorU32(currentBgColorForRect);
+
+        ImGui::GetWindowDrawList()->AddRectFilled(itemTopLeft, itemBottomRight, currentBgColorForRectU32);
+
+        ImVec2 Size = ImVec2(0, itemHeight);
+
+        if (ImGui::Selectable(module.name.c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, Size))
         {
             currentSelectedEmitterIdx = emitterIdx;
             currentSelectedModuleIdx = moduleIdxLoop;
         }
+        ImGui::PopStyleColor(3);
         ImGui::PopID(); // moduleIdxLoop에 대한 Pop
     }
-    ImGui::Unindent();
 }
 
 // --- 창 크기 변경 처리 ---
