@@ -4,6 +4,7 @@
 #include "IRenderPass.h"
 #include "EngineBaseTypes.h"
 #include "Classes/Particle/ParticleSystemComponent.h"
+#include "Classes/Particle/ParticleHelper.h"
 
 struct FSpriteParticleCameraConstants
 {
@@ -13,11 +14,11 @@ struct FSpriteParticleCameraConstants
     float pad1;
 };
 
-class FSpriteParticleRenderPass : public IRenderPass
+class FParticleRenderPass : public IRenderPass
 {
 public:
-    FSpriteParticleRenderPass();
-    virtual ~FSpriteParticleRenderPass();
+    FParticleRenderPass();
+    virtual ~FParticleRenderPass();
 
     virtual void Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManager) override;
 
@@ -25,13 +26,17 @@ public:
 
     void UpdateCameraConstant(const FVector& CameraUp, const FVector& CameraRight) const;
 
-    void PrepareRender();
+    void PrepareSpriteParticleRender();
+
+    void PrepareMeshParticleRender();
 
     virtual void Render(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
     virtual void ClearRenderArr() override;
 
-    void PrepareShader() const;
+    void PrepareSpriteParticleShader() const;
+
+    void PrepareMeshParticleShader() const;
 
     void CreateShader();
 
