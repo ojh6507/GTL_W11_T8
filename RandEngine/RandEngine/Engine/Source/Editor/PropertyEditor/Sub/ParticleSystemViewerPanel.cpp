@@ -84,8 +84,8 @@ void ParticleSystemViewerPanel::RenderLeftPane(const ImVec2& panelSize, float sp
 
         ImTextureID texID = (ImTextureID)RenderTargetRHI->SRV;
 
-        float origW = Width;
-        float origH = Height;
+        float origW = 1024;
+        float origH = 1024;
         RenderViewportPanel(ImVec2(leftAreaContentSize.x, viewportActualHeight), texID, origW, origH);
 
         // 수평 스플리터 (왼쪽 패널 내부)
@@ -142,6 +142,8 @@ void ParticleSystemViewerPanel::RenderRightPane(const ImVec2& panelSize)
 // --- 개별 UI 패널 렌더링 함수들 ---
 void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImTextureID textureId, float originalImageWidth, float originalImageHeight)
 {
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     bool childVisible = ImGui::BeginChild("ViewportPanel_TopLeft", panelSize, ImGuiChildFlags_Border);
     if (childVisible)
     {
@@ -175,6 +177,7 @@ void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImT
         }
     }
     ImGui::EndChild(); // ViewportPanel_TopLeft
+    ImGui::PopStyleColor();
 }
 
 void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, const MyEmitterData* emitterPtr, MyModuleData* modulePtr)
