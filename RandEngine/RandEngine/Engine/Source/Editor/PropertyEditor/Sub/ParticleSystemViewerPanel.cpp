@@ -231,8 +231,6 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
     bool systemHierarchyVisible = ImGui::BeginChild("SystemHierarchyPanel_Right", panelSize, ImGuiChildFlags_None);
     if (systemHierarchyVisible)
     {
-        if (ImGui::Button("+ 새 이미터 추가")) { localEmittersData.Add(MyEmitterData("새 이미터", true)); }
-        ImGui::SameLine();
         if (ImGui::Button("선택 이미터 삭제") && currentSelectedEmitterIdx != -1 && currentSelectedEmitterIdx < localEmittersData.Num())
         {
             localEmittersData.RemoveAt(currentSelectedEmitterIdx);
@@ -248,13 +246,15 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
         bool emitterStripVisible = ImGui::BeginChild("EmitterStrip", emitterStripContentSize, ImGuiChildFlags_None, emitterStripFlags);
         if (emitterStripVisible)
         {
-            float fixedBlockWidth = 200.0f;
+            float fixedBlockWidth = 150.0f;
             float blockHeight = ImGui::GetContentRegionAvail().y;
             if (blockHeight < 50.0f) blockHeight = 50.0f; // 최소 높이 보장
             // 패딩을 고려한 실제 블록 높이 (필요시 조정)
             ImVec2 emitterBlockSize = ImVec2(fixedBlockWidth, blockHeight - ImGui::GetStyle().WindowPadding.y * 2.0f);
             if (emitterBlockSize.y < 50.0f) emitterBlockSize.y = 50.0f;
-
+           
+          
+            AddEmitterStrip(localEmittersData);
 
             for (int i = 0; i < localEmittersData.Num(); ++i)
             {
@@ -272,15 +272,15 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
                 }
                 else
                 {
-                    childBgColor = ImVec4(0.078f, 0.078f, 0.098f, 1.0f);      // 매우 어두운 배경
-                    childBorderColorVec4 = ImVec4(0.25f, 0.25f, 0.26f, 1.0f);   // 미묘하게 밝은 테두리
+                    childBgColor = ImVec4(0.028f, 0.028f, 0.048f, 0.2f);      // 매우 어두운 배경
+                    childBorderColorVec4 = ImVec4(0.028f, 0.028f, 0.048f, 1.0f);      // 미묘하게 밝은 테두리
                 }
                 ImU32 childBorderColorU32 = ImGui::GetColorU32(childBorderColorVec4);;
 
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
                 ImGui::PushStyleColor(ImGuiCol_Border, ImGui::ColorConvertU32ToFloat4(childBorderColorU32));
-                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 
                 char child_id_str[64];
                 snprintf(child_id_str, sizeof(child_id_str), "emitter_block_frame_%d", i);
@@ -288,6 +288,7 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
                 if (emitterBlockFrameVisible)
                 {
                     RenderEmitterBlockContents(i, localEmittersData[i], currentSelectedEmitterIdx, currentSelectedModuleIdx);
+                    AddModule(localEmittersData);
                 }
                 ImGui::EndChild(); // emitter_block_frame
 
@@ -303,9 +304,37 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
     ImGui::PopStyleColor();
 }
 
+void ParticleSystemViewerPanel::AddEmitterStrip(TArray<MyEmitterData>& localEmittersData)
+{
+    if (ImGui::BeginPopupContextWindow("AddParticleContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    {
+        if (ImGui::Selectable("New Particle Sprite Emitter")) // 기존 "AddParticlePopUp"의 내용
+        {
+            localEmittersData.Add(MyEmitterData("새 이미터", true));
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void ParticleSystemViewerPanel::AddModule(TArray<MyEmitterData>& localEmittersData)
+{
+
+    if (ImGui::BeginPopupContextWindow("AddModuleContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    {
+        ImGui::Selectable("Lifetime");
+        ImGui::Selectable("Location");
+        ImGui::Selectable("Velocity");
+        ImGui::Selectable("Color");
+        ImGui::Selectable("Size");
+        ImGui::EndPopup();
+    }
+}
+
 void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmitterData& emitterData, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx)
 {
     ImVec2 nameStartPos = ImGui::GetCursorScreenPos();
+    float emitterNamePaddingX = 6.0f;
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + emitterNamePaddingX);
     ImGui::Text("%s", emitterData.name.c_str());
 
     float checkboxWidth = ImGui::GetFrameHeight();
@@ -336,27 +365,27 @@ void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmi
     ImGui::SetItemAllowOverlap();
 
     ImGui::Separator();
-  
+
     for (int moduleIdxLoop = 0; moduleIdxLoop < emitterData.modules.Num(); ++moduleIdxLoop)
     {
         MyModuleData& module = emitterData.modules[moduleIdxLoop];
-        
+
         ImGui::PushID(moduleIdxLoop); // 각 모듈에 대해 고유 ID 스택 생성
 
         bool isThisModuleSelected = (currentSelectedEmitterIdx == emitterIdx && currentSelectedModuleIdx == moduleIdxLoop);
-        
+
         // Selectable의 레이블이 중복될 수 있으므로, PushID로 구분하거나 레이블 자체를 고유하게 만듦
-        
+
         // --- 배경색 변경 시작 ---
-        ImVec4 moduleRegularBgColor = ImVec4(0.15f, 0.15f, 0.19f, 1.0f);
-        
-        ImVec4 moduleSelectedBgColor = ImVec4(1.0f, 0.39f, 0.0f, 1.0f);   
+        ImVec4 moduleRegularBgColor = ImVec4(0.15f, 0.15f, 0.19f, 0.2f);
+
+        ImVec4 moduleSelectedBgColor = ImVec4(1.0f, 0.15f, 0.0f, 1.0f);
 
         ImVec4 moduleHoveredColor = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
 
-        ImVec4 moduleSelectedHoveredColor = ImVec4(moduleSelectedBgColor.x * 1.1f, 
-                                                   moduleSelectedBgColor.y * 1.1f, moduleSelectedBgColor.z * 1.1f, 1.0f);
-        
+        ImVec4 moduleSelectedHoveredColor = ImVec4(moduleSelectedBgColor.x * 1.1f,
+            moduleSelectedBgColor.y * 1.1f, moduleSelectedBgColor.z * 1.1f, 1.0f);
+
         ImVec4 moduleActiveColor = moduleSelectedBgColor;
 
         if (isThisModuleSelected)
