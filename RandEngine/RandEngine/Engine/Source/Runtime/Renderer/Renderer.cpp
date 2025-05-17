@@ -36,6 +36,8 @@
 #include "Stats/Stats.h"
 #include "Stats/GPUTimingManager.h"
 
+#include "GlobalRenderResource.h"
+
 //------------------------------------------------------------------------------
 // 초기화 및 해제 관련 함수
 //------------------------------------------------------------------------------
@@ -44,6 +46,9 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     Graphics = InGraphics;
     BufferManager = InBufferManager;
     GPUTimingManager = InGPUTimingManager;
+
+    GDynamicVertexBufferPool.Initialize(Graphics->Device, Graphics->DeviceContext);
+    GDynamicIndexBufferPool.Initialize(Graphics->Device, Graphics->DeviceContext);
 
     ShaderManager = new FDXDShaderManager(Graphics->Device);
     ShadowManager = new FShadowManager();

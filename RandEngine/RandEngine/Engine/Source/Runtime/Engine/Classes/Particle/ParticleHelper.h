@@ -1,6 +1,7 @@
 #pragma once
 #include "Define.h"
 #include "Components/Material/Material.h"
+#include "Renderer/GlobalRenderResource.h"
 
 // UE5에서 일부 가져옴
 
@@ -459,18 +460,18 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      *	@param	InVertexSize			Stride of these verts, only used for verification
      *	@param	InDynamicParameterVertexStride	Stride of the dynamic parameter
      */
-    //void BuildViewFillData(
-    //    const FParticleSystemSceneProxy* Proxy,
-    //    const FSceneView* InView,
-    //    int32 InVertexCount,
-    //    int32 InVertexSize,
-    //    int32 InDynamicParameterVertexSize,
-    //    FGlobalDynamicIndexBuffer& DynamicIndexBuffer,
-    //    FGlobalDynamicVertexBuffer& DynamicVertexBuffer,
-    //    FGlobalDynamicVertexBufferAllocation& DynamicVertexAllocation,
-    //    FGlobalDynamicIndexBufferAllocation& DynamicIndexAllocation,
-    //    FGlobalDynamicVertexBufferAllocation* DynamicParameterAllocation,
-    //    FAsyncBufferFillData& Data) const;
+    /*void BuildViewFillData(
+        const FParticleSystemSceneProxy* Proxy,
+        const FEditorViewportClient* InView,
+        int32 InVertexCount,
+        int32 InVertexSize,
+        int32 InDynamicParameterVertexSize,
+        FGlobalDynamicIndexBuffer& DynamicIndexBuffer,
+        FGlobalDynamicVertexBuffer& DynamicVertexBuffer,
+        FGlobalDynamicVertexBufferAllocation& DynamicVertexAllocation,
+        FGlobalDynamicIndexBufferAllocation& DynamicIndexAllocation,
+        FGlobalDynamicVertexBufferAllocation* DynamicParameterAllocation,
+        FAsyncBufferFillData& Data) const;*/
 
     const UMaterial* MaterialResource;
 
