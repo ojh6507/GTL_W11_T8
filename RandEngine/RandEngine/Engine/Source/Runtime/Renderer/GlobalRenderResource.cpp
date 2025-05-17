@@ -30,18 +30,19 @@ FGlobalDynamicVertexBuffer::FAllocation FGlobalDynamicVertexBuffer::Allocate(uin
 
 void FGlobalDynamicVertexBuffer::Commit()
 {
-    //// 1) 이번 프레임에 Allocate() 된 모든 버퍼를 Unmap()
-    //for (FDynamicVertexBuffer* VB : VertexBuffers)
-    //{
-    //    if (VB && VB->GPUBuffer && VB->MappedBuffer)
-    //    {
-    //        GD3DContext->Unmap(VB->GPUBuffer, 0);
-    //        VB->MappedBuffer = nullptr;
-    //    }
-    //}
+    ID3D11DeviceContext* D3DContext = GDynamicVertexBufferPool.Context;
+    // 1) 이번 프레임에 Allocate() 된 모든 버퍼를 Unmap()
+    for (FDynamicVertexBuffer* VB : VertexBuffers)
+    {
+        if (VB && VB->MappedBuffer)
+        {
+            // Context 는 전역이나 멤버로 보관하신 DeviceContext 를 사용하세요
+            VB->Unmap(D3DContext);
+        }
+    }
 
-    //// 2) 버퍼 목록 초기화 → 다음 프레임에 새로 Allocate 시작
-    //VertexBuffers.Reset();
+    // 2) 다음 프레임을 위해 할당 기록 리셋
+    VertexBuffers.Empty();
 }
 
 FGlobalDynamicIndexBuffer::FAllocation FGlobalDynamicIndexBuffer::Allocate(uint32 NumIndices, uint32 IndexStride)
@@ -80,5 +81,26 @@ FGlobalDynamicIndexBuffer::FAllocation FGlobalDynamicIndexBuffer::Allocate(uint3
 
 void FGlobalDynamicIndexBuffer::Commit()
 {
+    ID3D11DeviceContext* D3DContext = GDynamicIndexBufferPool.Context;
+
+    // 16비트 인덱스 버퍼 정리
+    for (FDynamicIndexBuffer* IB : IndexBuffers16)
+    {
+        if (IB && IB->MappedBuffer)
+        {
+            IB->Unmap(D3DContext);
+        }
+    }
+    IndexBuffers16.Empty();
+
+    // 32비트 인덱스 버퍼 정리
+    for (FDynamicIndexBuffer* IB : IndexBuffers32)
+    {
+        if (IB && IB->MappedBuffer)
+        {
+            IB->Unmap(D3DContext);
+        }
+    }
+    IndexBuffers32.Empty();
 }
 
