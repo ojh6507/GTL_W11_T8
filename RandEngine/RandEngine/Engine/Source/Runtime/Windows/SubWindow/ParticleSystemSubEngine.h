@@ -2,6 +2,7 @@
 
 #include "SubEngine.h"
 class UStaticMeshComponent;
+class UParticleSystem;
 class UParticleSystemSubEngine : public USubEngine
 {
     DECLARE_CLASS(UParticleSystemSubEngine, USubEngine)
@@ -14,5 +15,7 @@ public:
     virtual void Input(float DeltaTime);
     virtual void Render();
     virtual void Release();
+    void OpenParticleSystemForEditing(UParticleSystem* InParticleSystem);
     UStaticMeshComponent* UnrealSphereComponent = nullptr;
+    UParticleSystem* ParticleSystem = nullptr;
 };

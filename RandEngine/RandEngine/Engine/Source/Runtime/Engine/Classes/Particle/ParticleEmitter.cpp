@@ -3,17 +3,23 @@
 #include "ParticleModule.h"
 #include "ParticleModuleTypeDataBase.h"
 #include "ParticleModuleRequired.h"
+#include "ParticleModuleSpawn.h"
 #include "ParticleDefines.h"
+#include "Runtime/Windows/SubWindow/ParticleSystemSubEngine.h"
+#include "Runtime/Launch/EngineLoop.h"
+#include "Engine/Engine.h"
+#include "Uobject/Casts.h"
 
 // UParticleEmitter 생성자
 UParticleEmitter::UParticleEmitter()
-    : bRequiresLoopNotification(false)
-    , bMeshRotationActive(false)
-    , DynamicParameterDataOffset(0)
-    , ParticleSize(0)
-    , ReqInstanceBytes(0)
-    , TypeDataOffset(0)
-    , TypeDataInstanceOffset(-1)
+    : EmitterName(TEXT("DefaultEmitter"))
+    , bRequiresLoopNotification_Cached(false)
+    , bMeshRotationActive_Cached(false)
+    , ParticleSize_Cached(sizeof(FBaseParticle))
+    , ReqInstanceBytes_Cached(0)
+    , TypeDataOffset_Cached(0)
+    , TypeDataInstanceOffset_Cached(-1)
+    , EstimatedMaxActiveParticles_Cached(0)
 {
     // 필요한 경우 멤버 변수들의 기본값 추가 설정
 }
@@ -22,86 +28,95 @@ UParticleEmitter::UParticleEmitter()
 void UParticleEmitter::CacheEmitterModuleInfo()
 {
     // --- 멤버 변수 초기화 ---
-    bRequiresLoopNotification = false;
-    bMeshRotationActive = false;
+    bRequiresLoopNotification_Cached = false;
+    bMeshRotationActive_Cached = false;
 
-    ModuleOffsetMap.Empty();
-    ModuleInstanceOffsetMap.Empty();
-    ModulesNeedingInstanceData.Empty();
+    ModuleOffsetMap_Cached.Empty();
+    ModuleInstanceOffsetMap_Cached.Empty();
+    ModulesNeedingInstanceData_Cached.Empty();
 
-    DynamicParameterDataOffset = 0;
-    ParticleSize = sizeof(FBaseParticle);
-    ReqInstanceBytes = 0;
-    TypeDataOffset = 0;
-    TypeDataInstanceOffset = -1;
+    ParticleSize_Cached = sizeof(FBaseParticle); // FBaseParticle 크기로 시작
+    ReqInstanceBytes_Cached = 0;
+    TypeDataOffset_Cached = 0; // TypeDataModule 페이로드가 없다면 0 유지
+    TypeDataInstanceOffset_Cached = -1;
 
     // --- LOD 0 처리 ---
-    if (LODLevels.IsEmpty()) { /*UE_LOG(LogTemp, Warning, TEXT("UParticleEmitter::CacheEmitterModuleInfo - LODLevels is empty."));*/ return; }
+    if (LODLevels.IsEmpty())
+    {
+        UE_LOG(ELogLevel::Warning, TEXT("UParticleEmitter::CacheEmitterModuleInfo - LODLevels is empty."));
+        return;
+    }
+
     UParticleLODLevel* HighLODLevel = LODLevels[0];
-    if (!HighLODLevel) { /*UE_LOG(LogTemp, Warning, TEXT("UParticleEmitter::CacheEmitterModuleInfo - HighLODLevel is null."));*/ return; }
+    if (!HighLODLevel)
+    {
+        UE_LOG(ELogLevel::Warning, TEXT("UParticleEmitter::CacheEmitterModuleInfo - HighLODLevel is null."));
+        return;
+    }
 
     // --- TypeDataModule 처리 ---
     UParticleModuleTypeDataBase* HighTypeData = HighLODLevel->TypeDataModule;
     if (HighTypeData)
     {
-        int32 ReqBytes = HighTypeData->RequiredBytes(nullptr);
+        int32 ReqBytes = HighTypeData->RequiredBytes(nullptr); // TypeDataModule이 파티클당 필요로 하는 추가 바이트
         if (ReqBytes > 0)
         {
-            TypeDataOffset = ParticleSize;
-            ParticleSize += ReqBytes;
+            TypeDataOffset_Cached = ParticleSize_Cached; // 현재까지의 ParticleSize가 TypeData의 시작 오프셋
+            ParticleSize_Cached += ReqBytes;  // ParticleSize에 TypeData 크기 추가
         }
         int32 TempInstanceBytes = HighTypeData->RequiredBytesPerInstance();
         if (TempInstanceBytes > 0)
         {
-            TypeDataInstanceOffset = ReqInstanceBytes;
-            ReqInstanceBytes += TempInstanceBytes;
+            TypeDataInstanceOffset_Cached = ReqInstanceBytes_Cached; // 현재까지의 ReqInstanceBytes가 TypeData의 인스턴스 오프셋
+            ReqInstanceBytes_Cached += TempInstanceBytes; // ReqInstanceBytes에 TypeData 인스턴스 크기 추가
         }
     }
 
     // --- RequiredModule 처리 ---
     UParticleModuleRequired* RequiredModule = HighLODLevel->RequiredModule;
-    if (!RequiredModule) { /*UE_LOG(LogTemp, Error, TEXT("UParticleEmitter::CacheEmitterModuleInfo - RequiredModule is null."));*/ return; }
+    if (!RequiredModule)
+    {
+        UE_LOG(ELogLevel::Error, TEXT("UParticleEmitter::CacheEmitterModuleInfo - RequiredModule is null."));
+        return;
+    }
 
     // ScreenAlignment 관련 로직이 없으므로 bMeshRotationActive는 다른 요인으로 결정
-    bMeshRotationActive = false; // 기본값
+    bMeshRotationActive_Cached = false; // 기본값
 
     // --- 일반 모듈들 순회 (LOD 0의 모듈들) ---
     for (int32 ModuleIdx = 0; ModuleIdx < HighLODLevel->Modules.Num(); ModuleIdx++)
     {
         UParticleModule* ParticleModule = HighLODLevel->Modules[ModuleIdx];
-        if (!ParticleModule) continue;
+        if (!ParticleModule)
+        {
+            continue;
+        }
+        bRequiresLoopNotification_Cached |= (ParticleModule->bEnabled && ParticleModule->RequiresLoopingNotification());
 
-        bRequiresLoopNotification |= (ParticleModule->bEnabled && ParticleModule->RequiresLoopingNotification());
-
+        // TypeDataModule은 이미 위에서 처리했으므로, 일반 모듈만 고려
         if (ParticleModule->GetModuleType() != EModuleType::TypeDataBase)
         {
             int32 ReqBytes = ParticleModule->RequiredBytes(HighTypeData);
             if (ReqBytes > 0)
             {
-                ModuleOffsetMap.Add(ParticleModule, ParticleSize);
-                // UParticleModuleParameterDynamic 지원 시 로직 (현재는 주석 처리)
-                // if (ParticleModule->GetModuleType() == EModuleType::ParameterDynamic && (DynamicParameterDataOffset == 0))
-                // {
-                //     DynamicParameterDataOffset = ParticleSize;
-                // }
-                ParticleSize += ReqBytes;
+                ModuleOffsetMap_Cached.Add(ParticleModule, ParticleSize_Cached);
+                ParticleSize_Cached += ReqBytes;
             }
 
             int32 TempInstanceBytes = ParticleModule->RequiredBytesPerInstance();
             if (TempInstanceBytes > 0)
             {
-                ModuleInstanceOffsetMap.Add(ParticleModule, ReqInstanceBytes);
-                ModulesNeedingInstanceData.Add(ParticleModule);
-                ReqInstanceBytes += TempInstanceBytes;
+                ModuleInstanceOffsetMap_Cached.Add(ParticleModule, ReqInstanceBytes_Cached);
+                ModulesNeedingInstanceData_Cached.Add(ParticleModule);
+                ReqInstanceBytes_Cached += TempInstanceBytes;
             }
         }
 
-        if (!bMeshRotationActive && ParticleModule->TouchesMeshRotation())
+        if (!bMeshRotationActive_Cached && ParticleModule->TouchesMeshRotation())
         {
-            bMeshRotationActive = true;
+            bMeshRotationActive_Cached = true;
         }
     }
-    // UE_LOG(LogTemp, Log, TEXT("UParticleEmitter::CacheEmitterModuleInfo completed. ParticleSize: %d, ReqInstanceBytes: %d"), ParticleSize, ReqInstanceBytes);
 }
 
 
@@ -116,37 +131,62 @@ void UParticleEmitter::Build()
     if (!HighLODLevel)
     {
         UE_LOG(ELogLevel::Warning, TEXT("UParticleEmitter::Build - HighLODLevel is null."));
+        EstimatedMaxActiveParticles_Cached = 0; // 안전을 위해 0으로 설정
+        CacheEmitterModuleInfo();
         return;
+    }
+
+
+    FParticleEmitterBuildInfo EmitterBuildInfo;
+
+    EmitterBuildInfo.bIsEditorBuild = true; // 항상 에디터 컨텍스트로 빌드 정보 준비
+    EmitterBuildInfo.OwningLODLevel = HighLODLevel;
+    EmitterBuildInfo.RequiredModule = HighLODLevel->RequiredModule;
+    EmitterBuildInfo.CurrentTypeDataModule = HighLODLevel->TypeDataModule;
+    EmitterBuildInfo.SpawnModule = nullptr;
+
+    for (UParticleModule* Mod : HighLODLevel->Modules)
+    {
+        if (Mod && Mod->bEnabled) // 유효하고 활성화된 모듈만
+        {
+            if (UParticleModuleSpawn* SpawnMod = Cast<UParticleModuleSpawn>(Mod))
+            {
+                EmitterBuildInfo.SpawnModule = SpawnMod;
+                break;
+            }
+        }
+    }
+    if (HighLODLevel->RequiredModule) // RequiredModule이 있어야 CompileModules 의미 있음
+    {
+        HighLODLevel->CompileModules(EmitterBuildInfo);
+        EstimatedMaxActiveParticles_Cached = EmitterBuildInfo.EstimatedMaxActiveParticleCount;
+    }
+    else
+    {
+        // RequiredModule이 없다면 예상 파티클 수를 0으로 설정하거나 기본값 사용
+        this->EstimatedMaxActiveParticles_Cached = 0;
+        EmitterBuildInfo.EstimatedMaxActiveParticleCount = 0; // BuildInfo에도 반영
+        UE_LOG(ELogLevel::Error, TEXT("UParticleEmitter '%s'::Build - RequiredModule is null in HighLODLevel. Cannot fully compile modules."), *EmitterName);
     }
 
     if (HighLODLevel->TypeDataModule != nullptr)
     {
         if (HighLODLevel->TypeDataModule->RequiresBuild())
         {
-            FParticleEmitterBuildInfo EmitterBuildInfo;
-
-            if (true) // 전역 플래그 사용
-            {
-                EmitterBuildInfo.bIsEditorBuild = true;
-                HighLODLevel->CompileModules(EmitterBuildInfo); // LODLevel에서 정보 수집
-            }
-            else
-            {
-                EmitterBuildInfo.bIsEditorBuild = false;
-            }
-
             HighLODLevel->TypeDataModule->Build(EmitterBuildInfo); // TypeData가 정보 사용
         }
+         else
+         {
+             UE_LOG(ELogLevel::Warning, TEXT("UParticleEmitter '%s'::Build - TypeDataModule does not require build."), *EmitterName);
+         }
         HighLODLevel->TypeDataModule->CacheModuleInfo(this);
     }
+    else
+    {
+        UE_LOG(ELogLevel::Warning, TEXT("UParticleEmitter '%s'::Build - TypeDataModule is null."), *EmitterName);
+    }
 
-    // Build가 완료된 후, 최종적으로 데이터 레이아웃을 캐싱합니다.
-    // TypeDataModule의 Build 과정에서 ParticleSize 등에 영향을 줄 수 있는
-    // 정보가 변경되었을 수도 있기 때문입니다 (예: TypeData가 특정 페이로드를 추가하는 경우).
-    // 하지만 일반적인 흐름은 CacheEmitterModuleInfo가 먼저 호출되어 ParticleSize의 기본틀을 잡고,
-    // TypeDataModule::Build는 그 정보를 참고하는 것입니다.
-    // 만약 TypeDataModule::Build가 ParticleSize에 영향을 준다면 순서 조정이 필요할 수 있습니다.
-    // 언리얼 엔진에서는 CacheEmitterModuleInfo가 Build의 마지막 부분에 호출됩니다.
+    // 모든 빌드 관련 작업 후 최종적으로 데이터 레이아웃 캐싱
     CacheEmitterModuleInfo();
     UE_LOG(ELogLevel::Display, TEXT("UParticleEmitter::Build completed for emitter."));
 }

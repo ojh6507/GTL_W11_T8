@@ -41,16 +41,19 @@ public:
     TArray<UParticleLODLevel*> LODLevels; // 실제로는 LODLevels[0]만 사용
 
     // --- CacheEmitterModuleInfo 결과 저장용 멤버 ---
-    bool bRequiresLoopNotification;
-    bool bMeshRotationActive; // 메시 회전이 필요한지 여부 (주로 TouchesMeshRotation() 결과)
-    TMap<UParticleModule*, int32> ModuleOffsetMap; // 파티클 데이터 내 모듈 페이로드 오프셋
-    TMap<UParticleModule*, int32> ModuleInstanceOffsetMap; // 이미터 인스턴스 데이터 내 모듈 페이로드 오프셋
-    TArray<UParticleModule*> ModulesNeedingInstanceData; // 인스턴스 데이터가 필요한 모듈 목록
-    int32 DynamicParameterDataOffset; // UParticleModuleParameterDynamic 지원 시 페이로드 오프셋
-    int32 ParticleSize; // 최종 계산된 단일 파티클의 총 크기 (FBaseParticle + 모든 모듈 페이로드)
-    int32 ReqInstanceBytes; // 이미터 인스턴스당 필요한 총 추가 바이트
-    int32 TypeDataOffset; // TypeDataModule 페이로드의 시작 오프셋
-    int32 TypeDataInstanceOffset; // TypeDataModule의 인스턴스별 데이터 오프셋
+    bool bRequiresLoopNotification_Cached;
+    bool bMeshRotationActive_Cached;
+
+    TMap<UParticleModule*, int32>ModuleOffsetMap_Cached; // 파티클 데이터 내 각 모듈 페이로드의 시작 오프셋 (FBaseParticle 이후)
+    TMap<UParticleModule*, int32> ModuleInstanceOffsetMap_Cached; // 이미터 인스턴스 데이터 내 각 모듈 페이로드의 시작 오프셋
+    TArray<UParticleModule*> ModulesNeedingInstanceData_Cached; // 인스턴스 데이터가 필요한 모듈 목록
+
+    int32 EstimatedMaxActiveParticles_Cached; // 예상 최대 활성 파티클 수 (BuildInfo로부터 가져옴)
+  
+    int32 ParticleSize_Cached;            // 최종 계산된 단일 파티클의 총 메모리 크기
+    int32 ReqInstanceBytes_Cached;        // 이미터 인스턴스당 필요한 총 추가 바이트 (모든 모듈 합산)
+    int32 TypeDataOffset_Cached;          // TypeDataModule 페이로드의 시작 오프셋 (ParticleSize_Cached 내)
+    int32 TypeDataInstanceOffset_Cached;  // TypeDataModule의 인스턴스별 데이터 오프셋 (ReqInstanceBytes_Cached 내)
 
 public:
     UParticleEmitter();
