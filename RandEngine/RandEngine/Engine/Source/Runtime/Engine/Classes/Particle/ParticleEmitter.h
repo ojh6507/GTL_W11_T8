@@ -49,11 +49,21 @@ public:
     TArray<UParticleModule*> ModulesNeedingInstanceData_Cached; // 인스턴스 데이터가 필요한 모듈 목록
 
     int32 EstimatedMaxActiveParticles_Cached; // 예상 최대 활성 파티클 수 (BuildInfo로부터 가져옴)
-  
+
     int32 ParticleSize_Cached;            // 최종 계산된 단일 파티클의 총 메모리 크기
     int32 ReqInstanceBytes_Cached;        // 이미터 인스턴스당 필요한 총 추가 바이트 (모든 모듈 합산)
     int32 TypeDataOffset_Cached;          // TypeDataModule 페이로드의 시작 오프셋 (ParticleSize_Cached 내)
     int32 TypeDataInstanceOffset_Cached;  // TypeDataModule의 인스턴스별 데이터 오프셋 (ReqInstanceBytes_Cached 내)
+
+    // --- 현재 지원 안 함 --- 의논 필요
+    // int32 SubUVDataOffset_Cached;
+    // int32 DynamicParameterDataOffset_Cached;
+    // int32 OrbitModuleOffset_Cached;
+    // int32 LightDataOffset_Cached;
+    // float LightVolumetricScatteringIntensity_Cached;
+    // int32 CameraPayloadOffset_Cached;
+    // bool bAxisLockEnabled_Cached;
+    // int32 LockAxisFlags_Cached;
 
 public:
     UParticleEmitter();
