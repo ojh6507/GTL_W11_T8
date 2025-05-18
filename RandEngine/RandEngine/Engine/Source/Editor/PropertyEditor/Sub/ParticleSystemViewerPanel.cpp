@@ -274,7 +274,15 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 
         if (ActualSelectedModule)
         {
-            ImGui::Text("Module: %s", *(ActualSelectedModule->GetFName().ToString())); // FName을 사용한다고 가정
+            FString moduleDisplayName = ActualSelectedModule->GetModuleDisplayName();
+            ImGui::Text("Module: %s", moduleDisplayName.ToAnsiString().c_str());
+            ImGui::Separator();
+
+            bool bPropertyChanged = false;
+            if (ImGui::Checkbox("Enabled", &ActualSelectedModule->bEnabled))
+            {
+                bPropertyChanged = true;
+            }
             ImGui::Separator();
 
             if (UParticleModuleSpawn* SpawnModule = Cast<UParticleModuleSpawn>(ActualSelectedModule))
@@ -303,8 +311,27 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                 {
                     if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
                 }
-                // ... 기타 RequiredModule 프로퍼티 (Material, ScreenAlignment 등) ...
-            
+                ImGui::Text("SubUV (Sprite Sheet):");
+                if (ImGui::DragInt("SubImages Horizontal", &RequiredMod->SubImages_Horizontal, 1, 1, 64)) bPropertyChanged = true;
+                if (ImGui::DragInt("SubImages Vertical", &RequiredMod->SubImages_Vertical, 1, 1, 64)) bPropertyChanged = true;
+                ImGui::Separator();
+                ImGui::Text("Lifecycle Flags:");
+                if (ImGui::Checkbox("Kill On Deactivate", &RequiredMod->bKillOnDeactivate)) bPropertyChanged = true;
+                if (ImGui::Checkbox("Kill On Completed", &RequiredMod->bKillOnCompleted)) bPropertyChanged = true;
+                ImGui::Separator();
+
+                ImGui::Text("Rendering Flags:");
+                if (ImGui::Checkbox("Requires Sorting", &RequiredMod->bRequiresSorting)) bPropertyChanged = true;
+                if (RequiredMod->bRequiresSorting)
+                {
+                     const char* sortModeItems[] = { "None", "View Depth", "View Distance" /*, ... */ };
+                     int currentSortMode = RequiredMod->SortMode; // 또는 static_cast<int>(RequiredMod->SortModeEnum);
+                     if (ImGui::Combo("Sort Mode", &currentSortMode, sortModeItems, IM_ARRAYSIZE(sortModeItems))) {
+                         RequiredMod->SortMode = currentSortMode; // 또는 static_cast<EParticleSortMode>(currentSortMode);
+                         bPropertyChanged = true;
+                     }
+                }
+                if (ImGui::Checkbox("Ignore Component Scale (Meshes Only)", &RequiredMod->bIgnoreComponentScale)) bPropertyChanged = true;
             }
             else if (UParticleModuleTypeDataMesh* MeshTD = Cast<UParticleModuleTypeDataMesh>(ActualSelectedModule))
             {

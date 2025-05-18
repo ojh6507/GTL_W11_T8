@@ -17,11 +17,28 @@ public:
     int32 SubImages_Horizontal;
     int32 SubImages_Vertical;
 
+
+    bool bKillOnDeactivate;
+
+    bool bKillOnCompleted;
+
+    bool bRequiresSorting;
+
+    int32 SortMode; // 또는 EParticleSortMode SortMode;
+
+    bool bIgnoreComponentScale; // 메시 이미터에만 주로 해당
+
+
     UParticleModuleRequired()
         : EmitterDuration(1.0f)
         , EmitterLoops(1)
         , SubImages_Horizontal(1)
         , SubImages_Vertical(1)
+        , bKillOnDeactivate(false)
+        , bKillOnCompleted(false)
+        , bRequiresSorting(false)
+        , SortMode(0) 
+        , bIgnoreComponentScale(false)
     {
     }
 

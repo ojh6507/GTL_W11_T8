@@ -1,6 +1,7 @@
 #pragma once
 #include "UObject/Object.h"
-#include "ParticleDefines.h"  
+#include "ParticleHelper.h"  
+#include "ParticleDefines.h"
 #include "UObject/ObjectMacros.h"
 
 class UParticleEmitter;
