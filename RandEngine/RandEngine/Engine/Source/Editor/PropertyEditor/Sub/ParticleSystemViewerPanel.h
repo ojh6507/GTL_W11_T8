@@ -49,7 +49,8 @@ private:
     void RenderPropertiesPanel(const ImVec2& panelSize, const MyEmitterData* emitterPtr, MyModuleData* modulePtr);
     void RenderEmitterBlockContents(int emitterIdx, MyEmitterData& emitterData, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx);
     void RenderEmitterStrip(const ImVec2& panelSize, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx, TArray<MyEmitterData>& localEmittersData);
-
+    void AddEmitterStrip(TArray<MyEmitterData>& localEmittersData);
+    void AddModule(TArray<MyEmitterData>& localEmittersData);
     // HWND 크기 (OnResize에서 설정)
     float Width = 800.0f;  // 적절한 초기값 설정
     float Height = 600.0f; // 적절한 초기값 설정
