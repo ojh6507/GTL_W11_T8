@@ -5,7 +5,7 @@
 #include "UnrealClient.h"
 #include "Actors/Cube.h"
 #include "Animation/Skeleton.h"
-#include "Actors/Cube.h"
+#include "Particle/ParticleSystem.h"
 #include "Engine/AssetManager.h"
 #include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
@@ -127,6 +127,7 @@ void UParticleSystemSubEngine::Render()
         if (particlePanel) 
         {
             particlePanel->PrepareRender(ViewportClient); // 내부적으로 멤버 변수 RenderTargetRHI 설정
+
         }
         UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
         SubUI->EndFrame();
@@ -152,4 +153,12 @@ void UParticleSystemSubEngine::Release()
         delete SubRenderer;
         SubRenderer = nullptr;
     }
+}
+
+void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InParticleSystem)
+{
+    ParticleSystem = InParticleSystem;
+    ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
+    particlePanel->SetEditedParticleSystem(ParticleSystem);
+
 }

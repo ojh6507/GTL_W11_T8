@@ -15,15 +15,18 @@ public:
     float Delay;
 
     bool bAutoActivate; // 컴포넌트에 의해 활성화될 때 자동으로 시작할지 여부
-
+    bool bIsLooping_Computed = false;
 public:
     UParticleSystem();
     virtual ~UParticleSystem() = default;
 
+    void InitializeSystem();
+    
+    void UpdateComputedFlags();
+
     // 시스템 내 모든 이미터 빌드
     void BuildEmitters();
 
-    // (선택적) 시스템 로드 후 또는 에디터에서 변경 시 호출될 수 있는 함수
-    // virtual void PostLoad() override;
-    // virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+    void PostLoad();
 };

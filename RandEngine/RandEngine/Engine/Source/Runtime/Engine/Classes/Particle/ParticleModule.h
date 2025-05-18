@@ -20,11 +20,37 @@ public:
 
     // --- 모듈 타입 식별 ---
     virtual EModuleType GetModuleType() const { return EModuleType::Base; }
+    virtual FString GetModuleDisplayName() const
+    {
+        switch (GetModuleType())
+        {
+            case EModuleType::Required:
+                return TEXT("Required");
+            case EModuleType::Base:
+                return TEXT("Base");
+            case EModuleType::Spawn:
+                return TEXT("Spawn");
+            case EModuleType::Color:
+                return TEXT("Color");
+            case EModuleType::Velocity:
+                return TEXT("Velocity");
+            case EModuleType::Size:
+                return TEXT("Size");
+            case EModuleType::Lifetime:
+                return TEXT("Lifetime");
+            case EModuleType::TypeDataMesh:
+                return TEXT("TypeDataMesh");
+            case EModuleType::TypeDataSprite:
+                return TEXT("TypeDataSprite");
+            default:
+                return TEXT("Unknown");
 
+        }
+    }
     // --- 파티클 데이터 요구량 ---
     // 이 모듈이 파티클별 데이터(FBaseParticle 이후에 붙는)에 필요한 바이트 수
     virtual int32 RequiredBytes(UParticleModuleTypeDataBase* /*SpawningTypeData*/) const { return 0; }
-   
+
     // 이 모듈이 이미터 인스턴스별 데이터에 필요한 바이트 수
     virtual int32 RequiredBytesPerInstance() const { return 0; }
 
