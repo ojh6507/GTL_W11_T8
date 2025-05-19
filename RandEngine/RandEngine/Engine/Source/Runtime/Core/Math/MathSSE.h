@@ -93,6 +93,11 @@ inline void VectorMatrixMultiply(FMatrix* Result, const FMatrix* Matrix1, const 
     Ret[3] = Temp;
 }
 
+FORCEINLINE int32 TruncToInt(float F)
+{
+    return _mm_cvtt_ss2si(_mm_set_ss(F));
+}
+
 FORCEINLINE float TruncToFloat(float F)
 {
     return _mm_cvtss_f32(_mm_round_ps(_mm_set_ss(F), 3));

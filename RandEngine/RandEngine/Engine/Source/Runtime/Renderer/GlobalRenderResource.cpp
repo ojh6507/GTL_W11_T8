@@ -36,7 +36,6 @@ void FGlobalDynamicVertexBuffer::Commit()
     {
         if (VB && VB->MappedBuffer)
         {
-            // Context 는 전역이나 멤버로 보관하신 DeviceContext 를 사용하세요
             VB->Unmap(D3DContext);
         }
     }
