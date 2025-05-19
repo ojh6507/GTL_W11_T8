@@ -87,3 +87,13 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, c
         );
     }
 }
+
+void UParticleSystemComponent::SetParticleTemplate(UParticleSystem* InTemplate)
+{
+    Template = InTemplate;
+}
+
+UParticleSystem* UParticleSystemComponent::GetParticleTemplate()
+{
+    return Template;
+}

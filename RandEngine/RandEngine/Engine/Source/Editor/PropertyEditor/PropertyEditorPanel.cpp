@@ -43,6 +43,7 @@
 #include "Animation/AnimSingleNodeInstance.h"
 #include "MyAnimInstance.h"
 #include "Animation/AnimSequence.h"
+#include "Particle/ParticleSystemComponent.h"
 
 void PropertyEditorPanel::Render()
 {
@@ -148,7 +149,10 @@ void PropertyEditorPanel::Render()
     {
         RenderForSkeletalComponent(SkeletalMeshComponent);
     }
-
+    if (UParticleSystemComponent* ParticleSystemComponent = GetTargetComponent<UParticleSystemComponent>(SelectedActor, SelectedComponent))
+    {
+        RenderForParticleComponent(ParticleSystemComponent);
+    }
     ImGui::End();
 }
 
@@ -1086,6 +1090,38 @@ void PropertyEditorPanel::RenderForSkeletalComponent(USkeletalMeshComponent* Ske
         ImGui::TreePop();
     }
     ImGui::PopStyleColor();
+}
+
+void PropertyEditorPanel::RenderForParticleComponent(UParticleSystemComponent* ParticleSystemComp) const
+{
+    const TMap<FName, FAssetInfo> Assets = UAssetManager::Get().GetAssetRegistry();
+
+    static FString PreviewName = FString("None");
+    if (ImGui::BeginCombo("##ParticleSystem", GetData(PreviewName), ImGuiComboFlags_None))
+    {
+        if (ImGui::Selectable("None", false))
+        {
+            ParticleSystemComp->SetParticleTemplate(nullptr);
+        }
+
+        for (const auto& Asset : Assets)
+        {
+            if (Asset.Value.AssetType != EAssetType::ParticleSystem)
+            {
+                continue;
+            }
+
+            if (ImGui::Selectable(GetData(Asset.Value.AssetName.ToString()), false))
+            {
+                if (UParticleSystem* NewParticleSystem = UAssetManager::Get().GetParticleSystem(Asset.Value.AssetName))
+                {
+                    ParticleSystemComp->SetParticleTemplate(NewParticleSystem);
+                    PreviewName = Asset.Value.AssetName.ToString();
+                }
+            }
+        }
+        ImGui::EndCombo();
+    }
 }
 
 void PropertyEditorPanel::RenderForMaterial(UStaticMeshComponent* StaticMeshComp)
