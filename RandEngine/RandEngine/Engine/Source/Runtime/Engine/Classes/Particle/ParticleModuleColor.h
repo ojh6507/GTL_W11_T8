@@ -1,6 +1,7 @@
 #pragma once
 #include "ParticleModule.h"
-
+struct FLinearColor;
+struct FArchive;
 class UParticleModuleColor : public UParticleModule
 {
     DECLARE_CLASS(UParticleModuleColor, UParticleModule);
@@ -8,6 +9,14 @@ class UParticleModuleColor : public UParticleModule
 public:
     UParticleModuleColor();
     ~UParticleModuleColor() override = default;
+public: 
+    // 파티클의 시작 색상
+    FLinearColor StartColor;
 
+    // 파티클의 끝 색상
+    FLinearColor EndColor;
+    bool bInterpolateColor;
+public:
+    virtual EModuleType GetModuleType() const override { return EModuleType::Color; }
+    friend FArchive& operator<<(FArchive& Ar, UParticleModuleColor& M);
 };
-

@@ -46,3 +46,9 @@ int32 UParticleModuleSpawn::GetTotalBurstAmountSimple() const
     for (const FParticleBurst& Burst : BurstList) { Total += Burst.Count; }
     return Total;
 }
+
+FArchive& operator<<(FArchive& Ar, UParticleModuleSpawn& M)
+{
+    M.Serialize(Ar);
+    return Ar;
+}

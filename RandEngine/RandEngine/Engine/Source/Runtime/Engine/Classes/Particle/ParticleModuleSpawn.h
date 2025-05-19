@@ -9,6 +9,13 @@ struct FParticleBurst
     int32 Count;
     float Time;
     FParticleBurst() : Count(0), Time(0.0f) {}
+    friend FArchive& operator<<(FArchive& Ar, FParticleBurst& Burst)
+    {
+        Ar << Burst.Count; // int32
+        Ar << Burst.Time;  // float
+        return Ar;
+    }
+
 };
 
 class UParticleModuleSpawn : public UParticleModule
@@ -58,4 +65,50 @@ public:
      * (루프에 따른 중첩은 고려하지 않는 단순 합계)
      */
     int32 GetTotalBurstAmountSimple() const;
+
+    virtual void Serialize(FArchive& Ar) override
+    {
+        // 1. 부모 클래스(UParticleModule)의 Serialize 호출
+        Super::Serialize(Ar);
+
+        // 2. Rate (FDistributionFloat) 직렬화
+        Ar << Rate;
+
+        // 3. RateScale (FDistributionFloat) 직렬화
+        Ar << RateScale;
+
+        // 4. BurstList (TArray<FParticleBurst>) 직렬화
+        if (Ar.IsLoading())
+        {
+            int32 NumBursts = 0;
+            Ar << NumBursts; // 배열 크기 읽기
+            BurstList.Empty();
+             BurstList.Reserve(NumBursts);
+            for (int32 i = 0; i < NumBursts; ++i)
+            {
+                FParticleBurst NewBurst;
+                Ar << NewBurst;   
+                BurstList.Add(NewBurst); 
+            }
+        }
+        else // Saving
+        {
+            int32 NumBursts = BurstList.Num();
+            Ar << NumBursts; // 배열 크기 쓰기
+            for (const FParticleBurst& Burst : BurstList)
+            {
+                FParticleBurst TempBurst = Burst; 
+                Ar << TempBurst;
+            }
+        }
+
+        // 5. bProcessSpawnRate (bool) 직렬화
+        Ar << bProcessSpawnRate;
+
+        // 6. bProcessBurstList (bool) 직렬화
+        Ar << bProcessBurstList;
+    }
+    friend FArchive& operator<<(FArchive& Ar, UParticleModuleSpawn& M);
+
+
 };
