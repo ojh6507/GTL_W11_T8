@@ -1,4 +1,3 @@
-#include "ShaderRegisters.hlsl"
 
 float4 mainPS() : SV_TARGET
 {

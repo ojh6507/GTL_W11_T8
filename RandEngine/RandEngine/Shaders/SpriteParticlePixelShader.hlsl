@@ -1,6 +1,15 @@
-#include "ShaderRegisters.hlsl"
+Texture2D Texture : register(t0);
+SamplerState Sampler : register(s0);
 
-float4 mainPS() : SV_TARGET
+struct PS_Input
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 Position : SV_POSITION;
+    float2 UV : TEXCOORD;
+    float4 Color : COLOR;
+};
+
+float4 mainPS(PS_Input Input) : SV_TARGET
+{
+    float4 TextureColor = Texture.Sample(Sampler, Input.UV);
+	return TextureColor * Input.Color;
 }

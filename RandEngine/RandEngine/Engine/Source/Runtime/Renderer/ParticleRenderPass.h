@@ -24,21 +24,29 @@ public:
 
     virtual void PrepareRenderArr() override;
 
-    void UpdateCameraConstant(const FVector& CameraUp, const FVector& CameraRight) const;
+    void UpdateCameraConstant(const std::shared_ptr<FEditorViewportClient>& Viewport) const;
 
-    void PrepareSpriteParticleRender();
+    void PrepareSpriteParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
 
-    void PrepareMeshParticleRender();
+    void PrepareMeshParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
 
     virtual void Render(const std::shared_ptr<FEditorViewportClient>& Viewport) override;
 
+    void RenderSpriteParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicSpriteEmitterData* SpriteEmitter);
+
+    void RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter);
+
     virtual void ClearRenderArr() override;
+
+    void PrepareRender();
 
     void PrepareSpriteParticleShader() const;
 
     void PrepareMeshParticleShader() const;
 
     void CreateShader();
+
+    void CreateBlendStates();
 
 protected:
     TArray<UParticleSystemComponent*> ParticleComps;
@@ -49,4 +57,6 @@ private:
     FGraphicsDevice* Graphics;
 
     FDXDShaderManager* ShaderManager;
+
+    ID3D11BlendState* BlendStates[3];
 };
