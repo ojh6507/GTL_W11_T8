@@ -118,57 +118,34 @@ void FDrawer::RenderParticleSytemContentDrawer()
     {
         if (ImGui::Selectable("Create New Particle System"))
         {
-            UParticleSystem* NewSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr); // 임시 Outer 사용
+            UParticleSystem* NewSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
             if (NewSystem)
             {
-                // 기본 이미터 추가 (헬퍼 함수 사용)
-                // UParticleEmitter* DefaultEmitter = CreateDefaultEmitterForSystem(NewSystem, EParticleType::Sprite);
-                // if (DefaultEmitter) NewSystem->Emitters.Add(DefaultEmitter);
-
-                NewSystem->InitializeSystem(); // 초기 빌드
-
-                // (선택적) 바로 저장 UI를 띄우거나, 임시 에셋으로 두고 나중에 저장하도록 유도
-                // SaveParticleSystemAsset(NewSystem);
-
-                // 생성된 시스템을 뷰어에서 열도록 요청
-                if (GEngineLoop.ParticleSystemViewerSubEngine)
-                {
-                    static_cast<UParticleSystemSubEngine*>(GEngineLoop.ParticleSystemViewerSubEngine)->OpenParticleSystemForEditing(NewSystem);
-                    GEngineLoop.ParticleSystemViewerSubEngine->RequestShowWindow(true);
-                }
+                NewSystem->InitializeSystem(); 
             }
         }
         ImGui::EndPopup();
     }
 
-    //// 2. 기존 파티클 시스템 에셋 목록 표시 (TObjectRange 또는 에셋 매니저 사용)
-    //// 여기서는 TObjectRange를 사용한다고 가정 (실제로는 에셋 레지스트리나 특정 경로 스캔 방식이 더 일반적)
-    //ImGui::Text("Existing Particle Systems:");
-    //for (UParticleSystem* PSA : TObjectIterator<UParticleSystem>()) // 모든 UParticleSystem 객체 순회
-    //{
-    //    if (!PSA || PSA->HasAnyFlags(RF_ClassDefaultObject | RF_ArchetypeObject)) // CDO나 Archetype은 제외
-    //        continue;
 
-    //    // 에셋 경로 또는 이름을 가져와서 표시 (사용자 시스템의 방식에 따라)
-    //    // FString AssetName = PSA->GetPathName(); // 또는 PSA->GetName()
-    //    FString AssetName = PSA->GetFName().ToString(); // FName 사용 시
-    //    if (ImGui::Selectable(AssetName.ToAnsiString().c_str())) // FString -> const char* 변환
-    //    {
-    //        // 선택 시 아무것도 안 함 (더블클릭으로 열기)
-    //    }
+    for (UParticleSystem* PSA : TObjectRange<UParticleSystem>()) // 모든 UParticleSystem 객체 순회
+    {
+        if (!PSA) 
+            continue;
 
-    //    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-    //    {
-    //        if (GEngineLoop.ParticleSystemViewerSubEngine)
-    //        {
-    //            static_cast<UParticleSystemSubEngine*>(GEngineLoop.ParticleSystemViewerSubEngine)->OpenParticleSystemForEditing(PSA);
-    //            GEngineLoop.ParticleSystemViewerSubEngine->RequestShowWindow(true);
-    //            // 더블 클릭된 에셋이 ParticleSystemViewerPanel의 CurrentEditedSystem으로 설정되어야 함
-    //            // ParticleSystemViewerPanel* Panel = static_cast<ParticleSystemViewerPanel*>(GEngineLoop.ParticleSystemViewerSubEngine->GetEditorPanel());
-    //            // if (Panel) Panel->SetEditedParticleSystem(PSA);
-    //        }
-    //    }
-    //}
+        FString AssetName = PSA->GetFName().ToString();
+        ImGui::Selectable(AssetName.ToAnsiString().c_str());
+
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+        {
+            if (GEngineLoop.ParticleSystemViewerSubEngine)
+            {
+                static_cast<UParticleSystemSubEngine*>(GEngineLoop.ParticleSystemViewerSubEngine)->OpenParticleSystemForEditing(PSA);
+                GEngineLoop.ParticleSystemViewerSubEngine->RequestShowWindow(true);
+              
+            }
+        }
+    }
     //// 만약 특정 경로의 에셋만 표시하고 싶다면, 에셋 매니저를 통해 해당 경로의 에셋 목록을 가져와야 합니다.
     //// 예: TArray<FAssetData> ParticleSystemAssets;
     ////     UAssetManager::Get().GetAssetsByPath(TEXT("/Game/Particles"), ParticleSystemAssets, true);

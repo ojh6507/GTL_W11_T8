@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "CoreMiscDefines.h"
 #include "Container/String.h"
 #include "HAL/PlatformType.h"
@@ -65,18 +65,29 @@ public:
 
     FORCEINLINE friend FArchive& operator<<(FArchive& Ar, FString& Value)
     {
-        int32 Length = Value.Len();
-        Ar << Length; // 문자열 길이 직렬화
+        int32 Length; // 로드 시에는 여기서 값을 읽어오고, 저장 시에는 아래에서 설정됨
 
         if (Ar.IsLoading())
         {
-            Value.Resize(Length);
+            Ar << Length; // <--- 여기서 Length를 읽음
+            Value.Resize(Length); // <--- 읽은 Length로 리사이즈
         }
-        Ar.Serialize(GetData(Value), Length * sizeof(TCHAR));
+        else
+        {
+            Length = Value.Len();
+            Ar << Length; // <--- 여기서 Length를 씀
+        }
 
+        if (Length > 0)
+        {
+            Ar.Serialize(GetData(Value), Length * sizeof(TCHAR)); // <--- 실제 데이터 처리
+        }
+        else if (Ar.IsLoading() && Length == 0)
+        {
+            Value.Empty();
+        }
         return Ar;
     }
-
     virtual void Serialize(void* V, int64 Length)
     {
         if (IsLoading())

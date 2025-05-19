@@ -1,7 +1,7 @@
 #pragma once
+#include "Serialization/Archive.h"
 #include "UObject/NameTypes.h"
 #include "MathUtility.h"
-
 enum class EDistributionType : uint8 // 명시적으로 기본 타입 지정 가능
 {
     Constant,
@@ -103,5 +103,77 @@ struct FDistributionFloat
             return Constant;
         }
         return Constant;
+    }
+
+    friend FArchive& operator<<(FArchive& Ar, FDistributionFloat& Dist)
+    {
+        // 1. DistributionType (enum) 직렬화
+        // enum을 uint8로 저장하고 로드 시 다시 enum으로 캐스팅
+        if (Ar.IsLoading())
+        {
+            uint8 DistTypeInt;
+            Ar << DistTypeInt;
+            Dist.DistributionType = static_cast<EDistributionType>(DistTypeInt);
+        }
+        else // Saving
+        {
+            uint8 DistTypeInt = static_cast<uint8>(Dist.DistributionType);
+            Ar << DistTypeInt;
+        }
+
+        // 2. 분포 타입에 따라 필요한 데이터 직렬화
+        switch (Dist.DistributionType)
+        {
+        case EDistributionType::Constant:
+            Ar << Dist.Constant;
+            break;
+
+        case EDistributionType::Uniform:
+            Ar << Dist.Min;
+            Ar << Dist.Max;
+            break;
+
+        case EDistributionType::Curve:
+
+            Ar << Dist.Constant;
+            break;
+
+        case EDistributionType::Parameter:
+            Ar << Dist.ParameterName; // FName 직렬화 (FArchive에 operator<<(FName&) 오버로드 필요)
+            // Parameter 타입일 경우에도 Constant 값을 fallback으로 저장/로드할 수 있습니다.
+            Ar << Dist.Constant;
+            // UE_LOG(LogSerialization, Verbose, TEXT("Serializing FDistributionFloat: Parameter type (Name: %s, Constant fallback: %f)."), *Dist.ParameterName.ToString(), Dist.Constant);
+            break;
+
+        default:
+            // 알 수 없는 분포 타입 처리 (오류 로그 또는 기본값 처리)
+            // UE_LOG(LogSerialization, Warning, TEXT("Serializing FDistributionFloat: Unknown distribution type encountered."));
+            // 기본적으로 Constant 값을 저장/로드할 수 있도록 처리 (안전한 fallback)
+            if (Ar.IsLoading()) { // 로딩 시에는 Constant 필드가 이미 초기화되어 있을 수 있으므로, 읽어오는 것이 안전
+                Ar << Dist.Constant;
+            }
+            else if (Dist.DistributionType != EDistributionType::Constant) { // 저장 시, 명시적으로 Constant가 아니었다면, Constant 필드라도 저장
+                Ar << Dist.Constant;
+            }
+            break;
+        }
+        // 로딩 시, 사용되지 않는 필드들은 기본값으로 남아있거나, 필요하다면 여기서 명시적으로 초기화할 수 있습니다.
+        // 예를 들어, 로딩 시 타입이 Constant로 바뀌었다면 Min, Max, ParameterName 등을 초기화.
+        if (Ar.IsLoading())
+        {
+            if (Dist.DistributionType != EDistributionType::Uniform)
+            {
+                // Dist.Min = 0.0f; // 필요에 따라 초기화
+                // Dist.Max = 0.0f;
+            }
+            if (Dist.DistributionType != EDistributionType::Parameter)
+            {
+                // Dist.ParameterName = NAME_None; // 필요에 따라 초기화
+            }
+            // Curve 타입에 대한 처리도 유사하게 가능
+        }
+
+
+        return Ar;
     }
 };

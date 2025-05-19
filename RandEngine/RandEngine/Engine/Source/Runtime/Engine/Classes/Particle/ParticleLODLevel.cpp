@@ -8,7 +8,10 @@
 #include "ParticleModuleRequired.h"
 #include "ParticleModuleTypeDataBase.h"
 
-
+#include "UObject/Casts.h"
+#include "UObject/ObjectFactory.h"
+#include "ParticleModuleTypeDataMesh.h"
+#include "ParticleModuleTypeDataSprite.h"
 int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
 {
     if (!RequiredModule)
@@ -46,8 +49,8 @@ int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
         EffectiveSpawnRate = SpawnModule->GetEffectiveSpawnRate(0.0f); // 이미터 시간 0에서의 스폰율 (또는 분포의 최대/평균)
         TotalBurstAmountFromSpawnModule = SpawnModule->GetTotalBurstAmountSimple();
     }
-    else 
-    { 
+    else
+    {
         UE_LOG(ELogLevel::Warning, TEXT("CalculateMaxActiveParticleCount: SpawnModule not found or disabled."));
     }
 
@@ -190,4 +193,134 @@ void UParticleLODLevel::CompileModules(FParticleEmitterBuildInfo& OutEmitterBuil
     {
         this->TypeDataModule->CompileModule(OutEmitterBuildInfo);
     }
+}
+static UParticleModule* CreateModuleByClassName(const FString& ClassName, UObject* Outer)
+{
+    // 참고: 실제 엔진에서는 FClassFinder나 UClass::TryFindTypeSlow 등을 사용할 수 있습니다.
+    // 여기서는 간단한 if-else 체인으로 예시를 듭니다.
+    // 실제로는 모든 가능한 모듈 타입을 여기에 등록해야 합니다.
+
+    if (ClassName == TEXT("UParticleModuleRequired")) return FObjectFactory::ConstructObject<UParticleModuleRequired>(Outer);
+    if (ClassName == TEXT("UParticleModuleSpawn")) return FObjectFactory::ConstructObject<UParticleModuleSpawn>(Outer); // 예시
+    if (ClassName == TEXT("UParticleModuleLifetime")) return FObjectFactory::ConstructObject<UParticleModuleLifetime>(Outer); // 예시
+    // ... 기타 모든 UParticleModule 파생 클래스들 ...
+    if (ClassName == TEXT("UParticleModuleTypeDataSprite")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataSprite>(Outer); // 예시
+    if (ClassName == TEXT("UParticleModuleTypeDataMesh")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataMesh>(Outer); // 예시
+    // ... 기타 모든 UParticleModuleTypeDataBase 파생 클래스들 ...
+
+    // UE_LOG(LogSerialization, Error, TEXT("Unknown module class name for deserialization: %s"), *ClassName);
+    return nullptr;
+}
+
+FArchive& operator<<(FArchive& Ar, UParticleLODLevel& LOD)
+{
+
+    if (Ar.IsLoading())
+    {
+        uint8 bEnable = (LOD.bEnabled) ? 1 : 0;
+        Ar << bEnable;
+
+
+        uint8 bHasRequiredModule = 0;
+        Ar << bHasRequiredModule;
+        if (bHasRequiredModule)
+        {
+            LOD.RequiredModule = FObjectFactory::ConstructObject<UParticleModuleRequired>(&LOD);
+            if (LOD.RequiredModule)
+            {
+                Ar << (*LOD.RequiredModule);
+            }
+        }
+        else
+        {
+            LOD.RequiredModule = nullptr;
+        }
+    }
+    else // Saving
+    {
+        uint8 bEnable = (LOD.bEnabled) ? 1 : 0;
+        Ar << bEnable;
+
+
+        uint8 bHasRequiredModule = (LOD.RequiredModule ? 1 : 0);
+        Ar << bHasRequiredModule;
+        if (bHasRequiredModule)
+        {
+            Ar << (*LOD.RequiredModule);
+        }
+    }
+
+    // --- 3. TypeDataModule 직렬화 (다형성 처리) ---
+    if (Ar.IsLoading())
+    {
+        uint8 bHasTypeDataModule = false;
+        Ar << bHasTypeDataModule;
+        if (bHasTypeDataModule)
+        {
+            FString TypeDataClassName;
+            Ar << TypeDataClassName; // 타입 이름 읽기
+            LOD.TypeDataModule = static_cast<UParticleModuleTypeDataBase*>(CreateModuleByClassName(TypeDataClassName, &LOD));
+
+            if (LOD.TypeDataModule)
+            {
+                Ar << (*LOD.TypeDataModule); // 해당 타입의 operator<< 호출
+            }
+
+        }
+        else
+        {
+            LOD.TypeDataModule = nullptr;
+        }
+    }
+    else // Saving
+    {
+        uint8 bHasTypeDataModule = (LOD.TypeDataModule ? 1 : 0);
+        Ar << bHasTypeDataModule;
+        if (bHasTypeDataModule)
+        {
+            FString TypeDataClassName = LOD.TypeDataModule->GetClass()->GetName();
+
+            Ar << TypeDataClassName;
+            Ar << (*LOD.TypeDataModule);
+        }
+    }
+
+    if (Ar.IsLoading())
+    {
+
+        int32 NumModules = 0;
+        Ar << NumModules;
+
+        LOD.Modules.Empty();
+        LOD.Modules.Reserve(NumModules);
+        for (int32 i = 0; i < NumModules; ++i)
+        {
+            FString ModuleClassName;
+            Ar << ModuleClassName; // 모듈의 실제 클래스 이름 읽기
+            UParticleModule* NewModule = CreateModuleByClassName(ModuleClassName, &LOD);
+
+            if (NewModule)
+            {
+                 Ar << (*NewModule); // 해당 타입의 operator<< 호출
+                 LOD.Modules.Add(NewModule);
+            }
+        }
+    }
+    else // Saving
+    {
+        int32 NumModules = LOD.Modules.Num();
+        Ar << NumModules;
+
+        for (UParticleModule* Module : LOD.Modules)
+        {
+            if (Module)
+            {
+                FString ModuleClassName = Module->GetClass()->GetName();
+                Ar << ModuleClassName;
+                Ar << (*Module);
+            }
+        }
+    }
+
+    return Ar;
 }

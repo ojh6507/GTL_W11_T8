@@ -11,11 +11,19 @@ public:
     FDistributionFloat Lifetime;
     float GetMaxLifetime() const
     {
-        if (Lifetime.IsConstant()) 
-            return Lifetime.GetConstantValue(); 
-        else 
+        if (Lifetime.IsConstant())
+            return Lifetime.GetConstantValue();
+        else
             return Lifetime.GetMaxValue();
     }
     virtual EModuleType GetModuleType() const override { return EModuleType::Lifetime; }
+
+    friend FArchive& operator<<(FArchive& Ar, UParticleModuleLifetime& M);
+
+    virtual void Serialize(FArchive& Ar)
+    {
+        Super::Serialize(Ar);
+        Ar << Lifetime;
+    }
 };
 
