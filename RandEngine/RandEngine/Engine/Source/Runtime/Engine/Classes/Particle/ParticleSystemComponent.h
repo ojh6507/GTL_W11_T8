@@ -13,7 +13,7 @@ public:
     ~UParticleSystemComponent() override = default;
 
     void InitParticles();
-    void PreareRenderData();
+    void PrepareRenderData();
 
 
     TArray<FParticleEmitterInstance*> EmitterInstances;
