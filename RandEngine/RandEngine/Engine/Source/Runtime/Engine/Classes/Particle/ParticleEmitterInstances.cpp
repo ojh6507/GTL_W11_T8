@@ -70,6 +70,7 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
     bRequiresSorting = ReqModule->bRequiresSorting;
     SortMode = ReqModule->SortMode;
     bIgnoreComponentScale = ReqModule->bIgnoreComponentScale;
+    ReqModule->bUseLocalSpace = true; // 로컬 스페이스 사용 여부 현재 일단 true
 
     // --- UParticleEmitter에서 직접 캐시된 플래그 가져오기 ---
     bRequiresLoopNotification = InEmitterTemplate->bRequiresLoopNotification_Cached;
@@ -92,6 +93,7 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
     bHaltSpawning = false;
     bHaltSpawningExternal = false;
     bFakeBurstsWhenSpawningSupressed = false;
+
 
     // --- 메모리 할당 ---
     delete[] ParticleData;       ParticleData = nullptr;
@@ -184,7 +186,7 @@ void FParticleDataContainer::Alloc(int32 InParticleDataNumBytes, int32 InParticl
 
         MemBlockSize = ParticleDataNumBytes + ParticleIndicesNumShorts * sizeof(uint16);
 
-        //ParticleData = (uint8*)FastParticleSmallBlockAlloc(MemBlockSize);
+        ParticleData = (uint8*)(FPlatformMemory::Malloc<EAllocationType::EAT_Container>(MemBlockSize));
         ParticleIndices = (uint16*)(ParticleData + ParticleDataNumBytes);
     }
     else
@@ -204,7 +206,7 @@ void FParticleDataContainer::Free()
             UE_LOG(ELogLevel::Error, TEXT("FParticleDataContainer::Free - MemBlockSize is <= 0"));
             return;
         }
-		//FastParticleSmallBlockFree(ParticleData, MemBlockSize);
+        FPlatformMemory::Free<EAllocationType::EAT_Container>(ParticleData, MemBlockSize);
 	}
 	MemBlockSize = 0;
 	ParticleDataNumBytes = 0;

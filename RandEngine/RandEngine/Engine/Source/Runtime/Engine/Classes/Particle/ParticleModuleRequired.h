@@ -40,6 +40,7 @@ public:
 
     bool bIgnoreComponentScale; // 메시 이미터에만 주로 해당
 
+    bool bUseLocalSpace; // 로컬 스페이스에서 파티클을 생성할지 여부
 
     UParticleModuleRequired()
         : EmitterDuration(1.0f)
