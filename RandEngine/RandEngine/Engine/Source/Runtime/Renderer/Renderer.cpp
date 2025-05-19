@@ -37,6 +37,7 @@
 #include "Stats/GPUTimingManager.h"
 
 #include "GlobalRenderResource.h"
+#include "ParticleRenderPass.h"
 
 //------------------------------------------------------------------------------
 // 초기화 및 해제 관련 함수
@@ -76,6 +77,8 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     PostProcessCompositingPass = new FPostProcessCompositingPass();
     SlateRenderPass = new FSlateRenderPass();
 
+    ParticleRenderPass = new FParticleRenderPass();
+
     if (false == ShadowManager->Initialize(Graphics, BufferManager))
     {
         static_assert(true, "ShadowManager Initialize Failed");
@@ -107,6 +110,8 @@ void FRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* InBuf
     PostProcessCompositingPass->Initialize(BufferManager, Graphics, ShaderManager);
     
     SlateRenderPass->Initialize(BufferManager, Graphics, ShaderManager);
+
+    ParticleRenderPass->Initialize(BufferManager, Graphics, ShaderManager);
 }
 
 void FRenderer::Release()
@@ -127,6 +132,7 @@ void FRenderer::Release()
     delete CompositingPass;
     delete PostProcessCompositingPass;
     delete SlateRenderPass;
+    delete ParticleRenderPass;
 }
 
 //------------------------------------------------------------------------------
@@ -184,6 +190,9 @@ void FRenderer::CreateConstantBuffers()
 
     UINT BonesBufferSize = sizeof(FBonesConstants);
     BufferManager->CreateBufferGeneric<FBonesConstants>("FBonesConstants", nullptr, BonesBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+
+    UINT SpriteCameraBufferSize = sizeof(FSpriteParticleCameraConstants);
+    BufferManager->CreateBufferGeneric<FSpriteParticleCameraConstants>("FSpriteParticleCameraConstantBuffer", nullptr, SpriteCameraBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
     // TODO: 함수로 분리
     ID3D11Buffer* ObjectBuffer = BufferManager->GetConstantBuffer(TEXT("FObjectConstantBuffer"));
@@ -272,6 +281,7 @@ void FRenderer::PrepareRenderPass() const
     EditorRenderPass->PrepareRenderArr();
     TileLightCullingPass->PrepareRenderArr();
     DepthPrePass->PrepareRenderArr();
+    ParticleRenderPass->PrepareRenderArr();
 }
 
 void FRenderer::ClearRenderArr() const
@@ -287,6 +297,7 @@ void FRenderer::ClearRenderArr() const
     EditorRenderPass->ClearRenderArr();
     DepthPrePass->ClearRenderArr();
     TileLightCullingPass->ClearRenderArr();
+    ParticleRenderPass->ClearRenderArr();
 }
 
 void FRenderer::UpdateCommonBuffer(const std::shared_ptr<FEditorViewportClient>& Viewport) const
@@ -423,6 +434,10 @@ void FRenderer::RenderWorldScene(const std::shared_ptr<FEditorViewportClient>& V
             }
         }
     }
+
+    QUICK_SCOPE_CYCLE_COUNTER(ParticlePass_CPU)
+    QUICK_GPU_SCOPE_CYCLE_COUNTER(ParticlePass_GPU, *GPUTimingManager)
+    ParticleRenderPass->Render(Viewport);
     
     // Render World Billboard
     if (ShowFlag & EEngineShowFlags::SF_BillboardText)

@@ -12,10 +12,10 @@ struct VS_Input
     float4 Color : COLOR;
 };
 
-struct VS_Output
+struct PS_Input
 {
     float4 Position : SV_POSITION;
-    float2 UV : TEXCOORD0;
+    float2 UV : TEXCOORD;
     float4 Color : COLOR;
 };
 
@@ -29,21 +29,24 @@ cbuffer SpriteCameraConstant : register(b0)
 
 static const float2 QuadUVs[4] =
 {
-    float2(0, 0), float2(1, 0), float2(1, 1), float2(0, 1)
+    float2(0, 0), 
+    float2(1, 0), 
+    float2(1, 1), 
+    float2(0, 1)
 };
 
 static const float2 QuadOffsets[4] =
 {
-    float2(-1.0, -1.0),
-    float2(1.0, -1.0),
+    float2(-1.0, 1.0),
     float2(1.0, 1.0),
-    float2(-1.0, 1.0)
+    float2(1.0, -1.0),
+    float2(-1.0, -1.0)
 };
 
 
-VS_Output mainVS(VS_Input Input, uint VertexID : SV_VertexID)
+PS_Input mainVS(VS_Input Input, uint VertexID : SV_VertexID)
 {
-    VS_Output Output;
+    PS_Input Output;
     
     float2 Offset = QuadOffsets[VertexID % 4];
     float2 ScaledOffset = Offset * Input.Size;

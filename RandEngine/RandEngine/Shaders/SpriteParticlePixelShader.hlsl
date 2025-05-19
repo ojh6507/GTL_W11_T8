@@ -10,6 +10,7 @@ struct PS_Input
 
 float4 mainPS(PS_Input Input) : SV_TARGET
 {
+    return Input.Color;
     float4 TextureColor = Texture.Sample(Sampler, Input.UV);
-	return TextureColor * Input.Color;
+    return TextureColor * Input.Color;
 }

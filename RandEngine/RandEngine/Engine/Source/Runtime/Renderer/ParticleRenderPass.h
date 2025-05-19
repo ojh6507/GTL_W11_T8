@@ -38,7 +38,7 @@ public:
 
     virtual void ClearRenderArr() override;
 
-    void PrepareRender();
+    void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
 
     void PrepareSpriteParticleShader() const;
 
