@@ -71,9 +71,17 @@ public:
 
     // --- 파티클 생명주기 함수 (가상 함수로 만들어 파생 클래스에서 오버라이드) ---
     // 파티클 스폰 직후 호출 (초기값 설정 등)
-    virtual void Spawn(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle* ParticleBase) {}
+    virtual void SpawnParticle(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle& ParticleBase) {}
+
     // 파티클 매 틱 업데이트 시 호출
-    virtual void Update(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) {}
+    virtual void UpdateParticle(FParticleEmitterInstance* Owner,
+        FBaseParticle& Particle,
+        const uint8* ParticleBaseForPayload, // PARTICLE_ELEMENT용
+        int32 PayloadRelativeOffset,       // PARTICLE_ELEMENT용 CurrentOffset 초기값
+        float DeltaTime)
+    {
+    }
+
     // 파티클 소멸 시 호출 (필요하다면)
     virtual void FinalUpdate(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) {}
     friend FArchive& operator<<(FArchive& Ar, UParticleModule& M);

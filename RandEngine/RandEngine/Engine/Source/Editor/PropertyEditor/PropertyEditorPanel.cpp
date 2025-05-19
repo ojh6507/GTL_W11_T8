@@ -1116,6 +1116,7 @@ void PropertyEditorPanel::RenderForParticleComponent(UParticleSystemComponent* P
                 if (UParticleSystem* NewParticleSystem = UAssetManager::Get().GetParticleSystem(Asset.Value.AssetName))
                 {
                     ParticleSystemComp->SetParticleTemplate(NewParticleSystem);
+                    ParticleSystemComp->InitParticles();
                     PreviewName = Asset.Value.AssetName.ToString();
                 }
             }

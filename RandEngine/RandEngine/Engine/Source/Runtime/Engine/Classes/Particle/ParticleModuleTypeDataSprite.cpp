@@ -29,6 +29,17 @@ void UParticleModuleTypeDataSprite::LoadTexture()
     }
 }
 
+void UParticleModuleTypeDataSprite::Serialize(FArchive& Ar)
+{
+    Super::Serialize(Ar);
+
+    Ar << TextureAssetPath;
+    if (Ar.IsLoading())
+    {
+        LoadTexture();
+    }
+}
+
 FArchive& operator<<(FArchive& Ar, UParticleModuleTypeDataSprite& M)
 {
     M.Serialize(Ar);
