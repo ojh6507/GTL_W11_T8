@@ -465,6 +465,8 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
 
     /** true if the particle emitter utilizes the DynamicParameter module */
     uint32 bUsesDynamicParameter : 1;
+
+    FAsyncBufferFillData AsyncFillData;
 };
 
 /** Source data for Sprite emitters */
