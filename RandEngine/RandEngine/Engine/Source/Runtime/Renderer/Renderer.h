@@ -28,6 +28,7 @@ class FEditorViewportClient;
 
 class FViewportResource;
 
+class FParticleRenderPass;
 class FStaticMeshRenderPass;
 class FSkeletalMeshRenderPass;
 class FWorldBillboardRenderPass;
@@ -117,6 +118,8 @@ public:
     FPostProcessCompositingPass* PostProcessCompositingPass = nullptr;
     
     FSlateRenderPass* SlateRenderPass = nullptr;
+
+    FParticleRenderPass* ParticleRenderPass = nullptr;
 };
 
 template<typename T>
