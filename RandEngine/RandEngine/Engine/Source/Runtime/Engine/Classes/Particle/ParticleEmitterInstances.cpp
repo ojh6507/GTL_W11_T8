@@ -127,3 +127,83 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
         Location = FVector(0.f);
     }
 }
+
+FDynamicSpriteEmitterReplayDataBase::FDynamicSpriteEmitterReplayDataBase()
+    : MaterialInterface(nullptr)
+    , RequiredModule(nullptr)
+    , NormalsSphereCenter(FVector::ZeroVector)
+    , NormalsCylinderDirection(FVector::ZeroVector)
+    , InvDeltaSeconds(0.0f)
+    , MaxDrawCount(0)
+    , OrbitModuleOffset(0)
+    , DynamicParameterDataOffset(0)
+    , LightDataOffset(0)
+    , LightVolumetricScatteringIntensity(0)
+    , CameraPayloadOffset(0)
+    , SubUVDataOffset(0)
+    , SubImages_Horizontal(1)
+    , SubImages_Vertical(1)
+    , bUseLocalSpace(false)
+    , bLockAxis(false)
+    , ScreenAlignment(0)
+    , LockAxisFlag(0)
+    , EmitterRenderMode(0)
+    , EmitterNormalsMode(0)
+    , PivotOffset(-0.5f, -0.5f, 0.0f)
+    , bUseVelocityForMotionBlur(false)
+    , bRemoveHMDRoll(false)
+    , MinFacingCameraBlendDistance(0.f)
+    , MaxFacingCameraBlendDistance(0.f)
+{
+}
+
+
+FDynamicSpriteEmitterReplayDataBase::~FDynamicSpriteEmitterReplayDataBase()
+{
+    delete RequiredModule;
+}
+
+FDynamicEmitterDataBase::FDynamicEmitterDataBase(const UParticleModuleRequired* RequiredModule)
+    : bSelected(false)
+    , EmitterIndex(INDEX_NONE)
+{
+}
+
+void FParticleDataContainer::Alloc(int32 InParticleDataNumBytes, int32 InParticleIndicesNumShorts)
+{
+    if (InParticleDataNumBytes > 0 && ParticleIndicesNumShorts >= 0 // we assume that the particle storage has reasonable alignment below
+        && InParticleDataNumBytes % sizeof(uint16) == 0)
+    {
+        ParticleDataNumBytes = InParticleDataNumBytes;
+        ParticleIndicesNumShorts = InParticleIndicesNumShorts;
+
+        MemBlockSize = ParticleDataNumBytes + ParticleIndicesNumShorts * sizeof(uint16);
+
+        //ParticleData = (uint8*)FastParticleSmallBlockAlloc(MemBlockSize);
+        ParticleIndices = (uint16*)(ParticleData + ParticleDataNumBytes);
+    }
+    else
+    {
+        UE_LOG(ELogLevel::Error, TEXT("FParticleDataContainer::Alloc - ParticleDataNumBytes is <= 0 or ParticleIndicesNumShorts is < 0"));
+        return;
+    }
+
+}
+
+void FParticleDataContainer::Free()
+{
+	if (ParticleData)
+	{
+        if (MemBlockSize <= 0)
+        {
+            UE_LOG(ELogLevel::Error, TEXT("FParticleDataContainer::Free - MemBlockSize is <= 0"));
+            return;
+        }
+		//FastParticleSmallBlockFree(ParticleData, MemBlockSize);
+	}
+	MemBlockSize = 0;
+	ParticleDataNumBytes = 0;
+	ParticleIndicesNumShorts = 0;
+	ParticleData = nullptr;
+	ParticleIndices = nullptr;
+}

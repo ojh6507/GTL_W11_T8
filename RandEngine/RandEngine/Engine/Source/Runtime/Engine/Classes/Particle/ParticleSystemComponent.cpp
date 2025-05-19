@@ -1,7 +1,7 @@
 #include "ParticleSystemComponent.h"
 #include "ParticleEmitterInstances.h"
-#include "ParticleHelper.h"
 #include "ParticleLODLevel.h"
+#include "ParticleSystem.h"
 
 UParticleSystemComponent::UParticleSystemComponent()
 {
