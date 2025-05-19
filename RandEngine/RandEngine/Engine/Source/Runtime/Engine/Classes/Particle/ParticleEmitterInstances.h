@@ -135,5 +135,4 @@ struct FParticleEmitterInstance
 
     void Tick(float DeltaTime);
 
-    int32 LoopCount;
 };
