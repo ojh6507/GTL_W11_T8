@@ -63,7 +63,7 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, c
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
-        FDynamicSpriteEmitterData* SpriteData = Cast<FDynamicSpriteEmitterData>(EmitterRenderData[Idx]);
+        FDynamicSpriteEmitterData* SpriteData = static_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]);
         FParticleEmitterInstance* EmitterInstance = EmitterInstances[Idx];
 
         // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
