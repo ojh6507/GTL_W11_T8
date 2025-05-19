@@ -98,7 +98,8 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
     {
         if (GetAsyncKeyState('W') & 0x8000)
         {
-            EditorPlayer->SetMode(CM_TRANSLATION);
+            if (ParticleSystem)
+                ParticleSystem->SaveParticleSystemToBinary();
         }
         if (GetAsyncKeyState('E') & 0x8000)
         {
@@ -160,5 +161,5 @@ void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InP
     ParticleSystem = InParticleSystem;
     ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
     particlePanel->SetEditedParticleSystem(ParticleSystem);
-
+ 
 }

@@ -33,3 +33,10 @@ void UParticleModuleTypeDataMesh::Build(const FParticleEmitterBuildInfo& Emitter
     // 런타임에는 이미 직렬화된 Mesh 포인터가 로드되어 있거나,
     // 여기서 로드된 Mesh 포인터를 사용합니다.
 }
+
+
+FArchive& operator<<(FArchive& Ar, UParticleModuleTypeDataMesh& M)
+{
+    M.Serialize(Ar);
+    return Ar;
+}

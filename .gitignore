@@ -457,3 +457,4 @@ FodyWeavers.xsd
 
 !EngineSIU/EngineSIU/Engine/Source/ThirdParty/**
 RandEngine/RandEngine/editor.ini
+*.myparticle

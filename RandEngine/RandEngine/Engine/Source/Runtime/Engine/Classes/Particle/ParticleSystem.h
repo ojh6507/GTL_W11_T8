@@ -29,4 +29,8 @@ public:
 
 
     void PostLoad();
+
+    void SaveParticleSystemToBinary();
+
+    static UParticleSystem* LoadParticleSystemFromBinary(const FString& FilePath, UObject* OuterForSystem);
 };

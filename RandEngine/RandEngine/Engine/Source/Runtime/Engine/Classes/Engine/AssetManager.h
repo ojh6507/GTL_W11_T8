@@ -7,13 +7,14 @@
 
 class UStaticMesh;
 class UAnimationAsset;
+class UParticleSystem;
 
 enum class EExtensionType : uint8
 {
     None = 0,
     Obj = 1ULL << 0,
     Fbx = 1ULL << 1,
-
+    ParticleSystem = 1ULL << 2,
     All = ~0ULL, 
 };
 
@@ -25,6 +26,7 @@ enum class EAssetType : uint8
     Material,
     Animation,
     Skeleton,
+    ParticleSystem,
 };
 
 struct FAssetInfo
@@ -53,7 +55,6 @@ struct FFbxLoadResult
     TArray<UAnimationAsset*> Animations;
     TArray<UMaterial*> Materials;
 };
-
 // TODO 파일로 존재하는 UAsset을 관리하는 Manager이지만, 현재 해당 역할을 벗어나 작동한다. 
 class UAssetManager : public UObject
 {
@@ -101,4 +102,5 @@ private:
     inline static TMap<FName, USkeleton*> SkeletonMap;
     inline static TMap<FName, USkeletalMesh*> SkeletalMeshMap;
     inline static TMap<FName, UAnimationAsset*> AnimationMap;
+    inline static TMap<FString, UParticleSystem*> ParticleSystemMap;
 };

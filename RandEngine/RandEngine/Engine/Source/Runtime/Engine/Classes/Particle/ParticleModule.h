@@ -76,4 +76,9 @@ public:
     virtual void Update(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) {}
     // 파티클 소멸 시 호출 (필요하다면)
     virtual void FinalUpdate(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) {}
+    friend FArchive& operator<<(FArchive& Ar, UParticleModule& M);
+    virtual void Serialize(FArchive& Ar) // 가상 멤버 함수로 변경
+    {
+        Ar << bEnabled;
+    }
 };

@@ -33,7 +33,15 @@ public:
     {
         return true;
     }
+    virtual void Serialize(FArchive& Ar) override // 오버라이드
+    {
+        Super::Serialize(Ar); 
+     
+        Ar << MeshAssetPath;
 
+        Ar << MeshScale;
+
+    }
     virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override;
-
+    friend FArchive& operator<<(FArchive& Ar, UParticleModuleTypeDataMesh& M);
 };
