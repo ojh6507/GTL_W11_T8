@@ -1,6 +1,7 @@
 #include "ParticleSystemComponent.h"
 #include "ParticleEmitterInstances.h"
 #include "ParticleLODLevel.h"
+#include "UObject/UObjectIterator.h"
 #include "ParticleSystem.h"
 #include "UObject/Casts.h"
 
@@ -24,6 +25,11 @@ void UParticleSystemComponent::TickComponent(float DeltaTime)
 
 void UParticleSystemComponent::InitParticles()
 {
+    for (auto pcs : TObjectRange<UParticleSystem>())
+    {
+        Template = pcs;
+        break;
+    }
     if (Template)
     {
         Template->InitializeSystem();
