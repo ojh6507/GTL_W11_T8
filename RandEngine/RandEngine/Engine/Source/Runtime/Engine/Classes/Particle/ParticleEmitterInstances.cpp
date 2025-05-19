@@ -128,6 +128,11 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
     }
 }
 
+void FParticleEmitterInstance::Tick(float DeltaTime)
+{
+
+}
+
 FDynamicSpriteEmitterReplayDataBase::FDynamicSpriteEmitterReplayDataBase()
     : MaterialInterface(nullptr)
     , RequiredModule(nullptr)

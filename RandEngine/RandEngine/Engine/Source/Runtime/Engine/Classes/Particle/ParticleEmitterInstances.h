@@ -102,4 +102,6 @@ struct FParticleEmitterInstance
     void KillParticle(int32 Index);
     
     void InitParameters(UParticleEmitter* InEmitterTemplate, UParticleSystemComponent* InComponent);
+
+    void Tick(float DeltaTime);
 };
