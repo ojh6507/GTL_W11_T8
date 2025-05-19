@@ -1,5 +1,6 @@
 #include "ParticleHelper.h"
 #include "ParticleModuleRequired.h"
+#include "Editor/UnrealEd/EditorViewportClient.h"
 
 FVector2D GetParticleSize(const FBaseParticle& Particle, const FDynamicSpriteEmitterReplayDataBase& Source)
 {
@@ -215,31 +216,31 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
 
         const FVector2D* SubUVVertexData = nullptr;
 
-        if (Source.RequiredModule->bCutoutTexureIsValid)
-        {
-            const int32 SubImageIndexInt = FMath::TruncToInt(SubImageIndex);
-            int32 FrameIndex = SubImageIndexInt % Source.RequiredModule->NumFrames;
+        //if (Source.RequiredModule->bCutoutTexureIsValid)
+        //{
+        //    const int32 SubImageIndexInt = FMath::TruncToInt(SubImageIndex);
+        //    int32 FrameIndex = SubImageIndexInt % Source.RequiredModule->NumFrames;
 
-            if (SubImageIndexInt < 0)
-            {
-                // Mod operator returns remainder toward zero, not toward negative which is what we want
-                FrameIndex = Source.RequiredModule->NumFrames - SubImageIndexInt;
-            }
+        //    if (SubImageIndexInt < 0)
+        //    {
+        //        // Mod operator returns remainder toward zero, not toward negative which is what we want
+        //        FrameIndex = Source.RequiredModule->NumFrames - SubImageIndexInt;
+        //    }
 
-            SubUVVertexData = &Source.RequiredModule->FrameData[FrameIndex];
-        }
+        //    SubUVVertexData = &Source.RequiredModule->FrameData[FrameIndex];
+        //}
 
-        const bool bHasUVVertexData = SubUVVertexData && Source.RequiredModule->bCutoutTexureIsValid;
+        //const bool bHasUVVertexData = SubUVVertexData && Source.RequiredModule->bCutoutTexureIsValid;
 
         for (int32 VertexIndex = 0; VertexIndex < NumVerticesPerParticle; ++VertexIndex)
         {
-            if (bHasUVVertexData)
-            {
-                // Warning: not supporting UV flipping with cutout geometry in the non-instanced path
-                FillVertex[VertexIndex].UV = SubUVVertexData[VertexIndex];
-            }
-            else
-            {
+            //if (bHasUVVertexData)
+            //{
+            //    // Warning: not supporting UV flipping with cutout geometry in the non-instanced path
+            //    FillVertex[VertexIndex].UV = SubUVVertexData[VertexIndex];
+            //}
+            //else
+            //{
                 if (VertexIndex == 0)
                 {
                     FillVertex[VertexIndex].UV = FVector2D(0.0f, 0.0f);
@@ -256,7 +257,7 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
                 {
                     FillVertex[VertexIndex].UV = FVector2D(1.0f, 0.0f);
                 }
-            }
+            //}
 
             FillVertex[VertexIndex].Position = FVector(ParticlePosition);
             FillVertex[VertexIndex].RelativeTime = Particle.RelativeTime;
@@ -286,4 +287,100 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
     }
 
     return true;
+}
+
+
+void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLocalSpace,
+    int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
+    const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const
+{
+    if (SortMode == PSORTMODE_ViewProjDepth)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            float InZ;
+            if (bLocalSpace)
+            {
+                InZ = (View->View * View->Projection).TransformFVector4(LocalToWorld.TransformPosition(Particle.Location)).W;
+            }
+            else
+            {
+                InZ = (View->View * View->Projection).TransformFVector4(Particle.Location).W;
+            }
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+
+            ParticleOrder[ParticleIndex].Z = InZ;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.Z > B.Z;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_DistanceToView)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            float InZ;
+            FVector Position;
+            if (bLocalSpace)
+            {
+                Position = LocalToWorld.TransformPosition(Particle.Location);
+            }
+            else
+            {
+                Position = Particle.Location;
+            }
+            InZ = (View->GetCameraLocation() - Position).SizeSquared();
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].Z = InZ;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.Z > B.Z;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_Age_OldestFirst)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].C = Particle.Flags & STATE_CounterMask;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.C > B.C;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_Age_NewestFirst)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].C = (~Particle.Flags) & STATE_CounterMask;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.C > B.C;  // Z 내림차순
+            }
+        );
+    }
 }

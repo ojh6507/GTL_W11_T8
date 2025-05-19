@@ -135,6 +135,128 @@ void FParticleEmitterInstance::SpawnParticles(int32 InCount, float InStartTime, 
         ActiveParticles++;
         SpawnCount++;
     }
+bool FParticleEmitterInstance::FillReplayData(FDynamicEmitterReplayDataBase& OutData)
+{
+    QUICK_SCOPE_CYCLE_COUNTER(STAT_ParticleEmitterInstance_FillReplayData);
+
+    // NOTE: This the base class implementation that should ONLY be called by derived classes' FillReplayData()!
+
+    // Make sure there is a template present
+    if (!SpriteTemplate)
+    {
+        return false;
+    }
+
+    // Allocate it for now, but we will want to change this to do some form
+    // of caching
+    if (ActiveParticles <= 0 || !bEnabled)
+    {
+        return false;
+    }
+    // If the template is disabled, don't return data.
+    UParticleLODLevel* LODLevel = CurrentLODLevel;
+    if ((LODLevel == NULL) || (LODLevel->bEnabled == false))
+    {
+        return false;
+    }
+
+    // Make sure we will not be allocating enough memory
+    if (MaxActiveParticles < ActiveParticles)
+    {
+        return false;
+    }
+
+    // Must be filled in by implementation in derived class
+    OutData.eEmitterType = DET_Unknown;
+
+    OutData.ActiveParticleCount = ActiveParticles;
+    OutData.ParticleStride = ParticleStride;
+    OutData.SortMode = SortMode;
+
+    // Take scale into account
+    OutData.Scale = FVector::OneVector;
+    if (Component)
+    {
+        OutData.Scale = FVector(Component->GetRelativeScale3D());
+    }
+
+    int32 ParticleMemSize = MaxActiveParticles * ParticleStride;
+
+    // Allocate particle memory
+
+    OutData.DataContainer.Alloc(ParticleMemSize, MaxActiveParticles);
+
+    FPlatformMemory::Memcpy(OutData.DataContainer.ParticleData, ParticleData, ParticleMemSize);
+    FPlatformMemory::Memcpy(OutData.DataContainer.ParticleIndices, ParticleIndices, OutData.DataContainer.ParticleIndicesNumShorts * sizeof(uint16));
+
+    // All particle emitter types derived from sprite emitters, so we can fill that data in here too!
+    {
+        FDynamicSpriteEmitterReplayDataBase* NewReplayData =
+            static_cast<FDynamicSpriteEmitterReplayDataBase*>(&OutData);
+
+        //NewReplayData->RequiredModule = LODLevel->RequiredModule->CreateRendererResource();
+        NewReplayData->MaterialInterface = NULL;	// Must be set by derived implementation
+        NewReplayData->InvDeltaSeconds = (LastDeltaTime > KINDA_SMALL_NUMBER) ? (1.0f / LastDeltaTime) : 0.0f;
+        //NewReplayData->LWCTile = ((Component == nullptr) || LODLevel->RequiredModule->bUseLocalSpace) ? FVector::Zero() : Component->GetLWCTile();
+
+        //NewReplayData->MaxDrawCount =
+        //    (LODLevel->RequiredModule->bUseMaxDrawCount == true) ? LODLevel->RequiredModule->MaxDrawCount : -1;
+        NewReplayData->MaxDrawCount = -1;
+        /*NewReplayData->ScreenAlignment = LODLevel->RequiredModule->ScreenAlignment;*/
+        NewReplayData->bUseLocalSpace = LODLevel->RequiredModule->bUseLocalSpace;
+        /*NewReplayData->EmitterRenderMode = SpriteTemplate->EmitterRenderMode;*/
+        NewReplayData->DynamicParameterDataOffset = DynamicParameterDataOffset;
+        NewReplayData->LightDataOffset = LightDataOffset;
+        NewReplayData->LightVolumetricScatteringIntensity = LightVolumetricScatteringIntensity;
+        NewReplayData->CameraPayloadOffset = CameraPayloadOffset;
+
+        NewReplayData->SubUVDataOffset = SubUVDataOffset;
+        NewReplayData->SubImages_Horizontal = LODLevel->RequiredModule->SubImages_Horizontal;
+        NewReplayData->SubImages_Vertical = LODLevel->RequiredModule->SubImages_Vertical;
+
+        //NewReplayData->MacroUVOverride.bOverride = LODLevel->RequiredModule->bOverrideSystemMacroUV;
+        //NewReplayData->MacroUVOverride.Radius = LODLevel->RequiredModule->MacroUVRadius;
+        //NewReplayData->MacroUVOverride.Position = FVector3f(LODLevel->RequiredModule->MacroUVPosition);
+
+        NewReplayData->bLockAxis = false;
+        //if (bAxisLockEnabled == true)
+        //{
+        //    NewReplayData->LockAxisFlag = LockAxisFlags;
+        //    if (LockAxisFlags != EPAL_NONE)
+        //    {
+        //        NewReplayData->bLockAxis = true;
+        //    }
+        //}
+
+        // If there are orbit modules, add the orbit module data
+        //if (LODLevel->OrbitModules.Num() > 0)
+        //{
+        //    UParticleLODLevel* HighestLODLevel = SpriteTemplate->LODLevels[0];
+        //    UParticleModuleOrbit* LastOrbit = HighestLODLevel->OrbitModules[LODLevel->OrbitModules.Num() - 1];
+        //    check(LastOrbit);
+
+        //    uint32* LastOrbitOffset = SpriteTemplate->ModuleOffsetMap.Find(LastOrbit);
+        //    NewReplayData->OrbitModuleOffset = *LastOrbitOffset;
+        //}
+
+        //NewReplayData->EmitterNormalsMode = LODLevel->RequiredModule->EmitterNormalsMode;
+        //NewReplayData->NormalsSphereCenter = (FVector)LODLevel->RequiredModule->NormalsSphereCenter;
+        //NewReplayData->NormalsCylinderDirection = (FVector)LODLevel->RequiredModule->NormalsCylinderDirection;
+
+        NewReplayData->PivotOffset = FVector2D(PivotOffset);
+
+        //NewReplayData->bUseVelocityForMotionBlur = LODLevel->RequiredModule->ShouldUseVelocityForMotionBlur();
+        //NewReplayData->bRemoveHMDRoll = LODLevel->RequiredModule->bRemoveHMDRoll;
+        //NewReplayData->MinFacingCameraBlendDistance = LODLevel->RequiredModule->MinFacingCameraBlendDistance;
+        //NewReplayData->MaxFacingCameraBlendDistance = LODLevel->RequiredModule->MaxFacingCameraBlendDistance;
+    }
+
+
+    return true;
+}
+
+void FParticleEmitterInstance::SpawnParticles(int32 Count, float StartTime, float Increment, const FVector& InitialLocation, const FVector& InitialVelocity, FParticleEventInstancePayload* EventPayload)
+{
 }
 
 void FParticleEmitterInstance::KillParticle(int32 Index)
@@ -171,7 +293,7 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
         MaxActiveParticles = 0;
         return;
     }
-    bEnabled = 1;
+    bEnabled = true;
 
     // --- UParticleEmitter의 _Cached 멤버로부터 값 복사 ---
     ParticleSize = InEmitterTemplate->ParticleSize_Cached;
@@ -210,8 +332,8 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
     bIsBeam = false; // 미지원
 
     // --- 런타임 상태 변수 초기화 ---
-    ActiveParticles = 0;
-    LoopCount = 0;
+    MaxActiveParticles = 5; // 임시로 5로 설정 추후 삭제
+    ActiveParticles = 5; // 임시로 5로 설정 추후 0으로 변경
     ParticleCounter = 0;
     SpawnFraction = 0.0f;
     SecondsSinceCreation = 0.0f;
@@ -472,7 +594,7 @@ FDynamicSpriteEmitterReplayDataBase::FDynamicSpriteEmitterReplayDataBase()
     , LockAxisFlag(0)
     , EmitterRenderMode(0)
     , EmitterNormalsMode(0)
-    , PivotOffset(-0.5f, -0.5f, 0.0f)
+    , PivotOffset(-0.5f, -0.5f)
     , bUseVelocityForMotionBlur(false)
     , bRemoveHMDRoll(false)
     , MinFacingCameraBlendDistance(0.f)

@@ -2,6 +2,16 @@
 #include "ParticleModule.h"
 #include "Container/String.h" 
 
+enum EParticleSortMode : int
+{
+    PSORTMODE_None,
+    PSORTMODE_ViewProjDepth,
+    PSORTMODE_DistanceToView,
+    PSORTMODE_Age_OldestFirst,
+    PSORTMODE_Age_NewestFirst,
+    PSORTMODE_MAX,
+};
+
 struct FParticleRequiredModule
 {
     uint32 NumFrames;
@@ -10,8 +20,8 @@ struct FParticleRequiredModule
     float AlphaThreshold;
     TArray<FVector2D> FrameData;
     //FRHIShaderResourceView* BoundingGeometryBufferSRV;
-    uint8 bCutoutTexureIsValid : 1;
-    uint8 bUseVelocityForMotionBlur : 1;
+    bool bCutoutTexureIsValid = false;
+    bool bUseVelocityForMotionBlur = false;
 };
 
 class UParticleModuleRequired : public UParticleModule
