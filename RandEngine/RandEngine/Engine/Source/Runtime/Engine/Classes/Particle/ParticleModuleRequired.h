@@ -66,24 +66,6 @@ public:
     }
 
     virtual EModuleType GetModuleType() const override { return EModuleType::Required; }
-
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleRequired& M);
-
-    virtual void Serialize(FArchive& Ar) override
-    {
-
-        Super::Serialize(Ar);
-
-        // --- UParticleModuleRequired 고유 멤버 직렬화 ---
-        Ar << EmitterDuration;
-        Ar << EmitterLoops;
-        Ar << SubImages_Horizontal;
-        Ar << SubImages_Vertical;
-        Ar << bKillOnDeactivate;
-        Ar << bKillOnCompleted;
-        Ar << bRequiresSorting;
-        Ar << SortMode;
-        Ar << bIgnoreComponentScale;
-
-    }
+    virtual void Serialize(FArchive& Ar) override;
 };

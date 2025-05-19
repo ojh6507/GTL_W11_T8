@@ -17,15 +17,12 @@ public:
     virtual int32 RequiredBytes(UParticleModuleTypeDataBase* SpawningTypeData) const override { return 0; }
     // 이미터 인스턴스당 필요한 추가 바이트 수
     virtual int32 RequiredBytesPerInstance() const override { return 0; }
-
+ 
     // 이 TypeDataModule이 빌드를 필요로 하는지 여부
     virtual bool RequiresBuild() const override { return false; }
     // 실제 빌드 로직
     virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override {}
     // 이미터 정보 캐싱
     virtual void CacheModuleInfo(UParticleEmitter* Emitter) override {}
-    virtual void Serialize(FArchive& Ar) override
-    {
-        Super::Serialize(Ar);
-    }
+    virtual void Serialize(FArchive& Ar) override;
 };

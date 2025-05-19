@@ -21,6 +21,7 @@ class UTextComponent;
 class UHeightFogComponent;
 class AEditorPlayer;
 class UStaticMeshComponent;
+class UParticleSystemComponent;
 class USkeletalMeshComponent;
 
 // 헬퍼 함수 예시
@@ -84,10 +85,10 @@ private:
     
     void RenderForSkeletalComponent(USkeletalMeshComponent* SkeletalMeshComponent) const;
 
+    void RenderForParticleComponent(UParticleSystemComponent* ParticleSystemComp) const;
     template<typename T>
         requires std::derived_from<T, UActorComponent>
     T* GetTargetComponent(AActor* SelectedActor, USceneComponent* SelectedComponent);
-
     
 private:
     float Width = 0, Height = 0;

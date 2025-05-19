@@ -1,4 +1,14 @@
 #include "ParticleModuleSpawn.h"
+UParticleModuleSpawn::UParticleModuleSpawn()
+    : bProcessSpawnRate(true)
+    , bProcessBurstList(true)
+{
+    Rate.DistributionType = EDistributionType::Constant;
+    Rate.Constant = 10.0f;
+
+    RateScale.DistributionType = EDistributionType::Constant;
+    RateScale.Constant = 1.0f;
+}
 
 float UParticleModuleSpawn::GetEffectiveSpawnRate(float EmitterTime) const
 {
@@ -45,6 +55,49 @@ int32 UParticleModuleSpawn::GetTotalBurstAmountSimple() const
     int32 Total = 0;
     for (const FParticleBurst& Burst : BurstList) { Total += Burst.Count; }
     return Total;
+}
+
+void UParticleModuleSpawn::Serialize(FArchive& Ar)
+{
+    // 1. 부모 클래스(UParticleModule)의 Serialize 호출
+    Super::Serialize(Ar);
+
+    // 2. Rate (FDistributionFloat) 직렬화
+    Ar << Rate;
+
+    // 3. RateScale (FDistributionFloat) 직렬화
+    Ar << RateScale;
+
+    // 4. BurstList (TArray<FParticleBurst>) 직렬화
+    if (Ar.IsLoading())
+    {
+        int32 NumBursts = 0;
+        Ar << NumBursts; // 배열 크기 읽기
+        BurstList.Empty();
+        BurstList.Reserve(NumBursts);
+        for (int32 i = 0; i < NumBursts; ++i)
+        {
+            FParticleBurst NewBurst;
+            Ar << NewBurst;
+            BurstList.Add(NewBurst);
+        }
+    }
+    else // Saving
+    {
+        int32 NumBursts = BurstList.Num();
+        Ar << NumBursts; // 배열 크기 쓰기
+        for (const FParticleBurst& Burst : BurstList)
+        {
+            FParticleBurst TempBurst = Burst;
+            Ar << TempBurst;
+        }
+    }
+
+    // 5. bProcessSpawnRate (bool) 직렬화
+    Ar << bProcessSpawnRate;
+
+    // 6. bProcessBurstList (bool) 직렬화
+    Ar << bProcessBurstList;
 }
 
 FArchive& operator<<(FArchive& Ar, UParticleModuleSpawn& M)

@@ -21,6 +21,9 @@ public:
     void PrepareRenderData();
     void FillRenderData(const FEditorViewportClient* View);
 
+    void SetParticleTemplate(UParticleSystem* InTemplate);
+   
+
     FGlobalDynamicVertexBuffer DynamicVB;
     FGlobalDynamicIndexBuffer  DynamicIB;
 

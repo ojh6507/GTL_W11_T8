@@ -566,6 +566,7 @@ struct FMath
         return A;
     }
 
+    [[nodiscard]] static FVector VRand();
     // double 타입에 대한 IsNaN 구현
     static inline bool IsNaN(double Value)
     {

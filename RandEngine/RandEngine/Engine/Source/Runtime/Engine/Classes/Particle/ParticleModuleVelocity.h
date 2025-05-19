@@ -18,12 +18,8 @@ public:
     virtual EModuleType GetModuleType() const override { return EModuleType::Velocity; }
 
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleVelocity& M);
+    virtual void SpawnParticle(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle& Particle);
+    virtual void UpdateParticle(FParticleEmitterInstance* Owner, FBaseParticle& Particle, const uint8* ParticleBaseForPayload, int32 PayloadRelativeOffset, float DeltaTime) override;
 
-    virtual void Serialize(FArchive& Ar) override // 오버라이드
-    {
-        Ar << MinStartVelocity;
-
-        Ar << MaxStartVelocity;
-
-    }
+    virtual void Serialize(FArchive& Ar) override;
 };

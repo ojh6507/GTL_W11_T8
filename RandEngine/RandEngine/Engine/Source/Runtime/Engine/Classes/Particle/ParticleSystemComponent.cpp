@@ -120,3 +120,8 @@ void UParticleSystemComponent::FillRenderData(const FEditorViewportClient* View)
 
     }
 }
+
+void UParticleSystemComponent::SetParticleTemplate(UParticleSystem* InTemplate)
+{
+    Template = InTemplate;
+}

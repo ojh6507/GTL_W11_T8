@@ -3,6 +3,12 @@
 #include "Components/Material/Material.h"
 #include "Renderer/GlobalRenderResource.h"
 
+#include <cassert>
+#include <cstddef>
+
+#ifndef check
+#define check(expr) assert(expr)
+#endif
 // UE5에서 일부 가져옴
 
 class UStaticMesh;
@@ -21,7 +27,6 @@ struct FParticleMeshEmitterInstance;
 	{																													\
 		check((Owner != NULL) && (Owner->Component != NULL));															\
 		int32&			ActiveParticles = Owner->ActiveParticles;														\
-		uint32			CurrentOffset	= Offset;																		\
 		const uint8*		ParticleData	= Owner->ParticleData;															\
 		const uint32		ParticleStride	= Owner->ParticleStride;														\
 		uint16*			ParticleIndices	= Owner->ParticleIndices;														\
@@ -35,12 +40,10 @@ struct FParticleMeshEmitterInstance;
 
 #define END_UPDATE_LOOP																									\
 			}																											\
-			CurrentOffset				= Offset;																		\
 		}																												\
 	}
 
 #define CONTINUE_UPDATE_LOOP																							\
-		CurrentOffset = Offset;																							\
 		continue;
 
 #define SPAWN_INIT																										\
@@ -60,6 +63,16 @@ struct FParticleMeshEmitterInstance;
 		ParticleIndices[ActiveParticles-1]	= CurrentIndex;																\
 		ActiveParticles--;																								\
 	}
+
+enum class EParticleFlags : uint32 
+{
+    None = 0,
+    Freeze = 1 << 0,
+    Death = 1 << 1,
+    Collision = 1 << 2,
+    DisableGravity = 1 << 3,
+    IsLit = 1 << 4,
+};
 
 /*-----------------------------------------------------------------------------
     FBaseParticle

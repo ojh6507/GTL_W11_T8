@@ -134,4 +134,5 @@ struct FParticleEmitterInstance
     void InitParameters(UParticleEmitter* InEmitterTemplate, UParticleSystemComponent* InComponent);
 
     void Tick(float DeltaTime);
+
 };

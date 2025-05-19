@@ -28,20 +28,14 @@ public:
     {
         return sizeof(FMeshParticlePayload);
     }
+    virtual void UpdateParticle(FParticleEmitterInstance* Owner, FBaseParticle& Particle, const uint8* ParticleBaseForPayload, int32 PayloadRelativeOffset, float DeltaTime) override;
 
     virtual bool RequiresBuild() const override
     {
         return true;
     }
-    virtual void Serialize(FArchive& Ar) override // 오버라이드
-    {
-        Super::Serialize(Ar); 
-     
-        Ar << MeshAssetPath;
-
-        Ar << MeshScale;
-
-    }
+    virtual void Serialize(FArchive& Ar) override;
     virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override;
+    virtual void SpawnParticle(FParticleEmitterInstance* Owner, int32 PayloadRelativeOffset, float SpawnTime, FBaseParticle& Particle) override;
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleTypeDataMesh& M);
 };
