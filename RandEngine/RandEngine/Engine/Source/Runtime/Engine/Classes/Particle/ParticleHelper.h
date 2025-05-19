@@ -371,6 +371,10 @@ struct FDynamicEmitterDataBase
     uint32	bValid : 1;
 
     int32  EmitterIndex;
+
+    FGlobalDynamicVertexBufferAllocation VertexAllocation;
+    FGlobalDynamicIndexBufferAllocation  IndexAllocation;
+    FGlobalDynamicVertexBufferAllocation ParamAllocation;
 };
 
 

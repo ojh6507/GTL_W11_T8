@@ -125,7 +125,7 @@ struct TDynamicBufferPool
                 if (Buf.BufferSize >= SizeInBytes && Buf.Stride == Stride)
                 {
                     CurrentBuffer = &Buf;
-                    CurrentBuffer->AllocatedByteCount = 0;  // ← 여기
+                    CurrentBuffer->AllocatedByteCount = 0;
                     break;
                 }
             }
@@ -140,7 +140,7 @@ struct TDynamicBufferPool
 
                 // GPU 버퍼 생성 + 맵
                 CurrentBuffer->Init(Device, Context);
-                CurrentBuffer->AllocatedByteCount = 0;  // ← 여기
+                CurrentBuffer->AllocatedByteCount = 0;
             }
         }
 
