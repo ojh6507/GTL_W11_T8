@@ -8,6 +8,59 @@
 class UStaticMesh;
 struct FParticleMeshEmitterInstance;
 
+#define DECLARE_PARTICLE(Name,Address)		\
+	FBaseParticle& Name = *((FBaseParticle*) (Address));
+
+#define DECLARE_PARTICLE_CONST(Name,Address)		\
+	const FBaseParticle& Name = *((const FBaseParticle*) (Address));
+
+#define DECLARE_PARTICLE_PTR(Name,Address)		\
+	FBaseParticle* Name = (FBaseParticle*) (Address);
+
+#define BEGIN_UPDATE_LOOP																								\
+	{																													\
+		check((Owner != NULL) && (Owner->Component != NULL));															\
+		int32&			ActiveParticles = Owner->ActiveParticles;														\
+		uint32			CurrentOffset	= Offset;																		\
+		const uint8*		ParticleData	= Owner->ParticleData;															\
+		const uint32		ParticleStride	= Owner->ParticleStride;														\
+		uint16*			ParticleIndices	= Owner->ParticleIndices;														\
+		for(int32 i=ActiveParticles-1; i>=0; i--)																			\
+		{																												\
+			const int32	CurrentIndex	= ParticleIndices[i];															\
+			const uint8* ParticleBase	= ParticleData + CurrentIndex * ParticleStride;									\
+			FBaseParticle& Particle		= *((FBaseParticle*) ParticleBase);												\
+			if ((Particle.Flags & STATE_Particle_Freeze) == 0)															\
+			{																											\
+
+#define END_UPDATE_LOOP																									\
+			}																											\
+			CurrentOffset				= Offset;																		\
+		}																												\
+	}
+
+#define CONTINUE_UPDATE_LOOP																							\
+		CurrentOffset = Offset;																							\
+		continue;
+
+#define SPAWN_INIT																										\
+	check((Owner != NULL) && (Owner->Component != NULL));																\
+	const int32		ActiveParticles	= Owner->ActiveParticles;															\
+	const uint32		ParticleStride	= Owner->ParticleStride;															\
+	uint32			CurrentOffset	= Offset;																			\
+	FBaseParticle&	Particle		= *(ParticleBase);
+
+#define PARTICLE_ELEMENT(Type,Name)																						\
+	Type& Name = *((Type*)((uint8*)ParticleBase + CurrentOffset));																\
+	CurrentOffset += sizeof(Type);
+
+#define KILL_CURRENT_PARTICLE																							\
+	{																													\
+		ParticleIndices[i]					= ParticleIndices[ActiveParticles-1];										\
+		ParticleIndices[ActiveParticles-1]	= CurrentIndex;																\
+		ActiveParticles--;																								\
+	}
+
 /*-----------------------------------------------------------------------------
     FBaseParticle
 -----------------------------------------------------------------------------*/
@@ -48,6 +101,34 @@ struct FBaseParticle
     float			Placeholder0;
     float			Placeholder1;
 };
+
+/*-----------------------------------------------------------------------------
+    Particle State Flags
+-----------------------------------------------------------------------------*/
+enum EParticleStates
+{
+    /** Ignore updates to the particle						*/
+    STATE_Particle_JustSpawned = 0x02000000,
+    /** Ignore updates to the particle						*/
+    STATE_Particle_Freeze = 0x04000000,
+    /** Ignore collision updates to the particle			*/
+    STATE_Particle_IgnoreCollisions = 0x08000000,
+    /**	Stop translations of the particle					*/
+    STATE_Particle_FreezeTranslation = 0x10000000,
+    /**	Stop rotations of the particle						*/
+    STATE_Particle_FreezeRotation = 0x20000000,
+    /** Combination for a single check of 'ignore' flags	*/
+    STATE_Particle_CollisionIgnoreCheck = STATE_Particle_Freeze | STATE_Particle_IgnoreCollisions | STATE_Particle_FreezeTranslation | STATE_Particle_FreezeRotation,
+    /** Delay collision updates to the particle				*/
+    STATE_Particle_DelayCollisions = 0x40000000,
+    /** Flag indicating the particle has had at least one collision	*/
+    STATE_Particle_CollisionHasOccurred = 0x80000000,
+    /** State mask. */
+    STATE_Mask = 0xFE000000,
+    /** Counter mask. */
+    STATE_CounterMask = (~STATE_Mask)
+};
+
 
 /**
  * Per-particle data sent to the GPU.
@@ -259,6 +340,36 @@ struct FMacroUVOverride
     }
 };
 
+//
+//	SubUV-related payloads
+//
+struct FFullSubUVPayload
+{
+    // The integer portion indicates the sub-image index.
+    // The fractional portion indicates the lerp factor.
+    float ImageIndex;
+    float RandomImageTime;
+};
+
+/**
+ *	Chain-able Orbit module instance payload
+ */
+struct FOrbitChainModuleInstancePayload
+{
+    /** The base offset of the particle from it's tracked location	*/
+    FVector	BaseOffset;
+    /** The offset of the particle from it's tracked location		*/
+    FVector	Offset;
+    /** The rotation of the particle at it's offset location		*/
+    FVector	Rotation;
+    /** The base rotation rate of the particle offset				*/
+    FVector	BaseRotationRate;
+    /** The rotation rate of the particle offset					*/
+    FVector	RotationRate;
+    /** The offset of the particle from the last frame				*/
+    FVector	PreviousOffset;
+};
+
 struct FParticleEventInstancePayload
 {
     uint32 bSpawnEventsPresent : 1;
@@ -270,6 +381,39 @@ struct FParticleEventInstancePayload
     int32 DeathTrackingCount;
     int32 CollisionTrackingCount;
     int32 BurstTrackingCount;
+};
+/**
+ *	DynamicParameter particle payload.
+ */
+struct FEmitterDynamicParameterPayload
+{
+    /** The float4 value to assign to the dynamic parameter. */
+    float DynamicParameterValue[4];
+};
+
+/**
+ *	Helper function for retrieving the dynamic payload of a particle.
+ *
+ *	@param	InDynamicPayloadOffset		The offset to the payload
+ *	@param	InParticle					The particle being processed
+ *	@param	OutDynamicData				The dynamic data from the particle
+ */
+FORCEINLINE void GetDynamicValueFromPayload(int32 InDynamicPayloadOffset, const FBaseParticle& InParticle, FVector4& OutDynamicData)
+{
+    const FEmitterDynamicParameterPayload* DynPayload = ((const FEmitterDynamicParameterPayload*)((uint8*)(&InParticle) + InDynamicPayloadOffset));
+    OutDynamicData.X = DynPayload->DynamicParameterValue[0];
+    OutDynamicData.Y = DynPayload->DynamicParameterValue[1];
+    OutDynamicData.Z = DynPayload->DynamicParameterValue[2];
+    OutDynamicData.W = DynPayload->DynamicParameterValue[3];
+}
+
+/** Camera offset particle payload */
+struct FCameraOffsetParticlePayload
+{
+    /** The base amount to offset the particle towards the camera */
+    float	BaseOffset;
+    /** The amount to offset the particle towards the camera */
+    float	Offset;
 };
 
 /** Source data base class for all emitter types */
@@ -775,3 +919,10 @@ struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
     mutable int32 LastCalculatedMeshLOD;
     const FParticleMeshEmitterInstance* EmitterInstance;
 };
+
+FORCEINLINE FVector2D GetParticleSizeWithUVFlipInSign(const FBaseParticle& Particle, const FVector2D& ScaledSize)
+{
+    return FVector2D(
+        Particle.BaseSize.X >= 0.0f ? ScaledSize.X : -ScaledSize.X,
+        Particle.BaseSize.Y >= 0.0f ? ScaledSize.Y : -ScaledSize.Y);
+}

@@ -15,6 +15,7 @@ public:
 
     void InitParticles();
     void PrepareRenderData();
+    void FillRenderData(const FVector& InCameraPosition, const FMatrix& InLocalToWorld);
 
     FGlobalDynamicVertexBuffer DynamicVB;
     FGlobalDynamicIndexBuffer  DynamicIB;

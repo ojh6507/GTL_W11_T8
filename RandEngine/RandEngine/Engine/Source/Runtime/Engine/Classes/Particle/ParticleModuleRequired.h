@@ -2,9 +2,21 @@
 #include "ParticleModule.h"
 #include "Container/String.h" 
 
+struct FParticleRequiredModule
+{
+    uint32 NumFrames;
+    uint32 NumBoundingVertices;
+    uint32 NumBoundingTriangles;
+    float AlphaThreshold;
+    TArray<FVector2D> FrameData;
+    //FRHIShaderResourceView* BoundingGeometryBufferSRV;
+    uint8 bCutoutTexureIsValid : 1;
+    uint8 bUseVelocityForMotionBlur : 1;
+};
+
 class UParticleModuleRequired : public UParticleModule
 {
-    DECLARE_CLASS(UParticleModuleRequired, UObject);
+    DECLARE_CLASS(UParticleModuleRequired, UParticleModule);
 
 public:
    
