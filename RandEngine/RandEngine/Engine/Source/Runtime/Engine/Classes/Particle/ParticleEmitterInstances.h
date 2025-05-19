@@ -100,4 +100,6 @@ struct FParticleEmitterInstance
     void SpawnParticles(int32 Count, float StartTime, float Increment, const FVector& InitialLocation, const FVector& InitialVelocity, struct FParticleEventInstancePayload* EventPayload);
 
     void KillParticle(int32 Index);
+    
+    void InitParameters(UParticleEmitter* InEmitterTemplate, UParticleSystemComponent* InComponent);
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "Define.h"
 #include "Components/Material/Material.h"
+#include "Renderer/GlobalRenderResource.h"
 
 // UE5에서 일부 가져옴
 
@@ -172,17 +173,17 @@ struct FAsyncBufferFillData
     /** View for this buffer fill task   */
     const FEditorViewportClient* View;
     /** Number of verts in VertexData   */
-    int32									VertexCount;
+    int32 VertexCount;
     /** Stride of verts, used only for error checking   */
-    int32									VertexSize;
+    int32 VertexSize;
     /** Pointer to vertex data   */
     void* VertexData;
     /** Number of indices in IndexData   */
-    int32									IndexCount;
+    int32 IndexCount;
     /** Pointer to index data   */
     void* IndexData;
     /** Number of triangles filled in   */
-    int32									OutTriangleCount;
+    int32 OutTriangleCount;
     /** Pointer to dynamic parameter data */
     void* DynamicParameterData;
 
@@ -439,17 +440,6 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
     {
     }
 
-
-    /**
-     *	Debug rendering
-     *
-     *	@param	Proxy		The primitive scene proxy for the emitter.
-     *	@param	PDI			The primitive draw interface to render with
-     *	@param	View		The scene view being rendered
-     *	@param	bCrosses	If true, render Crosses at particle position; false, render points
-     */
-    //virtual void RenderDebug(const FParticleSystemSceneProxy* Proxy, FPrimitiveDrawInterface* PDI, const FSceneView* View, bool bCrosses) const;
-
     /**
      *	Set up an buffer for async filling
      *
@@ -459,18 +449,17 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      *	@param	InVertexSize			Stride of these verts, only used for verification
      *	@param	InDynamicParameterVertexStride	Stride of the dynamic parameter
      */
-    //void BuildViewFillData(
-    //    const FParticleSystemSceneProxy* Proxy,
-    //    const FSceneView* InView,
-    //    int32 InVertexCount,
-    //    int32 InVertexSize,
-    //    int32 InDynamicParameterVertexSize,
-    //    FGlobalDynamicIndexBuffer& DynamicIndexBuffer,
-    //    FGlobalDynamicVertexBuffer& DynamicVertexBuffer,
-    //    FGlobalDynamicVertexBufferAllocation& DynamicVertexAllocation,
-    //    FGlobalDynamicIndexBufferAllocation& DynamicIndexAllocation,
-    //    FGlobalDynamicVertexBufferAllocation* DynamicParameterAllocation,
-    //    FAsyncBufferFillData& Data) const;
+    void BuildViewFillData(
+        const FEditorViewportClient* InView,
+        int32 InVertexCount,
+        int32 InVertexSize,
+        int32 InDynamicParameterVertexSize,
+        FGlobalDynamicIndexBuffer& DynamicIndexBuffer,
+        FGlobalDynamicVertexBuffer& DynamicVertexBuffer,
+        FGlobalDynamicVertexBufferAllocation& DynamicVertexAllocation,
+        FGlobalDynamicIndexBufferAllocation& DynamicIndexAllocation,
+        FGlobalDynamicVertexBufferAllocation* DynamicParameterAllocation,
+        FAsyncBufferFillData& Data) const;
 
     const UMaterial* MaterialResource;
 
