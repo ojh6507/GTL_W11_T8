@@ -13,9 +13,11 @@ public:
     UParticleSystemComponent();
     ~UParticleSystemComponent() override = default;
 
+    virtual void TickComponent(float DeltaTime) override;
+
     void InitParticles();
     void PrepareRenderData();
-    void FillRenderData(const FVector& InCameraPosition, const FMatrix& InLocalToWorld);
+    void FillRenderData(const FVector& InCameraPosition);
 
     FGlobalDynamicVertexBuffer DynamicVB;
     FGlobalDynamicIndexBuffer  DynamicIB;
