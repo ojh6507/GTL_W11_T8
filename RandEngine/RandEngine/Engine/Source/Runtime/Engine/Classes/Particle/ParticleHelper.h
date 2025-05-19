@@ -409,9 +409,9 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      *	@param	LocalToWorld		The local to world transform of the component rendering the emitter
      *	@param	ParticleOrder		The array to fill in with ordered indices
      */
-    //void SortSpriteParticles(int32 SortMode, bool bLocalSpace,
-    //    int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
-    //    const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const;
+    void SortSpriteParticles(int32 SortMode, bool bLocalSpace,
+        int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
+        const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const;
 
     /**
      *	Get the vertex stride for the dynamic rendering data
@@ -442,6 +442,15 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      */
     virtual void GetIndexAllocInfo(int32& OutNumIndices, int32& OutStride) const
     {
+        // 활성 파티클 개수
+        int32 NumParticles = GetSourceData()->ActiveParticleCount;
+
+        // 스프라이트 한 개당 6 인덱스 (2개의 삼각형)
+        const int32 IndicesPerParticle = 6;
+        OutNumIndices = NumParticles * IndicesPerParticle;
+
+        // 2바이트 인덱스 (uint16)
+        OutStride = sizeof(uint16);
     }
 
     /**
@@ -454,7 +463,6 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      *	@param	InDynamicParameterVertexStride	Stride of the dynamic parameter
      */
     void BuildViewFillData(
-        const FEditorViewportClient* InView,
         int32 InVertexCount,
         int32 InVertexSize,
         int32 InDynamicParameterVertexSize,

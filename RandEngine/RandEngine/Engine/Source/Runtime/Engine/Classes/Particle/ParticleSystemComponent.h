@@ -1,6 +1,7 @@
 #pragma once
 #include "ParticleSystem.h"
 #include "Components/PrimitiveComponent.h"
+#include "Renderer/GlobalRenderResource.h"
 
 struct FParticleEmitterInstance;
 struct FDynamicEmitterDataBase;
@@ -15,6 +16,8 @@ public:
     void InitParticles();
     void PrepareRenderData();
 
+    FGlobalDynamicVertexBuffer DynamicVB;
+    FGlobalDynamicIndexBuffer  DynamicIB;
 
     TArray<FParticleEmitterInstance*> EmitterInstances;
     UParticleSystem* Template;

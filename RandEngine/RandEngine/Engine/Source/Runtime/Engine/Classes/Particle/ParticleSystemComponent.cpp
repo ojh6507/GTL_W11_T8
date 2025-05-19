@@ -41,18 +41,19 @@ void UParticleSystemComponent::PrepareRenderData()
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
         FDynamicSpriteEmitterData* SpriteData = new FDynamicSpriteEmitterData(EmitterInstance->CurrentLODLevel->RequiredModule);
-        //SpriteData->BuildViewFillData(
-        //    ViewportClient,
-        //    Inst->ActiveParticles * VerticesPerParticle,
-        //    SpriteData->GetDynamicVertexStride(),
-        //    SpriteData->GetDynamicParameterVertexStride(),
-        //    GDynamicIndexBufferPool,  // 내부에 GlobalDynamicIB 래핑
-        //    GDynamicVertexBufferPool, // 내부에 GlobalDynamicVB 래핑
-        //    SpriteData->VertexAllocation,
-        //    SpriteData->IndexAllocation,
-        //    &SpriteData->ParamAllocation,
-        //    SpriteData->AsyncFillData
-        //)
+        int VerticesPerParticle = 4;
+        SpriteData->BuildViewFillData(
+            EmitterInstance->ActiveParticles * VerticesPerParticle,
+            SpriteData->GetDynamicVertexStride(),
+            SpriteData->GetDynamicParameterVertexStride(),
+            DynamicIB,
+            DynamicVB,
+            SpriteData->VertexAllocation,
+            SpriteData->IndexAllocation,
+            &SpriteData->ParamAllocation,
+            SpriteData->AsyncFillData
+        );
+
         EmitterRenderData.Add(SpriteData);
     }
 }
