@@ -18,7 +18,6 @@ public:
     void InitParticles();
     void PrepareRenderData();
 
-    void FillRenderData(const FVector& InCameraPosition, const FMatrix& InLocalToWorld);
     void SetParticleTemplate(UParticleSystem* InTemplate);
     void FillRenderData(const FVector& InCameraPosition);
 

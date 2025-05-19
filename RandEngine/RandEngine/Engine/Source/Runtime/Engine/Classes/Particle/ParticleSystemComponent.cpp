@@ -106,8 +106,3 @@ void UParticleSystemComponent::SetParticleTemplate(UParticleSystem* InTemplate)
 {
     Template = InTemplate;
 }
-
-UParticleSystem* UParticleSystemComponent::GetParticleTemplate()
-{
-    return Template;
-}
