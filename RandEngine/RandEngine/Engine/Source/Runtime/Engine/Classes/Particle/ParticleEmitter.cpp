@@ -200,3 +200,48 @@ UParticleLODLevel* UParticleEmitter::GetHighestLODLevel() const
     }
     return nullptr;
 }
+
+FArchive& operator<<(FArchive& Ar, UParticleEmitter& E)
+{
+    Ar << E.EmitterName;
+    int32 NumLODLevels = E.LODLevels.Num();
+    Ar << NumLODLevels;
+
+    if (Ar.IsLoading())
+    {
+        E.LODLevels.Empty();
+        E.LODLevels.Reserve(NumLODLevels);
+        for (int32 i = 0; i < NumLODLevels; ++i)
+        {
+            UParticleLODLevel* NewLOD = nullptr;
+            NewLOD = FObjectFactory::ConstructObject<UParticleLODLevel>(&E);
+            if (NewLOD)
+            {
+                Ar << (*NewLOD);
+                E.LODLevels.Add(NewLOD);
+            }
+
+        }
+        FParticleEmitterBuildInfo EmitterBuildInfo; // Emitter 레벨에서 BuildInfo 생성 및 기본값 설정
+        EmitterBuildInfo.bIsEditorBuild = true;
+        for (UParticleLODLevel* LoadedLOD : E.LODLevels)
+        {
+            if (LoadedLOD)
+            {
+                FParticleEmitterBuildInfo LODBuildInfo = EmitterBuildInfo;
+                LoadedLOD->CompileModules(LODBuildInfo);
+            }
+        }
+    }
+    else // Saving
+    {
+        for (UParticleLODLevel* LOD : E.LODLevels)
+        {
+            if (LOD)
+            {
+                Ar << (*LOD);
+            }
+        }
+    }
+    return Ar;
+}

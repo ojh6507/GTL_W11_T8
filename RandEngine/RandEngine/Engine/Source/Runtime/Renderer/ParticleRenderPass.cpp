@@ -211,7 +211,9 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     int32 IndexCount = SpriteEmitter->GetSource().ActiveParticleCount * 6;
     
     //TODO: Texture랑 Sampler 가져와야 함
-    
+    //Graphics->DeviceContext->PSSetShaderResources(0, 1, SpriteEmitter->MaterialResource->SRV);
+    //Graphics->DeviceContext->PSSetSamplers(0, 1, SpriteEmitter->MaterialResource->SamplerState);
+
     Graphics->DeviceContext->DrawIndexed(IndexCount, SpriteEmitter->IndexAllocation.FirstIndex, 0);
 }
 

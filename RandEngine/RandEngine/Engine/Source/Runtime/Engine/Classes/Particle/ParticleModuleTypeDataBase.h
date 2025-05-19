@@ -24,4 +24,8 @@ public:
     virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override {}
     // 이미터 정보 캐싱
     virtual void CacheModuleInfo(UParticleEmitter* Emitter) override {}
+    virtual void Serialize(FArchive& Ar) override
+    {
+        Super::Serialize(Ar);
+    }
 };

@@ -361,6 +361,7 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleVelocity.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystem.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystemComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystemRender.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\UnrealClient.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\UserInterface\Console.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\UserInterface\Drawer.cpp" />
@@ -766,7 +767,6 @@ xcopy /y /d "$(SolutionDir)$(ProjectName)\Engine\Source\ThirdParty\fmod\lib\$(Pl
     <ClInclude Include="Engine\Source\Runtime\Renderer\TileLightCullingPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\UpdateLightBufferPass.h" />
     <ClInclude Include="Engine\Source\Runtime\Renderer\WorldBillboardRenderPass.h" />
-    <ClInclude Include="Engine\Source\Runtime\Renderer\헤더.h" />
     <ClInclude Include="Engine\Source\Runtime\Serialization\Serializer.h" />
     <ClInclude Include="Engine\Source\Runtime\SlateCore\Input\Events.h" />
     <ClInclude Include="Engine\Source\Runtime\SlateCore\Widgets\SWindow.h" />

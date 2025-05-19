@@ -539,6 +539,7 @@ struct FMath
     template <typename T>
     [[nodiscard]] static FORCEINLINE int32 CeilToInt(T Value) { return static_cast<int32>(ceil(Value)); }
 
+    [[nodiscard]] static FORCEINLINE int32 TruncToInt(float F) { return SSE::TruncToInt(F); }
     [[nodiscard]] static FORCEINLINE float TruncToFloat(float F) { return SSE::TruncToFloat(F); }
     [[nodiscard]] static FORCEINLINE double TruncToDouble(double F) { return SSE::TruncToDouble(F); }
 

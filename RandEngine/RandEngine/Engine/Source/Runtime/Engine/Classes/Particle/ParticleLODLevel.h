@@ -28,4 +28,6 @@ public:
    
     // 에디터 기능: 빌드 정보 수집
     void CompileModules(FParticleEmitterBuildInfo& EmitterBuildInfo);
+
+    friend FArchive& operator<<(FArchive& Ar, UParticleLODLevel& LOD);
 };

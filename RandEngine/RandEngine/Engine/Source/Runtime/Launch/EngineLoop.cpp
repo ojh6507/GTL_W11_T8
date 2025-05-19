@@ -125,9 +125,9 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     if (ParticleSystemViewerWnd)
     {
         ParticleSystemViewerGD.Initialize(ParticleSystemViewerWnd, GraphicDevice.Device);
-        ParticleSystemViewerGD.ClearColor[0] = 0.03f;
-        ParticleSystemViewerGD.ClearColor[1] = 0.03f;
-        ParticleSystemViewerGD.ClearColor[2] = 0.03f;
+        ParticleSystemViewerGD.ClearColor[0] = 0.0f;
+        ParticleSystemViewerGD.ClearColor[1] = 0.0f;
+        ParticleSystemViewerGD.ClearColor[2] = 0.0f;
     }
     
     SkeletalViewerSubEngine = FObjectFactory::ConstructObject<USkeletalSubEngine>(nullptr);

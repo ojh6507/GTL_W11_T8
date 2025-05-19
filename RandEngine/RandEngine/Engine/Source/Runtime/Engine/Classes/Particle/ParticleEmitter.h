@@ -54,7 +54,7 @@ public:
     int32 ReqInstanceBytes_Cached;        // 이미터 인스턴스당 필요한 총 추가 바이트 (모든 모듈 합산)
     int32 TypeDataOffset_Cached;          // TypeDataModule 페이로드의 시작 오프셋 (ParticleSize_Cached 내)
     int32 TypeDataInstanceOffset_Cached;  // TypeDataModule의 인스턴스별 데이터 오프셋 (ReqInstanceBytes_Cached 내)
-
+    friend FArchive& operator<<(FArchive& Ar, UParticleEmitter& E);
     // --- 현재 지원 안 함 --- 의논 필요
     // int32 SubUVDataOffset_Cached;
     // int32 DynamicParameterDataOffset_Cached;
