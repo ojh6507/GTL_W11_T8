@@ -18,6 +18,8 @@
 #include "Particle/ParticleModuleSpawn.h"
 #include "Particle/ParticleModuleLifetime.h"
 
+#include "Engine/AssetManager.h"
+
 float ParticleSystemViewerPanel::LeftAreaTotalRatio = 0.7f;
 float ParticleSystemViewerPanel::ViewportInLeftRatio = 0.6f;
 
@@ -336,18 +338,36 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
             else if (UParticleModuleTypeDataMesh* MeshTD = Cast<UParticleModuleTypeDataMesh>(ActualSelectedModule))
             {
                 ImGui::TextUnformatted("Mesh TypeData Properties:");
-                char pathBuf[256];
-                // FString의 ToAnsiString()은 임시 객체를 반환할 수 있으므로 주의. strcpy_s 권장.
-                // 여기서는 간단히 ToAnsiString().c_str() 사용. 실제로는 버퍼 오버플로우 방지 필요.
-                strncpy_s(pathBuf, MeshTD->MeshAssetPath.ToAnsiString().c_str(), sizeof(pathBuf) - 1);
-                pathBuf[sizeof(pathBuf) - 1] = 0; // 널 종료 보장
+            
 
-                if (ImGui::InputText("Mesh Asset Path", pathBuf, sizeof(pathBuf)))  // Mesh 설정
+                const TMap<FName, FAssetInfo> Assets = UAssetManager::Get().GetAssetRegistry();
+                FString PreviewName = MeshTD->MeshAssetPath;
+                if(PreviewName.IsEmpty())
                 {
-                    MeshTD->MeshAssetPath = FString(pathBuf);
-                    if (CurrentEditedSystem) 
-                        CurrentEditedSystem->InitializeSystem();
+                    PreviewName = "None";
                 }
+                if (ImGui::BeginCombo("##StaticMesh", GetData(PreviewName), ImGuiComboFlags_None))
+                {
+                    for (const auto& Asset : Assets)
+                    {
+                        if (Asset.Value.AssetType != EAssetType::StaticMesh)
+                        {
+                            continue;
+                        }
+                        if (ImGui::Selectable(GetData(Asset.Value.AssetName.ToString()), false))
+                        {
+                            FString MeshName = Asset.Value.PackagePath.ToString() + "/" + Asset.Value.AssetName.ToString();
+                            MeshTD->MeshAssetPath = MeshName;
+                            if (CurrentEditedSystem)
+                            {
+                                CurrentEditedSystem->InitializeSystem();
+                            }
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+
 
                 if (ImGui::DragFloat3("Mesh Scale", &MeshTD->MeshScale.X, 0.01f)) 
                 { 

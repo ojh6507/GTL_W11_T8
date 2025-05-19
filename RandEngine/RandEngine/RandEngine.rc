@@ -54,7 +54,7 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "Assets\\Editor\\Icon\\RandEngine.ico"
 
-IDI_ICON2               ICON                    "Assets\\Editor\\Icon\\RandEngine1.ico"
+IDI_ICON2               ICON                    "Assets\\Editor\\Icon\\RandEngine.ico"
 
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
