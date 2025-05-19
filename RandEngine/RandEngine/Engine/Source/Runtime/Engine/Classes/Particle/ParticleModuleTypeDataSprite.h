@@ -22,7 +22,7 @@ public:
         Ar << TextureAssetPath;
         if (Ar.IsLoading())
         {
-            Build();
+            LoadTexture();
         }
     }
     void LoadTexture();
