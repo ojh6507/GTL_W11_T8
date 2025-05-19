@@ -371,6 +371,10 @@ struct FDynamicEmitterDataBase
     uint32	bValid : 1;
 
     int32  EmitterIndex;
+
+    FGlobalDynamicVertexBufferAllocation VertexAllocation;
+    FGlobalDynamicIndexBufferAllocation  IndexAllocation;
+    FGlobalDynamicVertexBufferAllocation ParamAllocation;
 };
 
 
@@ -465,6 +469,8 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
 
     /** true if the particle emitter utilizes the DynamicParameter module */
     uint32 bUsesDynamicParameter : 1;
+
+    FAsyncBufferFillData AsyncFillData;
 };
 
 /** Source data for Sprite emitters */
