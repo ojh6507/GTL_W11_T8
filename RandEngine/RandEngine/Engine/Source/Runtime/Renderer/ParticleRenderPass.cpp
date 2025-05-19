@@ -209,13 +209,22 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     int32 IndexCount = SpriteEmitter->GetSource().ActiveParticleCount * 6;
     
     //TODO: Texture랑 Sampler 가져와야 함
-    
+    //Graphics->DeviceContext->PSSetShaderResources(0, 1, SpriteEmitter->MaterialResource->SRV);
+    //Graphics->DeviceContext->PSSetSamplers(0, 1, SpriteEmitter->MaterialResource->SamplerState);
+
     Graphics->DeviceContext->DrawIndexed(IndexCount, SpriteEmitter->IndexAllocation.FirstIndex, 0);
 }
 
 void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter)
 {
     //MeshEmitter에서 VB IB 정보 가져와서 바인딩 하고 DrawIndexedInstanced();
+    ID3D11Buffer* VertexBuffer = MeshEmitter->VertexAllocation.VertexBuffer;
+    ID3D11Buffer* IndexBuffer = MeshEmitter->IndexAllocation.IndexBuffer;
+    UINT Stride = MeshEmitter->GetDynamicVertexStride();
+
+    Graphics->DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &MeshEmitter->VertexAllocation.VertexOffset);
+    //포맷 확인 필요
+    Graphics->DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
 void FParticleRenderPass::ClearRenderArr()
@@ -267,13 +276,14 @@ void FParticleRenderPass::CreateShader()
 {
     D3D11_INPUT_ELEMENT_DESC SpriteParticleLayoutDesc[] =
     {
-        { "POSITION",    0, DXGI_FORMAT_R32G32B32_FLOAT,   0, 0,                            D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "TEXCOORD",    0, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // RelativeTime
-        { "TEXCOORD",    1, DXGI_FORMAT_R32G32B32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // OldPosition
-        { "TEXCOORD",    2, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // ParticleId
-        { "TEXCOORD",    3, DXGI_FORMAT_R32G32_FLOAT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Size
-        { "TEXCOORD",    4, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Rotation
-        { "TEXCOORD",    5, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // SubImageIndex
+        {"TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,      0, 0,                            D3D11_INPUT_PER_VERTEX_DATA, 0 }, // UV
+        { "POSITION",    0, DXGI_FORMAT_R32G32B32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Position
+        { "TEXCOORD",    1, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // RelativeTime
+        { "TEXCOORD",    2, DXGI_FORMAT_R32G32B32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // OldPosition
+        { "TEXCOORD",    3, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // ParticleId
+        { "TEXCOORD",    4, DXGI_FORMAT_R32G32_FLOAT,      0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Size
+        { "TEXCOORD",    5, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Rotation
+        { "TEXCOORD",    6, DXGI_FORMAT_R32_FLOAT,         0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // SubImageIndex
         { "COLOR",       0, DXGI_FORMAT_R32G32B32A32_FLOAT,0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }, // Color
     };
     HRESULT hr = ShaderManager->AddVertexShaderAndInputLayout

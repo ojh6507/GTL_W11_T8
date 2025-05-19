@@ -9,6 +9,20 @@ UParticleSystemComponent::UParticleSystemComponent()
 {
 }
 
+void UParticleSystemComponent::TickComponent(float DeltaTime)
+{
+    Super::TickComponent(DeltaTime);
+
+    // 파티클 시스템의 모든 이미터 인스턴스에 대해 Tick 호출
+    for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
+    {
+        if (EmitterInstance)
+        {
+            EmitterInstance->Tick(DeltaTime);
+        }
+    }
+}
+
 void UParticleSystemComponent::InitParticles()
 {
     for (auto pcs : TObjectRange<UParticleSystem>())
@@ -65,11 +79,11 @@ void UParticleSystemComponent::PrepareRenderData()
     }
 }
 
-void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, const FMatrix& InLocalToWorld)
+void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
-        FDynamicSpriteEmitterData* SpriteData = Cast<FDynamicSpriteEmitterData>(EmitterRenderData[Idx]);
+        FDynamicSpriteEmitterData* SpriteData = static_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]);
         FParticleEmitterInstance* EmitterInstance = EmitterInstances[Idx];
 
         // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
@@ -82,7 +96,7 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, c
             /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
             /* InParticleOrder: */     nullptr,
             /* InViewOrigin: */        InCameraPosition,
-            /* InLocalToWorld: */      InLocalToWorld,
+            /* InLocalToWorld: */      GetWorldMatrix(),
             /* InVertsPerParticle: */  4
         );
     }
