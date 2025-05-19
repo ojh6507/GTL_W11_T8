@@ -4,6 +4,7 @@
 #include "UObject/UObjectIterator.h"
 #include "ParticleSystem.h"
 #include "UObject/Casts.h"
+#include "Editor/UnrealEd/EditorViewportClient.h"
 
 UParticleSystemComponent::UParticleSystemComponent()
 {
@@ -59,8 +60,8 @@ void UParticleSystemComponent::InitParticles()
             }
         }
     }
-    PrepareRenderData();
-    FillRenderData(FVector(0.f, 0.f, 0.f));
+    //PrepareRenderData();
+    //FillRenderData(FVector(0.f, 0.f, 0.f));
     auto temp = EmitterRenderData;
     auto temp2 = EmitterInstances;
 }
@@ -89,16 +90,22 @@ void UParticleSystemComponent::PrepareRenderData()
     }
 }
 
-void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
+void UParticleSystemComponent::FillRenderData(const FEditorViewportClient* View)
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
         FDynamicSpriteEmitterData* SpriteData = static_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]);
         FParticleEmitterInstance* EmitterInstance = EmitterInstances[Idx];
 
+        EmitterInstance->FillReplayData(SpriteData->Source);
+
         // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
         //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
-        EmitterInstance->FillReplayData(SpriteData->Source);
+        int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
+        FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
+        SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
+            SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
+            View, GetWorldMatrix(), ParticleOrder);
 
         // 2) 실제 Vertex/Index 버퍼 채우기
         SpriteData->GetVertexAndIndexDataNonInstanced(
@@ -106,7 +113,7 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
             /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
             /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
             /* InParticleOrder: */     nullptr,
-            /* InViewOrigin: */        InCameraPosition,
+            /* InViewOrigin: */        View->GetCameraLocation(),
             /* InLocalToWorld: */      GetWorldMatrix(),
             /* InVertsPerParticle: */  4
         );

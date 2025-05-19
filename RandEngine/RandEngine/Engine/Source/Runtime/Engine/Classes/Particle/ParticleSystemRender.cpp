@@ -1,5 +1,6 @@
 #include "ParticleHelper.h"
 #include "ParticleModuleRequired.h"
+#include "Editor/UnrealEd/EditorViewportClient.h"
 
 FVector2D GetParticleSize(const FBaseParticle& Particle, const FDynamicSpriteEmitterReplayDataBase& Source)
 {
@@ -286,4 +287,100 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
     }
 
     return true;
+}
+
+
+void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLocalSpace,
+    int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
+    const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const
+{
+    if (SortMode == PSORTMODE_ViewProjDepth)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            float InZ;
+            if (bLocalSpace)
+            {
+                InZ = (View->View * View->Projection).TransformFVector4(LocalToWorld.TransformPosition(Particle.Location)).W;
+            }
+            else
+            {
+                InZ = (View->View * View->Projection).TransformFVector4(Particle.Location).W;
+            }
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+
+            ParticleOrder[ParticleIndex].Z = InZ;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.Z > B.Z;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_DistanceToView)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            float InZ;
+            FVector Position;
+            if (bLocalSpace)
+            {
+                Position = LocalToWorld.TransformPosition(Particle.Location);
+            }
+            else
+            {
+                Position = Particle.Location;
+            }
+            InZ = (View->GetCameraLocation() - Position).SizeSquared();
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].Z = InZ;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.Z > B.Z;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_Age_OldestFirst)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].C = Particle.Flags & STATE_CounterMask;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.C > B.C;  // Z 내림차순
+            }
+        );
+    }
+    else if (SortMode == PSORTMODE_Age_NewestFirst)
+    {
+        for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
+        {
+            DECLARE_PARTICLE(Particle, ParticleData + ParticleStride * ParticleIndices[ParticleIndex]);
+            ParticleOrder[ParticleIndex].ParticleIndex = ParticleIndex;
+            ParticleOrder[ParticleIndex].C = (~Particle.Flags) & STATE_CounterMask;
+        }
+        std::sort(
+            ParticleOrder,
+            ParticleOrder + ParticleCount,
+            [](const FParticleOrder& A, const FParticleOrder& B)
+            {
+                return A.C > B.C;  // Z 내림차순
+            }
+        );
+    }
 }

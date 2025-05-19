@@ -5,6 +5,7 @@
 
 struct FParticleEmitterInstance;
 struct FDynamicEmitterDataBase;
+class FEditorViewportClient;
 class UParticleSystemComponent : public UPrimitiveComponent 
 {
     DECLARE_CLASS(UParticleSystemComponent, UPrimitiveComponent);
@@ -18,7 +19,7 @@ public:
 
     void InitParticles();
     void PrepareRenderData();
-    void FillRenderData(const FVector& InCameraPosition);
+    void FillRenderData(const FEditorViewportClient* View);
 
     FGlobalDynamicVertexBuffer DynamicVB;
     FGlobalDynamicIndexBuffer  DynamicIB;
