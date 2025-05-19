@@ -215,31 +215,31 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
 
         const FVector2D* SubUVVertexData = nullptr;
 
-        if (Source.RequiredModule->bCutoutTexureIsValid)
-        {
-            const int32 SubImageIndexInt = FMath::TruncToInt(SubImageIndex);
-            int32 FrameIndex = SubImageIndexInt % Source.RequiredModule->NumFrames;
+        //if (Source.RequiredModule->bCutoutTexureIsValid)
+        //{
+        //    const int32 SubImageIndexInt = FMath::TruncToInt(SubImageIndex);
+        //    int32 FrameIndex = SubImageIndexInt % Source.RequiredModule->NumFrames;
 
-            if (SubImageIndexInt < 0)
-            {
-                // Mod operator returns remainder toward zero, not toward negative which is what we want
-                FrameIndex = Source.RequiredModule->NumFrames - SubImageIndexInt;
-            }
+        //    if (SubImageIndexInt < 0)
+        //    {
+        //        // Mod operator returns remainder toward zero, not toward negative which is what we want
+        //        FrameIndex = Source.RequiredModule->NumFrames - SubImageIndexInt;
+        //    }
 
-            SubUVVertexData = &Source.RequiredModule->FrameData[FrameIndex];
-        }
+        //    SubUVVertexData = &Source.RequiredModule->FrameData[FrameIndex];
+        //}
 
-        const bool bHasUVVertexData = SubUVVertexData && Source.RequiredModule->bCutoutTexureIsValid;
+        //const bool bHasUVVertexData = SubUVVertexData && Source.RequiredModule->bCutoutTexureIsValid;
 
         for (int32 VertexIndex = 0; VertexIndex < NumVerticesPerParticle; ++VertexIndex)
         {
-            if (bHasUVVertexData)
-            {
-                // Warning: not supporting UV flipping with cutout geometry in the non-instanced path
-                FillVertex[VertexIndex].UV = SubUVVertexData[VertexIndex];
-            }
-            else
-            {
+            //if (bHasUVVertexData)
+            //{
+            //    // Warning: not supporting UV flipping with cutout geometry in the non-instanced path
+            //    FillVertex[VertexIndex].UV = SubUVVertexData[VertexIndex];
+            //}
+            //else
+            //{
                 if (VertexIndex == 0)
                 {
                     FillVertex[VertexIndex].UV = FVector2D(0.0f, 0.0f);
@@ -256,7 +256,7 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
                 {
                     FillVertex[VertexIndex].UV = FVector2D(1.0f, 0.0f);
                 }
-            }
+            //}
 
             FillVertex[VertexIndex].Position = FVector(ParticlePosition);
             FillVertex[VertexIndex].RelativeTime = Particle.RelativeTime;

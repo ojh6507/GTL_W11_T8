@@ -38,29 +38,29 @@ struct FParticleEmitterInstance
     /** Transform from simulation space to world space.					*/
     FMatrix SimulationToWorld;
     /** Component can disable Tick and Rendering of this emitter. */
-    uint8 bEnabled : 1;
+    bool bEnabled = false;
     /** If true, kill this emitter instance when it is deactivated.		*/
-    uint8 bKillOnDeactivate : 1;
+    bool bKillOnDeactivate = false;
     /** if true, kill this emitter instance when it has completed.		*/
-    uint8 bKillOnCompleted : 1;
+    bool bKillOnCompleted = false;
     /** Whether this emitter requires sorting as specified by artist.	*/
-    uint8 bRequiresSorting : 1;
+    bool bRequiresSorting = false;
     /** If true, halt spawning for this instance.						*/
-    uint8 bHaltSpawning : 1;
+    bool bHaltSpawning = false;
     /** If true, this emitter has been disabled by game code and some systems to re-enable are not allowed. */
-    uint8 bHaltSpawningExternal : 1;
+    bool bHaltSpawningExternal = false;
     /** If true, the emitter has modules that require loop notification.*/
-    uint8 bRequiresLoopNotification : 1;
+    bool bRequiresLoopNotification = false;
     /** If true, the emitter ignores the component's scale. (Mesh emitters only). */
-    uint8 bIgnoreComponentScale : 1;
+    bool bIgnoreComponentScale = false;
     /** Hack: Make sure this is a Beam type to avoid casting from/to wrong types. */
-    uint8 bIsBeam : 1;
+    bool bIsBeam = false;
     /** Whether axis lock is enabled, cached here to avoid finding it from the module each frame */
-    uint8 bAxisLockEnabled : 1;
+    bool bAxisLockEnabled = false;
     /** When true and spawning is supressed, the bursts will be faked so that when spawning is enabled again, the bursts don't fire late. */
-    uint8 bFakeBurstsWhenSpawningSupressed : 1;
+    bool bFakeBurstsWhenSpawningSupressed = false;
     /** true if the emitter has no active particles and will no longer spawn any in the future */
-    uint8 bEmitterIsDone : 1;
+    bool bEmitterIsDone = false;
     /** Axis lock flags, cached here to avoid finding it from the module each frame */
     /*TEnumAsByte<EParticleAxisLock> LockAxisFlags;*/
     /** The sort mode to use for this emitter as specified by artist.	*/
@@ -95,7 +95,37 @@ struct FParticleEmitterInstance
     float EmitterTime;
     /** how long did the last tick take? */
     float LastDeltaTime;
+    /** The previous location of the instance.							*/
+    FVector OldLocation;
+    /** The bounding box for the particles.								*/
+    //FBox ParticleBoundingBox;
+    /** The BurstFire information.										*/
+    /*TArray<struct FLODBurstFired> BurstFired;*/
+    /** The number of loops completed by the instance.					*/
+    int32 LoopCount;
+    /** Flag indicating if the render data is dirty.					*/
+    int32 IsRenderDataDirty;
+    /** The current duration fo the emitter instance.					*/
+    float EmitterDuration;
+    /** The emitter duration at each LOD level for the instance.		*/
+    TArray<float> EmitterDurations;
+    /** The emitter's delay for the current loop		*/
+    float CurrentDelay;
 
+    /** The number of triangles to render								*/
+    int32	TrianglesToRender;
+    int32 MaxVertexIndex;
+
+    /** The material to render this instance with.						*/
+    UMaterial* CurrentMaterial;
+
+    /** Position offset for each particle. Will be reset to zero at the end of the tick	*/
+    FVector PositionOffsetThisTick;
+
+    /** The PivotOffset applied to the vertex positions 			*/
+    FVector2D PivotOffset;
+
+    bool FillReplayData(FDynamicEmitterReplayDataBase& OutData);
 
     void SpawnParticles(int32 Count, float StartTime, float Increment, const FVector& InitialLocation, const FVector& InitialVelocity, struct FParticleEventInstancePayload* EventPayload);
 
