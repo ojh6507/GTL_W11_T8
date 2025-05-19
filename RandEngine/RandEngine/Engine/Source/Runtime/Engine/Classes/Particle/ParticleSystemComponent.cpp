@@ -8,6 +8,20 @@ UParticleSystemComponent::UParticleSystemComponent()
 {
 }
 
+void UParticleSystemComponent::TickComponent(float DeltaTime)
+{
+    Super::TickComponent(DeltaTime);
+
+    // 파티클 시스템의 모든 이미터 인스턴스에 대해 Tick 호출
+    for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
+    {
+        if (EmitterInstance)
+        {
+            EmitterInstance->Tick(DeltaTime);
+        }
+    }
+}
+
 void UParticleSystemComponent::InitParticles()
 {
     if (Template)
@@ -59,7 +73,7 @@ void UParticleSystemComponent::PrepareRenderData()
     }
 }
 
-void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, const FMatrix& InLocalToWorld)
+void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
@@ -76,7 +90,7 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition, c
             /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
             /* InParticleOrder: */     nullptr,
             /* InViewOrigin: */        InCameraPosition,
-            /* InLocalToWorld: */      InLocalToWorld,
+            /* InLocalToWorld: */      GetWorldMatrix(),
             /* InVertsPerParticle: */  4
         );
     }
