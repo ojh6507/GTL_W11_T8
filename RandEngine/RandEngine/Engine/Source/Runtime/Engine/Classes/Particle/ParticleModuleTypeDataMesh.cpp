@@ -12,7 +12,7 @@ void UParticleModuleTypeDataMesh::Build(const FParticleEmitterBuildInfo& Emitter
 
     if (!Mesh && !MeshAssetPath.IsEmpty())
     {
-        UE_LOG(ELogLevel::Warning, TEXT("UParticleModuleTypeDataMesh::Build (Runtime) - Mesh is null but MeshAssetPath ('%s') exists. Mesh should have been serialized."), *MeshAssetPath);
+        UE_LOG(ELogLevel::Warning, TEXT("UParticleModuleTypeDataMesh::Build (Runtime) - Mesh is null but MeshAssetPath ('%s') exists."), *MeshAssetPath);
 
     }
 
