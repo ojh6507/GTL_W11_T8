@@ -2,20 +2,21 @@
 
 struct VS_Input
 {
+    float2 UV : TEXCOORD;
     float3 Position : POSITION;
-    float RelativeTime : TEXCOORD0;
-    float3 OldPosition : TEXCOORD1;
-    float ParticleId : TEXCOORD2;
-    float2 Size : TEXCOORD3;
-    float Rotation : TEXCOORD4;
-    float SubImageIndex : TEXCOORD5;
+    float RelativeTime : TEXCOORD1;
+    float3 OldPosition : TEXCOORD2;
+    float ParticleId : TEXCOORD3;
+    float2 Size : TEXCOORD4;
+    float Rotation : TEXCOORD5;
+    float SubImageIndex : TEXCOORD6;
     float4 Color : COLOR;
 };
 
 struct PS_Input
 {
     float4 Position : SV_POSITION;
-    float2 UV : TEXCOORD;
+    float2 UV : TEXCOORD;   
     float4 Color : COLOR;
 };
 
@@ -26,14 +27,6 @@ cbuffer SpriteCameraConstant : register(b0)
     float3 CameraRight;
     float Pad2;
 }
-
-static const float2 QuadUVs[4] =
-{
-    float2(0, 0), 
-    float2(1, 0), 
-    float2(1, 1), 
-    float2(0, 1)
-};
 
 static const float2 QuadOffsets[4] =
 {
@@ -63,7 +56,7 @@ PS_Input mainVS(VS_Input Input, uint VertexID : SV_VertexID)
     
     float4 ViewPos = mul(float4(WorldPos, 1.0), ViewMatrix);
     Output.Position = mul(ViewPos, ProjectionMatrix);
-    Output.UV = QuadUVs[VertexID % 4];
+    Output.UV = Input.UV;
     Output.Color = Input.Color;
     
     return Output;
