@@ -13,6 +13,7 @@ public:
     UParticleSystemComponent();
     ~UParticleSystemComponent() override = default;
 
+    virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
 
     void InitParticles();

@@ -10,8 +10,8 @@ struct FParticleRequiredModule
     float AlphaThreshold;
     TArray<FVector2D> FrameData;
     //FRHIShaderResourceView* BoundingGeometryBufferSRV;
-    uint8 bCutoutTexureIsValid : 1;
-    uint8 bUseVelocityForMotionBlur : 1;
+    bool bCutoutTexureIsValid = false;
+    bool bUseVelocityForMotionBlur = false;
 };
 
 class UParticleModuleRequired : public UParticleModule

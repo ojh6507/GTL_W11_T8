@@ -9,6 +9,12 @@ UParticleSystemComponent::UParticleSystemComponent()
 {
 }
 
+void UParticleSystemComponent::InitializeComponent()
+{
+    Super::InitializeComponent();
+    InitParticles();
+}
+
 void UParticleSystemComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
@@ -53,6 +59,10 @@ void UParticleSystemComponent::InitParticles()
             }
         }
     }
+    PrepareRenderData();
+    FillRenderData(FVector(0.f, 0.f, 0.f));
+    auto temp = EmitterRenderData;
+    auto temp2 = EmitterInstances;
 }
 
 void UParticleSystemComponent::PrepareRenderData()
@@ -88,6 +98,7 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
 
         // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
         //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
+        EmitterInstance->FillReplayData(SpriteData->Source);
 
         // 2) 실제 Vertex/Index 버퍼 채우기
         SpriteData->GetVertexAndIndexDataNonInstanced(
@@ -99,5 +110,6 @@ void UParticleSystemComponent::FillRenderData(const FVector& InCameraPosition)
             /* InLocalToWorld: */      GetWorldMatrix(),
             /* InVertsPerParticle: */  4
         );
+
     }
 }
