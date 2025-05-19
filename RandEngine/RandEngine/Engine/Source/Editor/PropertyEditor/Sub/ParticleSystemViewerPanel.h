@@ -9,6 +9,7 @@ struct FDepthStencilRHI;
 class UParticleSystem;
 class UParticleModule;
 class UParticleEmitter;
+class UParticleLODLevel;
 
 class ParticleSystemViewerPanel : public UEditorPanel // UEditorPanel이 정의되어 있어야 함
 {
@@ -19,7 +20,6 @@ public:
     virtual void OnResize(HWND hWnd) override; // HWND는 Windows 특정 타입
 
     void SetEditedParticleSystem(UParticleSystem* System);
-    void CreateNewTestParticleSystem();//TEST 용
 public:
     UParticleSystem* CurrentEditedSystem;
 private:
@@ -42,6 +42,10 @@ private:
     void RenderPropertiesPanel(const ImVec2& panelSize, UParticleEmitter* SelectedEmitter, UParticleModule* SelectedModule);
     // RenderEmitterStrip은 UParticleSystem 포인터를 받거나 멤버 CurrentEditedSystem을 직접 사용
     void RenderEmitterStrip(const ImVec2& panelSize);
+    
+    void RenderEmitterHeader(int emitterIdx, UParticleEmitter* Emitter, UParticleLODLevel* LOD);
+    
+    
     // RenderEmitterBlockContents는 UParticleEmitter 참조/포인터를 받음
     void RenderEmitterBlockContents(int emitterIdx, UParticleEmitter* Emitter);
 
@@ -50,7 +54,7 @@ private:
     void HandleAddModuleMenu(UParticleEmitter* TargetEmitter); // AddModule에서 이름 변경 및 기능 분리
     void HandleDeleteSelectedEmitter();
     void HandleDeleteSelectedModule(UParticleEmitter* TargetEmitter);
-
+    void RenderModuleEntry(UParticleModule* Module, const FString& DisplayName, int emitterIdx, int moduleIdentifier);
     // HWND 크기 (OnResize에서 설정)
     float Width = 800.0f;  // 적절한 초기값 설정
     float Height = 600.0f; // 적절한 초기값 설정

@@ -9,7 +9,7 @@
 #include "Engine/FObjLoader.h"
 
 
-void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* device)
+void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* InDevice)
 {
     //RegisterMesh(renderer, "Quad", quadVertices, sizeof(quadVertices) / sizeof(FVertexSimple), quadIndices, sizeof(quadIndices)/sizeof(uint32));
 
@@ -23,25 +23,25 @@ void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* device)
     //FManagerLoadObjStaticMeshAsset("Assets//AxisCircleY.obj");
     //FManagerLoadObjStaticMeshAsset("Assets//AxisCircleZ.obj");
     // FManagerLoadObjStaticMeshAsset("Assets/helloBlender.obj");
+    Device = InDevice;
+    LoadTextureFromDDS(Device->Device, Device->DeviceContext, L"Assets/Texture/font.dds");
+    LoadTextureFromDDS(Device->Device, Device->DeviceContext, L"Assets/Texture/UUID_Font.dds");
 
-    LoadTextureFromDDS(device->Device, device->DeviceContext, L"Assets/Texture/font.dds");
-    LoadTextureFromDDS(device->Device, device->DeviceContext, L"Assets/Texture/UUID_Font.dds");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/ocean_sky.jpg");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/font.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/emart.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Explosion_SubUV.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/UUID_Font.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/Wooden Crate_Crate_BaseColor.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/spotLight.png");
 
-    LoadTextureFromFile(device->Device, L"Assets/Texture/ocean_sky.jpg");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/font.png");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/emart.png");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/T_Explosion_SubUV.png");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/UUID_Font.png");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/Wooden Crate_Crate_BaseColor.png");
-    LoadTextureFromFile(device->Device, L"Assets/Texture/spotLight.png");
-
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_Actor.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_LightSpot.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_LightPoint.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_LightDirectional.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_ExpoHeightFog.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/S_AtmosphericHeightFog.PNG");
-    LoadTextureFromFile(device->Device, L"Assets/Editor/Icon/AmbientLight_64x.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_Actor.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_LightSpot.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_LightPoint.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_LightDirectional.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_ExpoHeightFog.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_AtmosphericHeightFog.PNG");
+    LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/AmbientLight_64x.png");
 
 }
 
@@ -73,13 +73,18 @@ struct TupleHash {
     }
 };
 
-std::shared_ptr<FTexture> FResourceMgr::GetTexture(const FWString& name) const
+std::shared_ptr<FTexture> FResourceMgr::GetTexture(const FWString& name)
 {
     auto* TempValue = textureMap.Find(name);
+    if(TempValue == nullptr) 
+    {
+        LoadTextureFromFile(Device->Device, name.c_str());
+        TempValue = textureMap.Find(name);
+    }
     return TempValue ? *TempValue : nullptr;
 }
 
-HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, const wchar_t* filename, bool bIsSRGB)
+HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* Device, const wchar_t* filename, bool bIsSRGB)
 {
     IWICImagingFactory* wicFactory = nullptr;
     IWICBitmapDecoder* decoder = nullptr;
@@ -136,7 +141,7 @@ HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, const wchar_t* f
     initData.pSysMem = imageData;
     initData.SysMemPitch = width * 4;
     ID3D11Texture2D* Texture2D;
-    hr = device->CreateTexture2D(&textureDesc, &initData, &Texture2D);
+    hr = Device->CreateTexture2D(&textureDesc, &initData, &Texture2D);
     delete[] imageData;
     if (FAILED(hr)) return hr;
 
@@ -147,7 +152,7 @@ HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, const wchar_t* f
     srvDesc.Texture2D.MostDetailedMip = 0;
     srvDesc.Texture2D.MipLevels = 1;
     ID3D11ShaderResourceView* TextureSRV;
-    hr = device->CreateShaderResourceView(Texture2D, &srvDesc, &TextureSRV);
+    hr = Device->CreateShaderResourceView(Texture2D, &srvDesc, &TextureSRV);
 
     // 리소스 해제
     wicFactory->Release();
@@ -166,7 +171,7 @@ HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, const wchar_t* f
     samplerDesc.MinLOD = 0;
     samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    device->CreateSamplerState(&samplerDesc, &SamplerState);
+    Device->CreateSamplerState(&samplerDesc, &SamplerState);
     FWString name = FWString(filename);
 
     textureMap[name] = std::make_shared<FTexture>(TextureSRV, Texture2D, SamplerState, name, width, height);
@@ -175,14 +180,14 @@ HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, const wchar_t* f
     return hr;
 }
 
-HRESULT FResourceMgr::LoadTextureFromDDS(ID3D11Device* device, ID3D11DeviceContext* context, const wchar_t* filename)
+HRESULT FResourceMgr::LoadTextureFromDDS(ID3D11Device* Device, ID3D11DeviceContext* context, const wchar_t* filename)
 {
 
     ID3D11Resource* texture = nullptr;
     ID3D11ShaderResourceView* textureView = nullptr;
 
     HRESULT hr = DirectX::CreateDDSTextureFromFile(
-        device, context,
+        Device, context,
         filename,
         &texture,
         &textureView
@@ -218,7 +223,7 @@ HRESULT FResourceMgr::LoadTextureFromDDS(ID3D11Device* device, ID3D11DeviceConte
     samplerDesc.MinLOD = 0;
     samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    device->CreateSamplerState(&samplerDesc, &SamplerState);
+    Device->CreateSamplerState(&samplerDesc, &SamplerState);
 #pragma endregion Sampler
 
     FWString name = FWString(filename);
