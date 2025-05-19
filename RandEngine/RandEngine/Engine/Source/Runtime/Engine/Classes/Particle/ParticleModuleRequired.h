@@ -4,7 +4,7 @@
 
 class UParticleModuleRequired : public UParticleModule
 {
-    DECLARE_CLASS(UParticleModuleRequired, UObject);
+    DECLARE_CLASS(UParticleModuleRequired, UParticleModule);
 
 public:
    
