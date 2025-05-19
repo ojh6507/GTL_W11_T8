@@ -1,26 +1,71 @@
 #include "ParticleSystemViewerPanel.h"
-#include "Engine/Asset/SkeletalMeshAsset.h"
-#include "SubWindow/SkeletalSubEngine.h"
+
 #include "SubWindow/SubEngine.h"
-#include "Components/Mesh/SkeletalMesh.h"
-#include "Engine/SkeletalMeshActor.h"
 #include "PropertyEditor/ShowFlags.h"
 #include "Renderer/RendererHelpers.h"
 #include "Engine/UnrealClient.h"
 #include "UnrealEd/EditorViewportClient.h"
-// ParticleSystemViewerPanel.cpp
 
+#include "Particle/ParticleSystem.h"
+#include "Particle/ParticleEmitter.h"
+#include "Particle/ParticleLODLevel.h"
+#include "Particle/ParticleModule.h"
+#include "Particle/ParticleModuleRequired.h"
+
+#include "Particle/ParticleModuleTypeDataSprite.h"
+#include "Particle/ParticleModuleTypeDataMesh.h"
+
+#include "Particle/ParticleModuleSpawn.h"
+#include "Particle/ParticleModuleLifetime.h"
 
 float ParticleSystemViewerPanel::LeftAreaTotalRatio = 0.7f;
 float ParticleSystemViewerPanel::ViewportInLeftRatio = 0.6f;
-int ParticleSystemViewerPanel::SelectedEmitterIndex = -1;
-int ParticleSystemViewerPanel::SelectedModuleIndex = -1;
 
-TArray<MyEmitterData> ParticleSystemViewerPanel::EmittersData = {
-    MyEmitterData("Sparks", true, { MyModuleData("Spawn", 100.0f, ImVec4(1,0,0,1)), MyModuleData("Lifetime", 1.0f, ImVec4(0,1,0,1)) }),
-    MyEmitterData("Smoke", true, { MyModuleData("Initial Location", 0.0f, ImVec4(0,0,1,1)), MyModuleData("Initial Velocity", 50.0f, ImVec4(1,1,0,1)) }),
-    MyEmitterData("Rain", false, { MyModuleData("Gravity", 980.0f, ImVec4(0,1,1,1))})
-};
+
+ParticleSystemViewerPanel::ParticleSystemViewerPanel()
+    : CurrentEditedSystem(nullptr)
+    , SelectedEmitterIndex_Internal(-1)
+    , SelectedModuleIndex_Internal(-1)
+    , Width(800.0f), Height(600.0f) // 생성자에서 초기화
+    , RenderTargetRHI(nullptr), DepthStencilRHI(nullptr)
+{
+    // 테스트용 기본 파티클 시스템 생성 (실제로는 파일에서 로드하거나 "새로 만들기" 메뉴로 생성)
+    CreateNewTestParticleSystem();
+}
+
+void ParticleSystemViewerPanel::SetEditedParticleSystem(UParticleSystem* System)
+{
+    CurrentEditedSystem = System;
+    if (CurrentEditedSystem)
+    {
+        CurrentEditedSystem->InitializeSystem(); // 로드/설정 시 빌드
+    }
+    SelectedEmitterIndex_Internal = -1;
+    SelectedModuleIndex_Internal = -1;
+}
+
+// 테스트용 함수
+void ParticleSystemViewerPanel::CreateNewTestParticleSystem()
+{
+    //CurrentEditedSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr); // 적절한 Outer 제공
+    //if (CurrentEditedSystem)
+    //{
+    //    // 기본 스프라이트 이미터 추가
+    //    UParticleEmitter* Emitter = FObjectFactory::ConstructObject<UParticleEmitter>(CurrentEditedSystem);
+    //    Emitter->EmitterName = FString(TEXT("DefaultSpriteEmitter"));
+
+    //    UParticleLODLevel* LOD = FObjectFactory::ConstructObject<UParticleLODLevel>(Emitter);
+    //    LOD->RequiredModule = FObjectFactory::ConstructObject<UParticleModuleRequired>(LOD);
+    //    LOD->TypeDataModule = FObjectFactory::ConstructObject<UParticleModuleTypeDataSprite>(LOD); // 기본은 스프라이트
+    //    LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(LOD));
+    //    LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(LOD));
+    //    Emitter->LODLevels.Add(LOD);
+    //    CurrentEditedSystem->Emitters.Add(Emitter);
+
+    //    CurrentEditedSystem->InitializeSystem();
+    //}
+}
+
 // --- 메인 렌더링 함수 ---
 void ParticleSystemViewerPanel::Render()
 {
@@ -35,6 +80,8 @@ void ParticleSystemViewerPanel::Render()
         ImGui::End();
     }
 }
+
+
 void ParticleSystemViewerPanel::PrepareRender(FEditorViewportClient* ViewportClient)
 {
     const EViewModeIndex ViewMode = ViewportClient->GetViewMode();
@@ -91,21 +138,27 @@ void ParticleSystemViewerPanel::RenderLeftPane(const ImVec2& panelSize, float sp
         // 수평 스플리터 (왼쪽 패널 내부)
         RenderHorizontalSplitter(leftAreaContentSize, splitterThickness);
 
-        // 속성 패널 (남은 공간 사용)
-        MyEmitterData* currentEmitterPtr = nullptr;
-        MyModuleData* currentModulePtr = nullptr;
-        if (SelectedEmitterIndex != -1 && SelectedEmitterIndex < EmittersData.Num())
+
+        TArray< UParticleEmitter*>& CurrentEditedEmitters = CurrentEditedSystem->Emitters;
+        UParticleEmitter* currentEmitter = nullptr;
+        UParticleModule* currentModule = nullptr;
+
+        if (CurrentEditedSystem && SelectedEmitterIndex_Internal != -1 && 
+            CurrentEditedSystem->Emitters.IsValidIndex(SelectedEmitterIndex_Internal))
         {
-            currentEmitterPtr = &EmittersData[SelectedEmitterIndex];
-            if (SelectedModuleIndex != -1 && SelectedModuleIndex < currentEmitterPtr->modules.Num())
+            currentEmitter = CurrentEditedSystem->Emitters[SelectedEmitterIndex_Internal];
+
+            if (currentEmitter && !currentEmitter->LODLevels.IsEmpty() && currentEmitter->LODLevels[0])
             {
-                currentModulePtr = &currentEmitterPtr->modules[SelectedModuleIndex];
+                UParticleLODLevel* lod = currentEmitter->LODLevels[0];
+                if (SelectedModuleIndex_Internal != -1 && lod->Modules.IsValidIndex(SelectedModuleIndex_Internal))
+                {
+                    currentModule = lod->Modules[SelectedModuleIndex_Internal];
+                }
+                // 또는 RequiredModule, TypeDataModule도 선택 대상이 될 수 있음 (UI 로직 추가 필요)
             }
         }
-        // panelSize의 y를 0으로 주면 남은 공간을 모두 사용하도록 할 수 있지만, 여기서는 명시적으로 계산된 높이를 사용.
-        // 만약 PropertiesPanel이 ViewportPanel 아래 남은 모든 공간을 차지하게 하려면
-        // ImVec2(leftAreaContentSize.x, ImGui::GetContentRegionAvail().y) 를 사용.
-        RenderPropertiesPanel(ImVec2(leftAreaContentSize.x, ImGui::GetContentRegionAvail().y), currentEmitterPtr, currentModulePtr);
+        RenderPropertiesPanel(ImVec2(leftAreaContentSize.x, ImGui::GetContentRegionAvail().y), currentEmitter, currentModule);
     }
     ImGui::EndChild(); // LeftAreaContainer_Main
 }
@@ -135,7 +188,7 @@ void ParticleSystemViewerPanel::RenderHorizontalSplitter(const ImVec2& leftAreaC
 void ParticleSystemViewerPanel::RenderRightPane(const ImVec2& panelSize)
 {
     // RenderEmitterStrip가 오른쪽 패널의 전체 내용을 그리도록 호출
-    RenderEmitterStrip(panelSize, SelectedEmitterIndex, SelectedModuleIndex, EmittersData);
+    RenderEmitterStrip(panelSize);
 }
 
 
@@ -143,6 +196,11 @@ void ParticleSystemViewerPanel::RenderRightPane(const ImVec2& panelSize)
 void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImTextureID textureId, float originalImageWidth, float originalImageHeight)
 {
 
+    ImGui::BeginTabBar("##Viewport");
+    ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.05f, 0.05f, 0.08f, 0.80f));         // 비활성 탭
+    ImGui::PushStyleColor(ImGuiCol_TabActive, ImVec4(0.14f, 0.14f, 0.14f, 1.00f));   // 활성 탭
+
+    ImGui::BeginTabItem("Viewport");
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     bool childVisible = ImGui::BeginChild("ViewportPanel_TopLeft", panelSize, ImGuiChildFlags_Border);
     if (childVisible)
@@ -177,55 +235,177 @@ void ParticleSystemViewerPanel::RenderViewportPanel(const ImVec2& panelSize, ImT
         }
     }
     ImGui::EndChild(); // ViewportPanel_TopLeft
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(3);
+    ImGui::EndTabItem();
+    ImGui::EndTabBar();
 }
 
-void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, const MyEmitterData* emitterPtr, MyModuleData* modulePtr)
-{
+void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, UParticleEmitter* SelectedEmitter, UParticleModule* DefaultSelectedModule) {
     ImVec2 actualPanelSize = panelSize;
-    if (actualPanelSize.y <= 0) { // 높이가 0 또는 음수이면 남은 공간 모두 사용
+    if (actualPanelSize.y <= 0) 
+    { 
+        // 높이가 0 또는 음수이면 남은 공간 모두 사용
         actualPanelSize.y = ImGui::GetContentRegionAvail().y;
     }
 
     bool childVisible = ImGui::BeginChild("PropertiesPanel_BottomLeft", actualPanelSize, ImGuiChildFlags_Border);
     if (childVisible)
     {
-        if (modulePtr)
+        ImGui::BeginTabBar("##Details");
+        ImGui::PushStyleColor(ImGuiCol_Tab, ImVec4(0.05f, 0.05f, 0.08f, 0.80f));         // 비활성 탭
+        ImGui::PushStyleColor(ImGuiCol_TabActive, ImVec4(0.14f, 0.14f, 0.14f, 1.00f));   // 활성 탭
+
+        ImGui::BeginTabItem("Details");
+
+        const int REQUIRED_MODULE_INDEX = -2;
+        const int TYPEDATA_MODULE_INDEX = -3;
+        UParticleModule* ActualSelectedModule = DefaultSelectedModule;
+
+        if (SelectedEmitter && SelectedEmitter->GetHighestLODLevel()) 
         {
-            ImGui::Text("모듈 속성: %s (이미터: %s)", modulePtr->name.c_str(), emitterPtr ? emitterPtr->name.c_str() : "N/A");
-            ImGui::Separator();
-            // modulePtr이 const MyModuleData* 이므로, 값을 변경하려면 const_cast 필요
-            ImGui::InputFloat("Value Param 1", &const_cast<MyModuleData*>(modulePtr)->value_param1);
-            ImGui::ColorEdit4("Color Param", &const_cast<MyModuleData*>(modulePtr)->color_param.x);
+            if (SelectedModuleIndex_Internal == REQUIRED_MODULE_INDEX) 
+            {
+                ActualSelectedModule = SelectedEmitter->GetHighestLODLevel()->RequiredModule;
+            }
+            else if (SelectedModuleIndex_Internal == TYPEDATA_MODULE_INDEX) {
+                ActualSelectedModule = SelectedEmitter->GetHighestLODLevel()->TypeDataModule;
+            }
         }
-        else if (emitterPtr)
+
+        if (ActualSelectedModule)
         {
-            ImGui::Text("이미터 속성: %s", emitterPtr->name.c_str());
+            FString moduleDisplayName = ActualSelectedModule->GetModuleDisplayName();
+            ImGui::Text("Module: %s", moduleDisplayName.ToAnsiString().c_str());
             ImGui::Separator();
-            ImGui::Checkbox("활성화", &const_cast<MyEmitterData*>(emitterPtr)->is_enabled);
+
+            bool bPropertyChanged = false;
+            if (ImGui::Checkbox("Enabled", &ActualSelectedModule->bEnabled))
+            {
+                bPropertyChanged = true;
+            }
+            ImGui::Separator();
+
+            if (UParticleModuleSpawn* SpawnModule = Cast<UParticleModuleSpawn>(ActualSelectedModule))
+            {
+                if (ImGui::DragFloat("Spawn Rate", &SpawnModule->Rate.Constant, 0.1f, 0.0f, 1000.0f))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 값 변경 시 재빌드
+                }
+                // BurstList 편집 UI (TArray<FParticleBurst>는 더 복잡한 UI 필요)
+                ImGui::Text("Bursts: %d", SpawnModule->BurstList.Num());
+                // ... (버스트 추가/삭제/편집 UI) ...
+            }
+            else if (UParticleModuleLifetime* LifetimeModule = Cast<UParticleModuleLifetime>(ActualSelectedModule))
+            {
+                // ... (라이프타임 모듈 프로퍼티 UI) ...
+            }
+            else if (UParticleModuleRequired* RequiredMod = Cast<UParticleModuleRequired>(ActualSelectedModule))
+            {
+                ImGui::TextUnformatted("Required Module Properties:");
+                if (ImGui::DragFloat("Emitter Duration", &RequiredMod->EmitterDuration, 0.1f, 0.0f, 1000.0f)) 
+                {
+                    if (CurrentEditedSystem) 
+                        CurrentEditedSystem->InitializeSystem();
+                }
+                if (ImGui::DragInt("Emitter Loops", &RequiredMod->EmitterLoops, 1, 0, 100)) 
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+                ImGui::Text("SubUV (Sprite Sheet):");
+                if (ImGui::DragInt("SubImages Horizontal", &RequiredMod->SubImages_Horizontal, 1, 1, 64)) bPropertyChanged = true;
+                if (ImGui::DragInt("SubImages Vertical", &RequiredMod->SubImages_Vertical, 1, 1, 64)) bPropertyChanged = true;
+                ImGui::Separator();
+                ImGui::Text("Lifecycle Flags:");
+                if (ImGui::Checkbox("Kill On Deactivate", &RequiredMod->bKillOnDeactivate)) bPropertyChanged = true;
+                if (ImGui::Checkbox("Kill On Completed", &RequiredMod->bKillOnCompleted)) bPropertyChanged = true;
+                ImGui::Separator();
+
+                ImGui::Text("Rendering Flags:");
+                if (ImGui::Checkbox("Requires Sorting", &RequiredMod->bRequiresSorting)) bPropertyChanged = true;
+                if (RequiredMod->bRequiresSorting)
+                {
+                     const char* sortModeItems[] = { "None", "View Depth", "View Distance" /*, ... */ };
+                     int currentSortMode = RequiredMod->SortMode; // 또는 static_cast<int>(RequiredMod->SortModeEnum);
+                     if (ImGui::Combo("Sort Mode", &currentSortMode, sortModeItems, IM_ARRAYSIZE(sortModeItems))) {
+                         RequiredMod->SortMode = currentSortMode; // 또는 static_cast<EParticleSortMode>(currentSortMode);
+                         bPropertyChanged = true;
+                     }
+                }
+                if (ImGui::Checkbox("Ignore Component Scale (Meshes Only)", &RequiredMod->bIgnoreComponentScale)) bPropertyChanged = true;
+            }
+            else if (UParticleModuleTypeDataMesh* MeshTD = Cast<UParticleModuleTypeDataMesh>(ActualSelectedModule))
+            {
+                ImGui::TextUnformatted("Mesh TypeData Properties:");
+                char pathBuf[256];
+                // FString의 ToAnsiString()은 임시 객체를 반환할 수 있으므로 주의. strcpy_s 권장.
+                // 여기서는 간단히 ToAnsiString().c_str() 사용. 실제로는 버퍼 오버플로우 방지 필요.
+                strncpy_s(pathBuf, MeshTD->MeshAssetPath.ToAnsiString().c_str(), sizeof(pathBuf) - 1);
+                pathBuf[sizeof(pathBuf) - 1] = 0; // 널 종료 보장
+
+                if (ImGui::InputText("Mesh Asset Path", pathBuf, sizeof(pathBuf)))  // Mesh 설정
+                {
+                    MeshTD->MeshAssetPath = FString(pathBuf);
+                    if (CurrentEditedSystem) 
+                        CurrentEditedSystem->InitializeSystem();
+                }
+
+                if (ImGui::DragFloat3("Mesh Scale", &MeshTD->MeshScale.X, 0.01f)) 
+                { 
+                    if (CurrentEditedSystem) 
+                        CurrentEditedSystem->InitializeSystem();
+                }
+            }
+            else if (UParticleModuleTypeDataSprite* SpriteTD = Cast<UParticleModuleTypeDataSprite>(ActualSelectedModule))
+            {
+                ImGui::TextUnformatted("Sprite TypeData Properties:");
+                // 스프라이트 타입 데이터 관련 프로퍼티 (예: 기본 SubUV 설정 등)
+            }
+            else
+            {
+                ImGui::Text("Selected module type has no specific properties exposed for editing yet.");
+            }
+
+
+        }
+
+        else if (SelectedEmitter)
+        {
+            ImGui::Text("Emitter: %s", *SelectedEmitter->EmitterName);
+            ImGui::Separator();
+            // 예: 이미터 활성화 상태 편집 (LOD 0의 bEnabled)
+            if (SelectedEmitter->GetHighestLODLevel())
+            {
+                if (ImGui::Checkbox("Enabled", &SelectedEmitter->GetHighestLODLevel()->bEnabled))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+            }
         }
         else
         {
             ImGui::Text("선택된 항목 없음");
         }
+        ImGui::PopStyleColor(2);
+        ImGui::EndTabItem();
+        ImGui::EndTabBar();
     }
     ImGui::EndChild(); // PropertiesPanel_BottomLeft
 }
 
-void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx, TArray<MyEmitterData>& localEmittersData)
+void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize)
 {
+    if (!CurrentEditedSystem) return;
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.007, 0.007, 0.007, 1));
     bool systemHierarchyVisible = ImGui::BeginChild("SystemHierarchyPanel_Right", panelSize, ImGuiChildFlags_None);
     if (systemHierarchyVisible)
     {
-        if (ImGui::Button("+ 새 이미터 추가")) { localEmittersData.Add(MyEmitterData("새 이미터", true)); }
-        ImGui::SameLine();
-        if (ImGui::Button("선택 이미터 삭제") && currentSelectedEmitterIdx != -1 && currentSelectedEmitterIdx < localEmittersData.Num())
+        if (ImGui::Button("선택 이미터 삭제"))
         {
-            localEmittersData.RemoveAt(currentSelectedEmitterIdx);
-            currentSelectedEmitterIdx = -1;
-            currentSelectedModuleIdx = -1;
+            HandleDeleteSelectedEmitter();
         }
         ImGui::Separator();
+
 
         ImVec2 emitterStripContentSize = ImGui::GetContentRegionAvail();
         ImGuiWindowFlags emitterStripFlags = ImGuiWindowFlags_HorizontalScrollbar;
@@ -234,35 +414,52 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
         bool emitterStripVisible = ImGui::BeginChild("EmitterStrip", emitterStripContentSize, ImGuiChildFlags_None, emitterStripFlags);
         if (emitterStripVisible)
         {
-            float fixedBlockWidth = 200.0f;
-            float blockHeight = ImGui::GetContentRegionAvail().y;
-            if (blockHeight < 50.0f) blockHeight = 50.0f; // 최소 높이 보장
-            // 패딩을 고려한 실제 블록 높이 (필요시 조정)
+            float fixedBlockWidth = 150.0f;
+
+            float blockHeight = ImGui::GetContentRegionAvail().y > 50.0f ? ImGui::GetContentRegionAvail().y : 50.0f;
             ImVec2 emitterBlockSize = ImVec2(fixedBlockWidth, blockHeight - ImGui::GetStyle().WindowPadding.y * 2.0f);
-            if (emitterBlockSize.y < 50.0f) emitterBlockSize.y = 50.0f;
 
 
-            for (int i = 0; i < localEmittersData.Num(); ++i)
+            HandleAddEmitterMenu();
+
+            for (int i = 0; i < CurrentEditedSystem->Emitters.Num(); ++i)
             {
-                if (i > 0) ImGui::SameLine();
+                UParticleEmitter* Emitter = CurrentEditedSystem->Emitters[i];
+                if (!Emitter) continue;
 
+                if (i > 0) ImGui::SameLine();
+                
                 ImGui::PushID(i); // 각 이미터 블록에 고유 ID 부여
 
-                bool isEmitterSelectedForFrame = (currentSelectedEmitterIdx == i && currentSelectedModuleIdx == -1);
-                ImVec4 childBgColor = isEmitterSelectedForFrame ? ImGui::GetStyleColorVec4(ImGuiCol_HeaderHovered) : ImVec4(0.2f, 0.2f, 0.22f, 1.0f);
-                ImU32 childBorderColorU32 = isEmitterSelectedForFrame ? ImGui::GetColorU32(ImVec4(0.9f, 0.9f, 0.2f, 1.0f)) : ImGui::GetColorU32(ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+                bool isEmitterSelectedForFrame = (SelectedEmitterIndex_Internal == i && SelectedModuleIndex_Internal == -1);
+                
+            
+                ImVec4 childBgColor;
+                ImVec4 childBorderColorVec4;
+                if (isEmitterSelectedForFrame)
+                {
+                    childBgColor = ImVec4(0.05f, 0.14f, 0.24f, 1.0f);
+                    childBorderColorVec4 = ImVec4(0.1f, 0.7f, 0.6f, 1.0f);     // 청록
+                }
+                else
+                {
+                    childBgColor = ImVec4(0.028f, 0.028f, 0.048f, 0.2f);      // 매우 어두운 배경
+                    childBorderColorVec4 = ImVec4(0.028f, 0.028f, 0.048f, 1.0f);      // 미묘하게 밝은 테두리
+                }
+                ImU32 childBorderColorU32 = ImGui::GetColorU32(childBorderColorVec4);;
 
                 ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
                 ImGui::PushStyleColor(ImGuiCol_Border, ImGui::ColorConvertU32ToFloat4(childBorderColorU32));
-                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 
                 char child_id_str[64];
                 snprintf(child_id_str, sizeof(child_id_str), "emitter_block_frame_%d", i);
                 bool emitterBlockFrameVisible = ImGui::BeginChild(child_id_str, emitterBlockSize, ImGuiChildFlags_Border, ImGuiWindowFlags_None);
                 if (emitterBlockFrameVisible)
                 {
-                    RenderEmitterBlockContents(i, localEmittersData[i], currentSelectedEmitterIdx, currentSelectedModuleIdx);
+                    RenderEmitterBlockContents(i, Emitter);
+                    HandleAddModuleMenu(Emitter);
                 }
                 ImGui::EndChild(); // emitter_block_frame
 
@@ -275,12 +472,132 @@ void ParticleSystemViewerPanel::RenderEmitterStrip(const ImVec2& panelSize, int&
         ImGui::PopStyleVar(); // WindowPadding
     }
     ImGui::EndChild(); // SystemHierarchyPanel_Right
+    ImGui::PopStyleColor();
 }
 
-void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmitterData& emitterData, int& currentSelectedEmitterIdx, int& currentSelectedModuleIdx)
+void ParticleSystemViewerPanel::HandleAddEmitterMenu()
 {
+    if (!CurrentEditedSystem) return;
+
+    // EmitterStrip의 빈 공간 우클릭 시 팝업 (ImGui::BeginChild("EmitterStrip", ...) 내부에서 호출)
+    if (ImGui::BeginPopupContextWindow("AddEmitterContextWindow", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    {
+        if (ImGui::Selectable("New Particle Sprite Emitter"))
+        {
+            UParticleEmitter* NewEmitter = FObjectFactory::ConstructObject<UParticleEmitter>(CurrentEditedSystem);
+            NewEmitter->EmitterName = FString::Printf(TEXT("SpriteEmitter_%d"), CurrentEditedSystem->Emitters.Num());
+
+            UParticleLODLevel* LOD = FObjectFactory::ConstructObject<UParticleLODLevel>(NewEmitter);
+            LOD->RequiredModule = FObjectFactory::ConstructObject<UParticleModuleRequired>(LOD);
+            LOD->TypeDataModule = FObjectFactory::ConstructObject<UParticleModuleTypeDataSprite>(LOD);
+            LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(LOD));    // 기본 스폰 모듈
+            LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(LOD)); // 기본 라이프타임 모듈
+            NewEmitter->LODLevels.Add(LOD);
+
+            CurrentEditedSystem->Emitters.Add(NewEmitter);
+            CurrentEditedSystem->InitializeSystem(); // 시스템 재빌드
+            SelectedEmitterIndex_Internal = CurrentEditedSystem->Emitters.Num() - 1; // 새로 추가된 이미터 선택
+            SelectedModuleIndex_Internal = -1;
+        }
+        if (ImGui::Selectable("New Particle Mesh Emitter"))
+        {
+            UParticleEmitter* NewEmitter = FObjectFactory::ConstructObject<UParticleEmitter>(CurrentEditedSystem);
+            NewEmitter->EmitterName = FString::Printf(TEXT("MeshEmitter_%d"), CurrentEditedSystem->Emitters.Num());
+
+            UParticleLODLevel* LOD = FObjectFactory::ConstructObject<UParticleLODLevel>(NewEmitter);
+            LOD->RequiredModule = FObjectFactory::ConstructObject<UParticleModuleRequired>(LOD);
+            LOD->TypeDataModule = FObjectFactory::ConstructObject<UParticleModuleTypeDataMesh>(LOD); // 메시 타입 데이터
+            LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(LOD));
+            LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(LOD));
+            NewEmitter->LODLevels.Add(LOD);
+
+            CurrentEditedSystem->Emitters.Add(NewEmitter);
+            CurrentEditedSystem->InitializeSystem();
+            SelectedEmitterIndex_Internal = CurrentEditedSystem->Emitters.Num() - 1;
+            SelectedModuleIndex_Internal = -1;
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void ParticleSystemViewerPanel::HandleAddModuleMenu(UParticleEmitter* TargetEmitter)
+{
+    if (!TargetEmitter || TargetEmitter->LODLevels.IsEmpty() || !TargetEmitter->LODLevels[0]) return;
+    UParticleLODLevel* TargetLOD = TargetEmitter->LODLevels[0];
+
+    // 이미터 블록 내부(예: 모듈 목록 아래 빈 공간) 우클릭 시 팝업
+    // RenderEmitterBlockContents 함수 내부의 적절한 위치에서 이 함수를 호출하거나,
+    // 또는 모듈 목록 영역에 대한 컨텍스트 메뉴로 처리
+    if (ImGui::BeginPopupContextItem("AddModuleContextItem")) // 특정 아이템(이미터 블록)에 대한 컨텍스트 메뉴
+    {
+        if (ImGui::Selectable("Add Lifetime Module"))
+        {
+            TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(TargetLOD));
+            if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 또는 TargetEmitter->Build();
+        }
+        if (ImGui::Selectable("Add Spawn Module")) // 이미 있다면 중복 추가 방지 로직 필요할 수 있음
+        {
+            TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(TargetLOD));
+            if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+        }
+        // ... 기타 모듈 추가 ...
+        ImGui::EndPopup();
+    }
+}
+
+void ParticleSystemViewerPanel::HandleDeleteSelectedEmitter()
+{
+    if (CurrentEditedSystem && SelectedEmitterIndex_Internal != -1 && CurrentEditedSystem->Emitters.IsValidIndex(SelectedEmitterIndex_Internal))
+    {
+        UParticleEmitter* EmitterToRemove = CurrentEditedSystem->Emitters[SelectedEmitterIndex_Internal];
+        CurrentEditedSystem->Emitters.RemoveAt(SelectedEmitterIndex_Internal);
+        // EmitterToRemove->MarkAsGarbage(); // UObject 시스템의 소멸 처리
+        SelectedEmitterIndex_Internal = -1;
+        SelectedModuleIndex_Internal = -1;
+        CurrentEditedSystem->InitializeSystem();
+    }
+}
+
+void ParticleSystemViewerPanel::HandleDeleteSelectedModule(UParticleEmitter* TargetEmitter)
+{
+    if (!CurrentEditedSystem || !TargetEmitter || TargetEmitter->LODLevels.IsEmpty() || !TargetEmitter->LODLevels[0])
+    {
+        return; // 유효하지 않은 입력 또는 상태
+    }
+
+    UParticleLODLevel* LOD = TargetEmitter->LODLevels[0];
+
+    // SelectedModuleIndex_Internal이 유효한 인덱스인지 확인
+    if (SelectedModuleIndex_Internal != -1 && LOD->Modules.IsValidIndex(SelectedModuleIndex_Internal))
+    {
+
+        LOD->Modules.RemoveAt(SelectedModuleIndex_Internal);
+
+        // 선택 상태 초기화 또는 조정
+        SelectedModuleIndex_Internal = -1;
+        // 만약 SelectedEmitterIndex_Internal이 TargetEmitter의 인덱스와 다르면 문제가 될 수 있으므로,
+        // 이 함수는 보통 현재 선택된 이미터(SelectedEmitterIndex_Internal로 식별되는)에 대해서만 작동해야 합니다.
+
+        // 변경 사항 반영을 위해 시스템 재빌드
+        CurrentEditedSystem->InitializeSystem();
+        // 또는 최소한 해당 이미터만 재빌드
+        // TargetEmitter->Build();
+        // CurrentEditedSystem->UpdateComputedFlags(); // 이미터 변경이 시스템 전체 플래그에 영향 줄 수 있음
+    }
+}
+
+void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, UParticleEmitter* Emitter) 
+{
+    if (!Emitter || Emitter->LODLevels.IsEmpty() || !Emitter->LODLevels[0] || !Emitter->LODLevels[0]->RequiredModule)
+    {
+        return;
+    }
+    
+    UParticleLODLevel* LOD = Emitter->LODLevels[0];
+
     ImVec2 nameStartPos = ImGui::GetCursorScreenPos();
-    ImGui::Text("%s", emitterData.name.c_str());
+    FString EmitterName = Emitter->EmitterName;
+    ImGui::Text("%s", EmitterName.ToAnsiString().c_str());
 
     float checkboxWidth = ImGui::GetFrameHeight();
     // 체크박스를 이름 오른쪽에 정렬하기 위한 오프셋 계산
@@ -289,14 +606,19 @@ void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmi
     float desiredCheckboxX = ImGui::GetWindowContentRegionMax().x - checkboxWidth - ImGui::GetStyle().ItemInnerSpacing.x;
     float currentX = ImGui::GetCursorPosX(); // Text 다음에 오는 커서 X 위치
 
-    if (currentX < desiredCheckboxX) {
+    if (currentX < desiredCheckboxX) 
+    {
         ImGui::SameLine(0.0f, desiredCheckboxX - currentX);
     }
     else { // 이름이 너무 길어서 공간이 없으면 그냥 옆에 붙임
         ImGui::SameLine();
     }
 
-    ImGui::Checkbox("##Enable", &emitterData.is_enabled); // "##Enable"은 현재 ID 스택 내에서 고유 ID를 만듦
+    if(ImGui::Checkbox("##Enable", &LOD->bEnabled))
+    {
+        if (CurrentEditedSystem) 
+            CurrentEditedSystem->InitializeSystem();
+    }
 
     ImVec2 checkboxEndPos = ImGui::GetItemRectMax();
 
@@ -304,29 +626,136 @@ void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, MyEmi
     ImGui::SetCursorScreenPos(nameStartPos);
     if (ImGui::InvisibleButton("##emitter_header_clickable", ImVec2(checkboxEndPos.x - nameStartPos.x, ImGui::GetTextLineHeightWithSpacing())))
     {
-        currentSelectedEmitterIdx = emitterIdx;
-        currentSelectedModuleIdx = -1;
+        SelectedEmitterIndex_Internal = emitterIdx;
+        SelectedModuleIndex_Internal = -1;
     }
     ImGui::SetItemAllowOverlap();
 
     ImGui::Separator();
-    ImGui::Text("모듈:");
-    ImGui::Indent();
-    for (int moduleIdxLoop = 0; moduleIdxLoop < emitterData.modules.Num(); ++moduleIdxLoop)
+
+    const int REQUIRED_MODULE_INDEX = -2;
+    const int TYPEDATA_MODULE_INDEX = -3;
+
+    if (LOD->RequiredModule)
     {
-        MyModuleData& module = emitterData.modules[moduleIdxLoop];
+        UParticleModule* Module = LOD->RequiredModule; // 공통 타입으로 처리
+        ImGui::PushID("RequiredModule"); // 고유 ID
+
+        bool isThisModuleSelected = (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal == REQUIRED_MODULE_INDEX);
+        // ... (Selectable 배경색 및 스타일 설정 로직 - 이전 답변 참고) ...
+        ImVec4 moduleSelectedBgColor = ImVec4(0.8f, 0.5f, 0.2f, 1.0f); // 선택 시 다른 색상 (예시)
+        ImVec4 moduleRegularBgColor = ImVec4(0.2f, 0.2f, 0.22f, 0.5f); // 기본 배경색 (예시)
+        // ... (PushStyleColor 등) ...
+        if (isThisModuleSelected) ImGui::PushStyleColor(ImGuiCol_Header, moduleSelectedBgColor);
+        else ImGui::PushStyleColor(ImGuiCol_Header, moduleRegularBgColor);
+        // HeaderHovered, HeaderActive도 유사하게 설정
+
+        FString ModuleDisplayName = Module->GetModuleDisplayName(); // "Required" 반환 예상
+        if (ImGui::Selectable(ModuleDisplayName.ToAnsiString().c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, ImVec2(0, ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f)))
+        {
+            SelectedEmitterIndex_Internal = emitterIdx;
+            SelectedModuleIndex_Internal = REQUIRED_MODULE_INDEX; // 특별 인덱스로 선택
+        }
+        if (isThisModuleSelected) ImGui::PopStyleColor(1); else ImGui::PopStyleColor(1); // Header
+        // ImGui::PopStyleColor(2); // HeaderHovered, HeaderActive도 Pop
+        ImGui::PopID();
+    }
+
+    if (LOD->TypeDataModule)
+    {
+        UParticleModule* Module = LOD->TypeDataModule; // 공통 타입으로 처리
+        ImGui::PushID("TypeDataModule");
+
+        bool isThisModuleSelected = (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal == TYPEDATA_MODULE_INDEX);
+        // ... (Selectable 배경색 및 스타일 설정 로직) ...
+        ImVec4 moduleSelectedBgColor = ImVec4(0.2f, 0.5f, 0.8f, 1.0f); // 선택 시 다른 색상 (예시)
+        ImVec4 moduleRegularBgColor = ImVec4(0.2f, 0.2f, 0.22f, 0.5f); // 기본 배경색 (예시)
+        if (isThisModuleSelected) ImGui::PushStyleColor(ImGuiCol_Header, moduleSelectedBgColor);
+        else ImGui::PushStyleColor(ImGuiCol_Header, moduleRegularBgColor);
+
+        FString ModuleDisplayName = Module->GetModuleDisplayName(); // "TypeData Sprite", "TypeData Mesh" 등 반환 예상
+        if (ImGui::Selectable(ModuleDisplayName.ToAnsiString().c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, ImVec2(0, ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f)))
+        {
+            SelectedEmitterIndex_Internal = emitterIdx;
+            SelectedModuleIndex_Internal = TYPEDATA_MODULE_INDEX; // 특별 인덱스로 선택
+        }
+        if (isThisModuleSelected) ImGui::PopStyleColor(1); else ImGui::PopStyleColor(1);
+        ImGui::PopID();
+    }
+
+    if (LOD->RequiredModule || LOD->TypeDataModule) ImGui::Separator(); // 구분선
+    for (int moduleIdxLoop = 0; moduleIdxLoop < LOD->Modules.Num(); ++moduleIdxLoop)
+    {
+        UParticleModule* Module = LOD->Modules[moduleIdxLoop];
+        if (!Module) continue;
+
+        
         ImGui::PushID(moduleIdxLoop); // 각 모듈에 대해 고유 ID 스택 생성
 
-        bool isThisModuleSelected = (currentSelectedEmitterIdx == emitterIdx && currentSelectedModuleIdx == moduleIdxLoop);
+        bool isThisModuleSelected = (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal == moduleIdxLoop);
+
         // Selectable의 레이블이 중복될 수 있으므로, PushID로 구분하거나 레이블 자체를 고유하게 만듦
-        if (ImGui::Selectable(module.name.c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups))
+
+        // --- 배경색 변경 시작 ---
+        ImVec4 moduleRegularBgColor = ImVec4(0.15f, 0.15f, 0.19f, 0.2f);
+
+        ImVec4 moduleSelectedBgColor = ImVec4(1.0f, 0.15f, 0.0f, 1.0f);
+
+        ImVec4 moduleHoveredColor = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
+
+        ImVec4 moduleSelectedHoveredColor = ImVec4(moduleSelectedBgColor.x * 1.1f,
+            moduleSelectedBgColor.y * 1.1f, moduleSelectedBgColor.z * 1.1f, 1.0f);
+
+        ImVec4 moduleActiveColor = moduleSelectedBgColor;
+
+        if (isThisModuleSelected)
         {
-            currentSelectedEmitterIdx = emitterIdx;
-            currentSelectedModuleIdx = moduleIdxLoop;
+            ImGui::PushStyleColor(ImGuiCol_Header, moduleSelectedBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, moduleSelectedBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, moduleSelectedBgColor);
         }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, moduleRegularBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, moduleRegularBgColor);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, moduleActiveColor);
+        }
+
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 itemTopLeft = ImGui::GetCursorScreenPos();
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float itemHeight = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f; // 표준 아이템 높이
+
+        ImVec2 itemBottomRight = ImVec2(itemTopLeft.x + availableWidth, itemTopLeft.y + itemHeight);
+
+        // 3. 가로로 꽉 차는 배경 사각형 그리기
+        ImVec4 currentBgColorForRect = isThisModuleSelected ? moduleSelectedBgColor : moduleRegularBgColor;
+        ImU32 currentBgColorForRectU32 = ImGui::GetColorU32(currentBgColorForRect);
+
+        ImGui::GetWindowDrawList()->AddRectFilled(itemTopLeft, itemBottomRight, currentBgColorForRectU32);
+
+        ImVec2 Size = ImVec2(0, itemHeight);
+        FString ModuleName = Module->GetModuleDisplayName();
+        if (ImGui::Selectable(ModuleName.ToAnsiString().c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, Size))
+        {
+            SelectedEmitterIndex_Internal = emitterIdx;
+            SelectedModuleIndex_Internal = moduleIdxLoop;
+        }
+        ImGui::PopStyleColor(3);
         ImGui::PopID(); // moduleIdxLoop에 대한 Pop
     }
-    ImGui::Unindent();
+    if (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal != -1) 
+    {
+        if (ImGui::BeginPopupContextItem("DeleteModuleContextItem")) 
+        { 
+            // 현재 선택된 모듈 아이템 위에서 우클릭
+            if (ImGui::Selectable("Delete Selected Module")) 
+            {
+                HandleDeleteSelectedModule(Emitter);
+            }
+            ImGui::EndPopup();
+        }
+    }
 }
 
 // --- 창 크기 변경 처리 ---
