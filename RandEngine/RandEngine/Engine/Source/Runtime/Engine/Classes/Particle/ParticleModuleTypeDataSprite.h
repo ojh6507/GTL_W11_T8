@@ -8,5 +8,10 @@ class UParticleModuleTypeDataSprite : public UParticleModuleTypeDataBase
 public:
     UParticleModuleTypeDataSprite() {}
     virtual EModuleType GetModuleType() const override { return EModuleType::TypeDataSprite; }
-    // 스프라이트는 특별한 추가 데이터나 빌드 과정이 거의 필요 없을 수 있음
+ 
+    FString TextureAssetPath;
+    FTexture* CachedTexture = nullptr;
+    virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override;
+    virtual int32 RequiredBytes(UParticleModuleTypeDataBase* SpawningTypeData) const override { return 0; }
+    virtual int32 RequiredBytesPerInstance() const override { return 0; }
 };

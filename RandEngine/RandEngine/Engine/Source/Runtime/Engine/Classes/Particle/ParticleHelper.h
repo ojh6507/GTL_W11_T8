@@ -354,8 +354,8 @@ struct FDynamicEmitterDataBase
     }
 
     /** Custom new/delete with recycling */
-    void* operator new(size_t Size);
-    void operator delete(void* RawMemory, size_t Size);
+    //void* operator new(size_t Size);
+    //void operator delete(void* RawMemory, size_t Size);
 
     /** Returns the source data for this particle system */
     virtual const FDynamicEmitterReplayDataBase& GetSource() const = 0;
@@ -409,9 +409,9 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
      *	@param	LocalToWorld		The local to world transform of the component rendering the emitter
      *	@param	ParticleOrder		The array to fill in with ordered indices
      */
-    void SortSpriteParticles(int32 SortMode, bool bLocalSpace,
-        int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
-        const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const;
+    //void SortSpriteParticles(int32 SortMode, bool bLocalSpace,
+    //    int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
+    //    const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const;
 
     /**
      *	Get the vertex stride for the dynamic rendering data
