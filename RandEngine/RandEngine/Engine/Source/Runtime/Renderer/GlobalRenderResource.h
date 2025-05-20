@@ -125,6 +125,11 @@ struct TDynamicBufferPool
                 if (Buf.BufferSize >= SizeInBytes && Buf.Stride == Stride)
                 {
                     CurrentBuffer = &Buf;
+
+                    D3D11_MAPPED_SUBRESOURCE MappedRes;
+                    Context->Map(CurrentBuffer->GPUBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedRes);
+                    CurrentBuffer->MappedBuffer = reinterpret_cast<uint8*>(MappedRes.pData);
+
                     CurrentBuffer->AllocatedByteCount = 0;
                     break;
                 }
