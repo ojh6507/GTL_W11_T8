@@ -514,6 +514,8 @@ struct FDynamicEmitterDataBase
     //void* operator new(size_t Size);
     //void operator delete(void* RawMemory, size_t Size);
 
+    virtual void FreeSourceData() = 0;
+
     /** Returns the source data for this particle system */
     virtual const FDynamicEmitterReplayDataBase& GetSource() const = 0;
 
@@ -548,6 +550,8 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
     virtual ~FDynamicSpriteEmitterDataBase()
     {
     }
+
+    virtual void FreeSourceData() override = 0;
 
     const UMaterial* GetMaterial()
     {
@@ -664,6 +668,11 @@ struct FDynamicSpriteEmitterData : public FDynamicSpriteEmitterDataBase
 
     /** Initialize this emitter's dynamic rendering data, called after source data has been filled in */
     void Init(bool bInSelected);
+
+    virtual void FreeSourceData() override
+    {
+        Source.DataContainer.Free();
+    }
 
     /**
      *	Get the vertex stride for the dynamic rendering data
@@ -792,6 +801,11 @@ struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
 
     virtual ~FDynamicMeshEmitterData()
     {
+    }
+
+    virtual void FreeSourceData() override
+    {
+        Source.DataContainer.Free();
     }
 
     //uint32 GetMeshLODIndexFromProxy(const FParticleSystemSceneProxy* InOwnerProxy) const;

@@ -59,16 +59,13 @@ void UParticleSystemComponent::InitParticles()
             }
         }
     }
-    //PrepareRenderData();
-    //FillRenderData(FVector(0.f, 0.f, 0.f));
-    auto temp = EmitterRenderData;
-    auto temp2 = EmitterInstances;
 }
 
 void UParticleSystemComponent::PrepareRenderData()
 {
     EmitterRenderData.Empty();
     EmitterRenderData.Reserve(EmitterInstances.Num());
+
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
         EModuleType ModuleType = EmitterInstance->CurrentLODLevel->TypeDataModule->GetModuleType();
@@ -166,8 +163,18 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
         }
     }
 
+    ClearRenderData();
+}
+
+void UParticleSystemComponent::ClearRenderData()
+{
     DynamicVB.Commit();
     DynamicIB.Commit();
+
+    for (auto* RenderData : EmitterRenderData)
+    {
+        RenderData->FreeSourceData();
+    }
 }
 
 void UParticleSystemComponent::SetParticleTemplate(UParticleSystem* InTemplate)
