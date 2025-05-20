@@ -3,12 +3,17 @@
 #include "ParticleModule.h"
 #include "UObject/Casts.h"
 
-#include "ParticleModuleSpawn.h"
-#include "ParticleModuleLifetime.h"
-#include "ParticleModuleRequired.h"
-#include "ParticleModuleTypeDataBase.h"
+#include "Particle/ParticleModule.h"
+#include "Particle/ParticleModuleRequired.h"
+#include "Particle/ParticleModuleTypeDataSprite.h"
+#include "Particle/ParticleModuleTypeDataMesh.h"
+#include "Particle/ParticleModuleSpawn.h"
+#include "Particle/ParticleModuleLifetime.h"
+#include "Particle/ParticleModuleColor.h"
+#include "Particle/ParticleModuleLocation.h"
+#include "Particle/ParticleModuleSize.h"
+#include "Particle/ParticleModuleVelocity.h"
 
-#include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
 #include "ParticleModuleTypeDataMesh.h"
 #include "ParticleModuleTypeDataSprite.h"
@@ -197,14 +202,17 @@ static UParticleModule* CreateModuleByClassName(const FString& ClassName, UObjec
     // 실제로는 모든 가능한 모듈 타입을 여기에 등록해야 합니다.
 
     if (ClassName == TEXT("UParticleModuleRequired")) return FObjectFactory::ConstructObject<UParticleModuleRequired>(Outer);
-    if (ClassName == TEXT("UParticleModuleSpawn")) return FObjectFactory::ConstructObject<UParticleModuleSpawn>(Outer); // 예시
-    if (ClassName == TEXT("UParticleModuleLifetime")) return FObjectFactory::ConstructObject<UParticleModuleLifetime>(Outer); // 예시
-    // ... 기타 모든 UParticleModule 파생 클래스들 ...
-    if (ClassName == TEXT("UParticleModuleTypeDataSprite")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataSprite>(Outer); // 예시
-    if (ClassName == TEXT("UParticleModuleTypeDataMesh")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataMesh>(Outer); // 예시
-    // ... 기타 모든 UParticleModuleTypeDataBase 파생 클래스들 ...
+    if (ClassName == TEXT("UParticleModuleSpawn")) return FObjectFactory::ConstructObject<UParticleModuleSpawn>(Outer);
+    if (ClassName == TEXT("UParticleModuleLifetime")) return FObjectFactory::ConstructObject<UParticleModuleLifetime>(Outer);
+    
+    if (ClassName == TEXT("UParticleModuleColor")) return FObjectFactory::ConstructObject<UParticleModuleColor>(Outer);
+    if (ClassName == TEXT("UParticleModuleLocation")) return FObjectFactory::ConstructObject<UParticleModuleLocation>(Outer);
+    if (ClassName == TEXT("UParticleModuleSize")) return FObjectFactory::ConstructObject<UParticleModuleSize>(Outer);
+    if (ClassName == TEXT("UParticleModuleVelocity")) return FObjectFactory::ConstructObject<UParticleModuleVelocity>(Outer);
 
-    // UE_LOG(LogSerialization, Error, TEXT("Unknown module class name for deserialization: %s"), *ClassName);
+    if (ClassName == TEXT("UParticleModuleTypeDataSprite")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataSprite>(Outer);
+    if (ClassName == TEXT("UParticleModuleTypeDataMesh")) return FObjectFactory::ConstructObject<UParticleModuleTypeDataMesh>(Outer);
+    
     return nullptr;
 }
 
