@@ -121,6 +121,14 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
                 ParticleSystem->SaveParticleSystemToBinary();
             }
         }
+        if (GetAsyncKeyState('F') & 0x8000)
+        {
+            FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+            ViewTransform.SetLocation(
+                FVector(0,0,0) - (ViewTransform.GetForwardVector() * 50.0f)
+            );
+
+        }
 
     }
 }
