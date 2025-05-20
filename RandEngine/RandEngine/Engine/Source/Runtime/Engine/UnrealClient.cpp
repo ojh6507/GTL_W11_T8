@@ -12,7 +12,7 @@ FViewportResource::FViewportResource()
     ClearColors.Add(EResourceType::ERT_Gizmo, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_Overlay, { 0.f, 0.f, 0.f, 0.f });
     ClearColors.Add(EResourceType::ERT_PostProcessCompositing, { 0.f, 0.f, 0.f, 0.f });
-    ClearColors.Add(EResourceType::ERT_SubScene, { 1.f, 0.f, 0.f, 1.f });
+    ClearColors.Add(EResourceType::ERT_SubScene, { 0.f, 0.f, 0.f, 1.f });
 }
 
 FViewportResource::~FViewportResource()

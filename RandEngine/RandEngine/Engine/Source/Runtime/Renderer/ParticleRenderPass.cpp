@@ -193,24 +193,23 @@ void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewpo
 {
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
 
-    USceneComponent* SelectedComponent = Engine->GetSelectedComponent();
-    AActor* SelectedActor = Engine->GetSelectedActor();
+    //USceneComponent* SelectedComponent = Engine->GetSelectedComponent();
+    //AActor* SelectedActor = Engine->GetSelectedActor();
 
-    USceneComponent* TargetComponent = nullptr;
+    //USceneComponent* TargetComponent = nullptr;
 
-    if (SelectedComponent != nullptr)
-    {
-        TargetComponent = SelectedComponent;
-    }
-    else if (SelectedActor != nullptr)
-    {
-        TargetComponent = SelectedActor->GetRootComponent();
-    }
+    //if (SelectedComponent != nullptr)
+    //{
+    //    TargetComponent = SelectedComponent;
+    //}
+    //else if (SelectedActor != nullptr)
+    //{
+    //    TargetComponent = SelectedActor->GetRootComponent();
+    //}
 
     FVector4 UUIDColor = Particle->EncodeUUID() / 255.0f;
-    const bool bIsSelected = (Engine && TargetComponent == Particle);
-
-    UpdateObjectConstant(UUIDColor, bIsSelected);
+    
+    UpdateObjectConstant(UUIDColor, false);
 
     ID3D11Buffer* InstanceBuffer = MeshEmitter->VertexAllocation.VertexBuffer;
     UINT VBStride = sizeof(FStaticMeshVertex);
@@ -488,7 +487,7 @@ void FParticleRenderPass::PrepareRenderSingleParticle(const std::shared_ptr<FEdi
 
     FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
     FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
-
+   
     Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
 
@@ -515,16 +514,22 @@ void FParticleRenderPass::RenderSingleParticle(const std::shared_ptr<FEditorView
         }
     }
 
-    PrepareSpriteParticleRender(Viewport);
-    for (const auto& SpriteRenderData : SpriteRenderDatas)
+    if (SpriteRenderDatas.Num() > 0)
     {
-        RenderSpriteParticle(Viewport, SpriteRenderData);
+        PrepareSpriteParticleRender(Viewport);
+        for (const auto& SpriteRenderData : SpriteRenderDatas)
+        {
+            RenderSpriteParticle(Viewport, SpriteRenderData);
+        }
     }
 
-    PrepareMeshParticleRender(Viewport);
-    for (const auto& MeshRenderData : MeshRenderDatas)
+    if (MeshRenderDatas.Num() > 0)
     {
-        RenderMeshParticle(Viewport, MeshRenderData, InParticleComponent);
+        PrepareMeshParticleRender(Viewport);
+        UpdateLitUnlitConstant(false);
+        for (const auto& MeshRenderData : MeshRenderDatas)
+        {
+            RenderMeshParticle(Viewport, MeshRenderData, InParticleComponent);
+        }
     }
-
 }
