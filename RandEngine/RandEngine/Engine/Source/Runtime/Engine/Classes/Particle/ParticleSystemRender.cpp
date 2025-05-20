@@ -1,6 +1,7 @@
 #include "ParticleHelper.h"
 #include "ParticleModuleRequired.h"
 #include "Editor/UnrealEd/EditorViewportClient.h"
+#include "Math/JungleMath.h"
 
 FVector2D GetParticleSize(const FBaseParticle& Particle, const FDynamicSpriteEmitterReplayDataBase& Source)
 {
@@ -373,11 +374,23 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
         FillVertex = (FMeshParticleInstanceVertex*)TempVert;
         for (int VertexIndex = 0; VertexIndex < Source.ActiveParticleCount; ++VertexIndex)
         {
+            FMatrix ModelMatrix;
+            FVector Zero = FVector::Zero();
+            CalculateParticleTransform(FMatrix::Identity, ParticlePosition, Particle.Rotation, Particle.Velocity, Particle.Size,
+                Zero, Zero, Zero, Zero, Zero, Zero, ModelMatrix);
+            
             FillVertex[VertexIndex].Color = Particle.Color;
             //TODO : Transform은 나중에 받자
-            FillVertex[VertexIndex].Transform[0] = FVector4(1,0,0,ParticlePosition.X);
-            FillVertex[VertexIndex].Transform[1] = FVector4(0,1,0,ParticlePosition.Y);
-            FillVertex[VertexIndex].Transform[2] = FVector4(0,0,1,ParticlePosition.Z);
+            FillVertex[VertexIndex].Transform[0] = FVector4(Particle.Size.X, 0, 0, ParticlePosition.X);
+            FillVertex[VertexIndex].Transform[1] = FVector4(0, Particle.Size.Y, 0, ParticlePosition.Y);
+            FillVertex[VertexIndex].Transform[2] = FVector4(0, 0, Particle.Size.Z, ParticlePosition.Z);
+            //FillVertex[VertexIndex].Transform[0] = FVector4(ModelMatrix.M[0][0], ModelMatrix.M[0][1], ModelMatrix.M[0][2], ModelMatrix.M[0][3]);
+            //FillVertex[VertexIndex].Transform[1] = FVector4(ModelMatrix.M[1][0], ModelMatrix.M[1][1], ModelMatrix.M[1][2], ModelMatrix.M[1][3]);
+            //FillVertex[VertexIndex].Transform[2] = FVector4(ModelMatrix.M[2][0], ModelMatrix.M[2][1], ModelMatrix.M[2][2], ModelMatrix.M[2][3]);
+            UE_LOG(ELogLevel::Display, "\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f",
+                FillVertex[VertexIndex].Transform[0].X, FillVertex[VertexIndex].Transform[0].Y, FillVertex[VertexIndex].Transform[0].Z, FillVertex[VertexIndex].Transform[0].W,
+                FillVertex[VertexIndex].Transform[1].X, FillVertex[VertexIndex].Transform[1].Y, FillVertex[VertexIndex].Transform[1].Z, FillVertex[VertexIndex].Transform[1].W,
+                FillVertex[VertexIndex].Transform[2].X, FillVertex[VertexIndex].Transform[2].Y, FillVertex[VertexIndex].Transform[2].Z, FillVertex[VertexIndex].Transform[2].W);
             FillVertex[VertexIndex].Velocity = Particle.Velocity;
             //SubUV랑 SubUVLerp 건너뜀
             FillVertex[VertexIndex].RelativeTime = Particle.RelativeTime;
@@ -397,6 +410,17 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
     }
 
     return true;
+}
+
+void FDynamicMeshEmitterData::CalculateParticleTransform(const FMatrix& ProxyLocalToWorld, const FVector& ParticleLocation, float ParticleRotation, const FVector& ParticleVelocity, const FVector& ParticleSize, const FVector& ParticlePayloadInitialOrientation, const FVector& ParticlePayloadRotation, const FVector& ParticlePayloadCameraOffset, const FVector& ParticlePayloadOrbitOffset, const FVector& ViewOrigin, const FVector& ViewDirection, FMatrix& OutTransformMat) const
+{
+    FMatrix ScaleMat = FMatrix::GetScaleMatrix(ParticleSize);
+    FMatrix RotationMat = FMatrix::Identity;
+    FMatrix TranslationMat = FMatrix::GetTranslationMatrix(ParticleLocation);
+
+    FMatrix RTMat = RotationMat * TranslationMat;
+
+    OutTransformMat =  ScaleMat * RTMat;
 }
 
 void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLocalSpace,

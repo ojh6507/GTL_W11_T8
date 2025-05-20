@@ -33,7 +33,7 @@ FParticleRenderPass::~FParticleRenderPass()
 void FParticleRenderPass::Initialize(FDXDBufferManager* InBufferManager, FGraphicsDevice* InGraphics, FDXDShaderManager* InShaderManager)
 {
     BufferManager = InBufferManager;
-    Graphics = InGraphics;
+    Graphics = InGraphics;  
     ShaderManager = InShaderManager;
     CreateShader();
     CreateBlendStates();
@@ -134,7 +134,7 @@ void FParticleRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& V
     {
         TArray<FDynamicMeshEmitterData*> MeshRenderDatas;
         TArray<FDynamicSpriteEmitterData*> SpriteRenderDatas;
-        for (const auto& RenderData : Particle->EmitterRenderData)
+        for (const auto& RenderData : Particle->EmitterRenderData)   
         {
             if (FDynamicSpriteEmitterData* SpriteRenderData = dynamic_cast<FDynamicSpriteEmitterData*>(RenderData))
             {
@@ -170,18 +170,18 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
 {
     if (!SpriteEmitter || !SpriteEmitter->VertexAllocation.IsValid() || !SpriteEmitter->IndexAllocation.IsValid())
         return;
-
+    
     ID3D11Buffer* VertexBuffer = SpriteEmitter->VertexAllocation.VertexBuffer;
     ID3D11Buffer* IndexBuffer = SpriteEmitter->IndexAllocation.IndexBuffer;
     UINT Stride = SpriteEmitter->GetDynamicVertexStride();
-
+    
     Graphics->DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &SpriteEmitter->VertexAllocation.VertexOffset);
     //포맷 확인 필요
     Graphics->DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
+    
     //IndexCount SpriteEmitter에서 가져와야 함
     int32 IndexCount = SpriteEmitter->GetSource().ActiveParticleCount * 6;
-
+    
     //TODO: Texture랑 Sampler 가져와야 함
     //Graphics->DeviceContext->PSSetShaderResources(0, 1, SpriteEmitter->MaterialResource->SRV);
     //Graphics->DeviceContext->PSSetSamplers(0, 1, SpriteEmitter->MaterialResource->SamplerState);
@@ -245,7 +245,7 @@ void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewpo
             0, 0, 0);
         return;
     }
-
+    
     for (int SubMeshIndex = 0; SubMeshIndex < RenderData->MaterialSubsets.Num(); SubMeshIndex++)
     {
         uint32 MaterialIndex = RenderData->MaterialSubsets[SubMeshIndex].MaterialIndex;
@@ -328,7 +328,7 @@ void FParticleRenderPass::CreateShader()
     }
 
     D3D11_INPUT_ELEMENT_DESC MeshParticleLayoutDesc[] =
-    {
+    {  
         { "POSITION",        0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,                            D3D11_INPUT_PER_VERTEX_DATA,   0 },
         { "COLOR",           0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
         { "NORMAL",          0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
@@ -476,55 +476,4 @@ void FParticleRenderPass::ChangeViewMode(EViewModeIndex ViewMode)
     Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->IASetInputLayout(InputLayout);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
-}
-
-void FParticleRenderPass::PrepareRenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
-{
- 
-    const EResourceType ResourceType = EResourceType::ERT_SubScene;
-    FViewportResource* ViewportResource = Viewport->GetViewportResource();
-    ViewportResource->ClearDepthStencils(Graphics->DeviceContext);
-    ViewportResource->ClearRenderTargets(Graphics->DeviceContext);
-
-    FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
-    FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
-
-    Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
-    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
-
-    InParticleComponent->PrepareRenderData();
-    InParticleComponent->FillRenderData(Viewport);
-
-}
-
-void FParticleRenderPass::RenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
-{
-    PrepareRenderSingleParticle(Viewport, InParticleComponent);
-    Graphics->DeviceContext->OMSetDepthStencilState(Graphics->DepthStencilState, 0);
-    TArray<FDynamicMeshEmitterData*> MeshRenderDatas;
-    TArray<FDynamicSpriteEmitterData*> SpriteRenderDatas;
-    for (const auto& RenderData : InParticleComponent->EmitterRenderData)
-    {
-        if (FDynamicSpriteEmitterData* SpriteRenderData = dynamic_cast<FDynamicSpriteEmitterData*>(RenderData))
-        {
-            SpriteRenderDatas.Add(SpriteRenderData);
-        }
-        else if (FDynamicMeshEmitterData* MeshRenderData = dynamic_cast<FDynamicMeshEmitterData*>(RenderData))
-        {
-            MeshRenderDatas.Add(MeshRenderData);
-        }
-    }
-
-    PrepareSpriteParticleRender(Viewport);
-    for (const auto& SpriteRenderData : SpriteRenderDatas)
-    {
-        RenderSpriteParticle(Viewport, SpriteRenderData);
-    }
-
-    PrepareMeshParticleRender(Viewport);
-    for (const auto& MeshRenderData : MeshRenderDatas)
-    {
-        RenderMeshParticle(Viewport, MeshRenderData, InParticleComponent);
-    }
-
 }

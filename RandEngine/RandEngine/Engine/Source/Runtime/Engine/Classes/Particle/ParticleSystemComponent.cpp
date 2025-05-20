@@ -149,6 +149,7 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
                 SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
                 View.get(), GetWorldMatrix(), ParticleOrder);
 
+            //UStaticMesh 관련 처리 임시로 여기에 배치
             SpriteData->StaticMesh = Cast<UParticleModuleTypeDataMesh>(EmitterInstance->CurrentLODLevel->TypeDataModule)->Mesh;
             TArray<UMaterial*> Materials;
             SpriteData->StaticMesh->GetUsedMaterials(Materials);
