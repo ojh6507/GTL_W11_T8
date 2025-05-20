@@ -785,9 +785,14 @@ struct FDynamicMeshEmitterReplayData
 /** Dynamic emitter data for Mesh emitters */
 struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
 {
-    FDynamicMeshEmitterData(const UParticleModuleRequired* RequiredModule);
+    FDynamicMeshEmitterData(const UParticleModuleRequired* RequiredModule) :
+        FDynamicSpriteEmitterDataBase(RequiredModule)
+    {
+    }
 
-    virtual ~FDynamicMeshEmitterData();
+    virtual ~FDynamicMeshEmitterData()
+    {
+    }
 
     //uint32 GetMeshLODIndexFromProxy(const FParticleSystemSceneProxy* InOwnerProxy) const;
     ///** Initialize this emitter's dynamic rendering data, called after source data has been filled in */
@@ -874,6 +879,8 @@ struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
         return sizeof(FMeshParticleInstanceVertexDynamicParameter);
     }
 
+    bool GetVertexData(void* VertexData, void* DynamicParameterVertexData, FParticleOrder* ParticleOrder, const FVector& InCameraPosition, const FMatrix& InLocalToWorld) const;
+
     /**
      *	Get the source replay data for this emitter
      */
@@ -900,7 +907,7 @@ struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
 
     int32					LastFramePreRendered;
 
-    UStaticMesh* StaticMesh;
+    UStaticMesh* StaticMesh = nullptr;
     TArray<UMaterial*> MeshMaterials;
 
     /** offset to FMeshTypeDataPayload */

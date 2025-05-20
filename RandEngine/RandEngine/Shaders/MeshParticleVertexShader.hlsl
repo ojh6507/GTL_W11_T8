@@ -37,10 +37,10 @@ PS_INPUT_StaticMesh mainVS(VS_Input Input)
     PS_INPUT_StaticMesh Output;
 
     Output.Position = float4(Input.Position, 1.0);
-    float4x4 Transform = (Input.Transform0, Input.Transform1, Input.Transform2, float4(0, 0, 0, 1));
+    float4x4 Transform = float4x4(Input.Transform0, Input.Transform1, Input.Transform2, float4(0, 0, 0, 1));
     float3x3 Rotation = (float3x3) Transform;
     float3x3 InvTransform = transpose(Rotation);
-    Output.Position = mul(Output.Position, Transform);
+    Output.Position = mul(Transform, Output.Position);
     Output.WorldPosition = Output.Position.xyz;
     
     Output.Position = mul(Output.Position, ViewMatrix);
