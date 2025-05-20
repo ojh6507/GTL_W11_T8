@@ -5,7 +5,7 @@
 #include "UObject/UObjectIterator.h"
 #include "UObject/Casts.h"
 #include "UnrealEd/EditorViewportClient.h"
-#include <UnrealClient.h>
+#include "UnrealClient.h"
 
 FParticleRenderPass::FParticleRenderPass()
     : BufferManager(nullptr)
@@ -240,6 +240,11 @@ void FParticleRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportCli
     FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
+    for (UParticleSystemComponent* ParticleComp : ParticleComps)
+    {
+        ParticleComp->PrepareRenderData();
+        ParticleComp->FillRenderData(Viewport);
+    }
 }
 
 void FParticleRenderPass::PrepareSpriteParticleShader() const
@@ -309,7 +314,7 @@ void FParticleRenderPass::CreateShader()
         { "TEXCOORD",  5, DXGI_FORMAT_R32_FLOAT,          0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // SUBUV Lerp
         { "TEXCOORD",  6, DXGI_FORMAT_R32_FLOAT,          0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Relative Time
     };
-    hr = ShaderManager->AddVertexShaderAndInputLayout
+   /* hr = ShaderManager->AddVertexShaderAndInputLayout
     (L"MeshParticleVertexShader", L"Shaders/MeshParticleVertexShader.hlsl", "mainVS", MeshParticleLayoutDesc, ARRAYSIZE(MeshParticleLayoutDesc));
     if (FAILED(hr))
     {
@@ -319,7 +324,7 @@ void FParticleRenderPass::CreateShader()
     if (FAILED(hr))
     {
         return;
-    }
+    }*/
 }
 
 void FParticleRenderPass::CreateBlendStates()

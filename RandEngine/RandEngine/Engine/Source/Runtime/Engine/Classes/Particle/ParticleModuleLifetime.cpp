@@ -2,6 +2,7 @@
 
 UParticleModuleLifetime::UParticleModuleLifetime()
 {
+    Lifetime.Constant = 10.0f; // 기본값으로 0.0f 설정
 }
 void UParticleModuleLifetime::SpawnParticle(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle& Particle)
 {
