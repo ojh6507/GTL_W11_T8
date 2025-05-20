@@ -9,6 +9,7 @@
 #include "Components/Mesh/StaticMeshRenderData.h"
 #include "Engine/Asset/StaticMeshAsset.h"
 #include "Engine/EditorEngine.h"
+#include <RendererHelpers.h>
 
 FParticleRenderPass::FParticleRenderPass()
     : BufferManager(nullptr)
@@ -298,8 +299,29 @@ void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewpo
 
     Graphics->DeviceContext->IASetVertexBuffers(1, 1, &InstanceBuffer, &Stride, &MeshEmitter->VertexAllocation.VertexOffset);
 
-    Graphics->DeviceContext->DrawIndexedInstanced(IndexInfo.NumIndices, MeshEmitter->GetSourceData()->ActiveParticleCount, 
-                                                  0, 0, 0);
+    if (RenderData->MaterialSubsets.Num() == 0)
+    {
+        Graphics->DeviceContext->DrawIndexedInstanced(IndexInfo.NumIndices, MeshEmitter->GetSourceData()->ActiveParticleCount,
+            0, 0, 0);
+        return;
+    }
+    
+    for (int SubMeshIndex = 0; SubMeshIndex < RenderData->MaterialSubsets.Num(); SubMeshIndex++)
+    {
+        uint32 MaterialIndex = RenderData->MaterialSubsets[SubMeshIndex].MaterialIndex;
+
+        FSubMeshConstants SubMeshData = FSubMeshConstants(false);
+
+        BufferManager->UpdateConstantBuffer(TEXT("FSubMeshConstants"), SubMeshData);
+
+        MaterialUtils::UpdateMaterial(BufferManager, Graphics, MeshEmitter->MeshMaterials[MaterialIndex]->GetMaterialInfo());
+
+        uint32 StartIndex = RenderData->MaterialSubsets[SubMeshIndex].IndexStart;
+        uint32 IndexCount = RenderData->MaterialSubsets[SubMeshIndex].IndexCount;
+        Graphics->DeviceContext->DrawIndexed(IndexCount, StartIndex, 0);
+        Graphics->DeviceContext->DrawIndexedInstanced(IndexCount, MeshEmitter->GetSourceData()->ActiveParticleCount,
+            StartIndex, 0, 0);
+    }
 }
 
 void FParticleRenderPass::ClearRenderArr()
