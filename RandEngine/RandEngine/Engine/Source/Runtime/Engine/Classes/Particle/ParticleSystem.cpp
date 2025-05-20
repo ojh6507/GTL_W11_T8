@@ -80,7 +80,7 @@ void UParticleSystem::SaveParticleSystemToBinary()
         }
     }
     FString FilePath = "Contents/Particle/";
-    FilePath += GetFName().ToString() + std::to_string(GetFName().GetDisplayIndex())+".myparticle";
+    FilePath += ParticleSystemFileName +".myparticle";
     const char* pathForStream = nullptr;
     std::string str = FilePath.ToAnsiString();
     pathForStream = str.c_str();

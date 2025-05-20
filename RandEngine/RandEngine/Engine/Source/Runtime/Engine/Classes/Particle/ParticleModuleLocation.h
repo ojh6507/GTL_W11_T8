@@ -28,10 +28,15 @@ public:
 public:
     UParticleModuleLocation();
     ~UParticleModuleLocation() override = default;
+    
     virtual void Serialize(FArchive& Ar) override;
+
     virtual void SpawnParticle(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle& ParticleBase) override;
 
     virtual void UpdateParticle(FParticleEmitterInstance* Owner, FBaseParticle& Particle, const uint8* ParticleBaseForPayload, int32 PayloadRelativeOffset, float DeltaTime) override;
+    
+    virtual EModuleType GetModuleType() const override { return EModuleType::Location; }
+
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleLocation& M);
 };
 
