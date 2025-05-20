@@ -243,7 +243,7 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     
     Graphics->DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &SpriteEmitter->VertexAllocation.VertexOffset);
     //포맷 확인 필요
-    Graphics->DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+    Graphics->DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     
     //IndexCount SpriteEmitter에서 가져와야 함
     int32 IndexCount = SpriteEmitter->GetSource().ActiveParticleCount * 6;

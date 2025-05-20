@@ -5,13 +5,12 @@ template <typename BufferType>
 class TDynamicBuffer;
 
 using FDynamicVertexBuffer = TDynamicBuffer<ID3D11Buffer>;
-using FDynamicIndexBuffer = TDynamicBuffer<ID3D11Buffer>;
 
 /**
  * An individual dynamic vertex buffer.
  */
 template <typename BufferType>
-class TDynamicBuffer final
+class TDynamicBuffer
 {
 public:
     /** The aligned size of all dynamic vertex buffers. */
@@ -38,6 +37,8 @@ public:
         , Stride(InStride)
     {
     }
+
+    virtual ~TDynamicBuffer() = default;
 
     void Init(ID3D11Device* Device, ID3D11DeviceContext* Context)
     {
@@ -150,6 +151,58 @@ struct TDynamicBufferPool
         }
 
         return CurrentBuffer;
+    }
+};
+
+// 인덱스 전용으로 Init() 동작만 바꾼 서브클래스
+class FDynamicIndexBuffer : public TDynamicBuffer<ID3D11Buffer>
+{
+public:
+    // 부모 템플릿 생성자 호출
+    explicit FDynamicIndexBuffer(uint32 InMinBufferSize, uint32 InStride)
+        : TDynamicBuffer<ID3D11Buffer>(InMinBufferSize, InStride)
+    {
+    }
+
+    // 정점용 Init() 대신 인덱스용 Init() 구현
+    void Init(ID3D11Device* Device, ID3D11DeviceContext* Context)
+    {
+        // (1) 기존 리소스 있으면 해제
+        if (GPUBuffer)
+        {
+            if (MappedBuffer)
+            {
+                Context->Unmap(GPUBuffer, 0);
+                MappedBuffer = nullptr;
+            }
+            GPUBuffer->Release();
+            GPUBuffer = nullptr;
+        }
+
+        // (2) 버퍼 설명 – BindFlags 만 INDEX_BUFFER 로 변경
+        D3D11_BUFFER_DESC Desc = {};
+        Desc.ByteWidth = BufferSize;
+        Desc.Usage = D3D11_USAGE_DYNAMIC;
+        Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        Desc.MiscFlags = 0;
+        Desc.StructureByteStride = Stride;  // 보통 sizeof(uint16) or sizeof(uint32)
+
+        // (3) GPU 버퍼 생성
+        HRESULT hr = Device->CreateBuffer(&Desc, nullptr, &GPUBuffer);
+        if (!SUCCEEDED(hr))
+        {
+            UE_LOG(ELogLevel::Error, TEXT("Index CreateBuffer failed"));
+            return;
+        }
+
+        // (4) 즉시 Map 해서 쓰기 포인터 확보
+        D3D11_MAPPED_SUBRESOURCE MappedRes;
+        Context->Map(GPUBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedRes);
+        MappedBuffer = reinterpret_cast<uint8*>(MappedRes.pData);
+
+        // (5) 할당 카운트 초기화
+        AllocatedByteCount = 0;
     }
 };
 
