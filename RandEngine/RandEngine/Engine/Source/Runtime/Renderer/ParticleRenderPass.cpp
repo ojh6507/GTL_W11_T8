@@ -8,6 +8,7 @@
 #include <UnrealClient.h>
 #include "Components/Mesh/StaticMeshRenderData.h"
 #include "Engine/Asset/StaticMeshAsset.h"
+#include "Engine/EditorEngine.h"
 
 FParticleRenderPass::FParticleRenderPass()
     : BufferManager(nullptr)
@@ -69,6 +70,25 @@ void FParticleRenderPass::UpdateCameraConstant(const std::shared_ptr<FEditorView
     BufferManager->UpdateConstantBuffer(TEXT("FSpriteParticleCameraConstantBuffer"), CameraData);
 }
 
+void FParticleRenderPass::UpdateObjectConstant(const FVector4& UUIDColor, bool bIsSelected) const
+{
+    FObjectConstantBuffer ObjectData = {};
+    //Instance buffer에 있는 Transform 사용으로 필요없음
+    ObjectData.WorldMatrix = FMatrix::Identity;
+    ObjectData.InverseTransposedWorld = FMatrix::Identity;
+    ObjectData.UUIDColor = UUIDColor;
+    ObjectData.bIsSelected = bIsSelected;
+
+    BufferManager->UpdateConstantBuffer(TEXT("FObjectConstantBuffer"), ObjectData);
+}
+
+void FParticleRenderPass::UpdateLitUnlitConstant(int32 isLit) const
+{
+    FLitUnlitConstants Data;
+    Data.bIsLit = isLit;
+    BufferManager->UpdateConstantBuffer(TEXT("FLitUnlitConstants"), Data);
+}
+
 void FParticleRenderPass::PrepareSpriteParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -82,8 +102,25 @@ void FParticleRenderPass::PrepareSpriteParticleRender(const std::shared_ptr<FEdi
 
 void FParticleRenderPass::PrepareMeshParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
+    const EViewModeIndex ViewMode = Viewport->GetViewMode();
+    ChangeViewMode(ViewMode);
+
     Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    PrepareMeshParticleShader();
+
+    TArray<FString> PSBufferKeys = {
+        TEXT("FLightInfoBuffer"),
+        TEXT("FMaterialConstants"),
+        TEXT("FLitUnlitConstants"),
+        TEXT("FSubMeshConstants"),
+        TEXT("FTextureConstants"),
+    };
+
+    BufferManager->BindConstantBuffers(PSBufferKeys, 0, EShaderStage::Pixel);
+    BufferManager->BindConstantBuffer(TEXT("FDiffuseMultiplier"), 6, EShaderStage::Pixel);
+    BufferManager->BindConstantBuffer(TEXT("FLightInfoBuffer"), 0, EShaderStage::Vertex);
+    BufferManager->BindConstantBuffer(TEXT("FMaterialConstants"), 1, EShaderStage::Vertex);
+    BufferManager->BindConstantBuffer(TEXT("FObjectConstantBuffer"), 12, EShaderStage::Vertex);
+
     const float BlendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
     UINT SampleMask = 0xffffffff;
     Graphics->DeviceContext->OMSetBlendState(BlendStates[0], BlendFactor, SampleMask);
@@ -117,7 +154,7 @@ void FParticleRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& V
         PrepareMeshParticleRender(Viewport);
         for (const auto& MeshRenderData : MeshRenderDatas)
         {
-            RenderMeshParticle(Viewport, MeshRenderData);
+            RenderMeshParticle(Viewport, MeshRenderData, Particle);
         }
     }
 }
@@ -217,9 +254,29 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     Graphics->DeviceContext->DrawIndexed(IndexCount, SpriteEmitter->IndexAllocation.FirstIndex, 0);
 }
 
-void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter)
+void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter, const UParticleSystemComponent* Particle)
 {
-    //MeshEmitter에서 VB IB 정보 가져와서 바인딩 하고 DrawIndexedInstanced();
+    UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
+
+    USceneComponent* SelectedComponent = Engine->GetSelectedComponent();
+    AActor* SelectedActor = Engine->GetSelectedActor();
+
+    USceneComponent* TargetComponent = nullptr;
+
+    if (SelectedComponent != nullptr)
+    {
+        TargetComponent = SelectedComponent;
+    }
+    else if (SelectedActor != nullptr)
+    {
+        TargetComponent = SelectedActor->GetRootComponent();
+    }
+
+    FVector4 UUIDColor = Particle->EncodeUUID() / 255.0f;
+    const bool bIsSelected = (Engine && TargetComponent == Particle);
+
+    UpdateObjectConstant(UUIDColor, bIsSelected);
+
     ID3D11Buffer* InstanceBuffer = MeshEmitter->VertexAllocation.VertexBuffer;
     UINT VBStride = sizeof(FStaticMeshVertex);
     UINT Offset = 0;
@@ -252,6 +309,8 @@ void FParticleRenderPass::ClearRenderArr()
 
 void FParticleRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
+    Graphics->DeviceContext->RSSetViewports(1, &Viewport->GetViewportResource()->GetD3DViewport());
+
     const EResourceType ResourceType = EResourceType::ERT_Scene;
     FViewportResource* ViewportResource = Viewport->GetViewportResource();
     FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
@@ -275,20 +334,6 @@ void FParticleRenderPass::PrepareSpriteParticleShader() const
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
 }
 
-void FParticleRenderPass::PrepareMeshParticleShader() const
-{
-    ID3D11VertexShader* VertexShader = nullptr;
-    ID3D11InputLayout* InputLayout = nullptr;
-    ID3D11PixelShader* PixelShader = nullptr;
-
-    VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
-    InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
-    PixelShader = ShaderManager->GetPixelShaderByKey(L"MeshParticlePixelShader");
-
-    Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
-    Graphics->DeviceContext->IASetInputLayout(InputLayout);
-    Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
-}
 
 void FParticleRenderPass::CreateShader()
 {
@@ -393,4 +438,79 @@ void FParticleRenderPass::CreateBlendStates()
     {
         return;
     }
+}
+
+void FParticleRenderPass::ChangeViewMode(EViewModeIndex ViewMode)
+{
+    ID3D11VertexShader* VertexShader = nullptr;
+    ID3D11InputLayout* InputLayout = nullptr;
+    ID3D11PixelShader* PixelShader = nullptr;
+
+    switch (ViewMode)
+    {
+    case EViewModeIndex::VMI_Lit_Gouraud:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"GOURAUD_MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"GOURAUD_MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"GOURAUD_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(1);
+        break;
+    case EViewModeIndex::VMI_Lit_Lambert:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"LAMBERT_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(1);
+        break;
+    case EViewModeIndex::VMI_Lit_BlinnPhong:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"PHONG_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(1);
+        break;
+    case EViewModeIndex::VMI_LIT_PBR:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"PBR_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(1);
+        break;
+    case EViewModeIndex::VMI_Wireframe:
+    case EViewModeIndex::VMI_Unlit:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"LAMBERT_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(0);
+        break;
+    case EViewModeIndex::VMI_SceneDepth:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShaderDepth");
+        UpdateLitUnlitConstant(0);
+        break;
+    case EViewModeIndex::VMI_WorldNormal:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShaderWorldNormal");
+        UpdateLitUnlitConstant(0);
+        break;
+    case EViewModeIndex::VMI_WorldTangent:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShaderWorldTangent");
+        UpdateLitUnlitConstant(0);
+        break;
+        // HeatMap ViewMode 등
+    default:
+        VertexShader = ShaderManager->GetVertexShaderByKey(L"MeshParticleVertexShader");
+        InputLayout = ShaderManager->GetInputLayoutByKey(L"MeshParticleVertexShader");
+        PixelShader = ShaderManager->GetPixelShaderByKey(L"LAMBERT_StaticMeshPixelShader");
+        UpdateLitUnlitConstant(1);
+        break;
+    }
+
+    // Rasterizer
+    Graphics->ChangeRasterizer(ViewMode);
+
+    // Setup
+    Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
+    Graphics->DeviceContext->IASetInputLayout(InputLayout);
+    Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
 }

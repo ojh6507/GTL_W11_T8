@@ -37,17 +37,19 @@ PS_INPUT_StaticMesh mainVS(VS_Input Input)
     PS_INPUT_StaticMesh Output;
 
     Output.Position = float4(Input.Position, 1.0);
-    float4x4 Transfrom = (Input.Transform0, Input.Transform1, Input.Transform2, float4(0, 0, 0, 1));
-    Output.Position = mul(Output.Position, Transfrom);
+    float4x4 Transform = (Input.Transform0, Input.Transform1, Input.Transform2, float4(0, 0, 0, 1));
+    float3x3 Rotation = (float3x3) Transform;
+    float3x3 InvTransform = transpose(Rotation);
+    Output.Position = mul(Output.Position, Transform);
     Output.WorldPosition = Output.Position.xyz;
     
     Output.Position = mul(Output.Position, ViewMatrix);
     Output.Position = mul(Output.Position, ProjectionMatrix);
     
-    Output.WorldNormal = mul(Input.Normal, (float3x3) InverseTransposedWorld);
+    Output.WorldNormal = mul(Input.Normal, InvTransform);
 
     // Begin Tangent
-    float3 WorldTangent = mul(Input.Tangent.xyz, (float3x3) WorldMatrix);
+    float3 WorldTangent = mul(Input.Tangent.xyz, Rotation);
     WorldTangent = normalize(WorldTangent);
     WorldTangent = normalize(WorldTangent - Output.WorldNormal * dot(Output.WorldNormal, WorldTangent));
 
