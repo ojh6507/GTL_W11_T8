@@ -477,3 +477,54 @@ void FParticleRenderPass::ChangeViewMode(EViewModeIndex ViewMode)
     Graphics->DeviceContext->IASetInputLayout(InputLayout);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
 }
+
+void FParticleRenderPass::PrepareRenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
+{
+
+    const EResourceType ResourceType = EResourceType::ERT_SubScene;
+    FViewportResource* ViewportResource = Viewport->GetViewportResource();
+    ViewportResource->ClearDepthStencils(Graphics->DeviceContext);
+    ViewportResource->ClearRenderTargets(Graphics->DeviceContext);
+
+    FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
+    FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
+
+    Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
+    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
+
+    InParticleComponent->PrepareRenderData();
+    InParticleComponent->FillRenderData(Viewport);
+
+}
+
+void FParticleRenderPass::RenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
+{
+    PrepareRenderSingleParticle(Viewport, InParticleComponent);
+    Graphics->DeviceContext->OMSetDepthStencilState(Graphics->DepthStencilState, 0);
+    TArray<FDynamicMeshEmitterData*> MeshRenderDatas;
+    TArray<FDynamicSpriteEmitterData*> SpriteRenderDatas;
+    for (const auto& RenderData : InParticleComponent->EmitterRenderData)
+    {
+        if (FDynamicSpriteEmitterData* SpriteRenderData = dynamic_cast<FDynamicSpriteEmitterData*>(RenderData))
+        {
+            SpriteRenderDatas.Add(SpriteRenderData);
+        }
+        else if (FDynamicMeshEmitterData* MeshRenderData = dynamic_cast<FDynamicMeshEmitterData*>(RenderData))
+        {
+            MeshRenderDatas.Add(MeshRenderData);
+        }
+    }
+
+    PrepareSpriteParticleRender(Viewport);
+    for (const auto& SpriteRenderData : SpriteRenderDatas)
+    {
+        RenderSpriteParticle(Viewport, SpriteRenderData);
+    }
+
+    PrepareMeshParticleRender(Viewport);
+    for (const auto& MeshRenderData : MeshRenderDatas)
+    {
+        RenderMeshParticle(Viewport, MeshRenderData, InParticleComponent);
+    }
+
+}

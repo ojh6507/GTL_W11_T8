@@ -344,6 +344,8 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
     const uint16* ParticleIndices = Source.DataContainer.ParticleIndices;
     const FParticleOrder* OrderedIndices = ParticleOrder;
 
+    FillVertex = (FMeshParticleInstanceVertex*)TempVert;
+
     for (int32 i = 0; i < ParticleCount; i++)
     {
         ParticleIndex = OrderedIndices ? OrderedIndices[i].ParticleIndex : i;
@@ -371,41 +373,32 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
             GetDynamicValueFromPayload(Source.DynamicParameterDataOffset, Particle, DynamicParameterValue);
         }
 
-        FillVertex = (FMeshParticleInstanceVertex*)TempVert;
-        for (int VertexIndex = 0; VertexIndex < Source.ActiveParticleCount; ++VertexIndex)
+        
+        FMatrix ModelMatrix;
+        FVector Zero = FVector::Zero();
+        CalculateParticleTransform(FMatrix::Identity, ParticlePosition, Particle.Rotation, Particle.Velocity, Particle.Size,
+            Zero, Zero, Zero, Zero, Zero, Zero, ModelMatrix);
+
+        FillVertex[i].Color = Particle.Color;
+        //TODO : Transform은 나중에 받자
+        FillVertex[i].Transform[0] = FVector4(Particle.Size.X, 0, 0, ParticlePosition.X);
+        FillVertex[i].Transform[1] = FVector4(0, Particle.Size.Y, 0, ParticlePosition.Y);
+        FillVertex[i].Transform[2] = FVector4(0, 0, Particle.Size.Z, ParticlePosition.Z);
+
+        FillVertex[i].Velocity = Particle.Velocity;
+        //SubUV랑 SubUVLerp 건너뜀
+        FillVertex[i].RelativeTime = Particle.RelativeTime;
+    }
+
+    if (bUsesDynamicParameter)
+    {
+        DynFillVertex = (FMeshParticleInstanceVertexDynamicParameter*)TempDynamicParameterVert;
+        for (int i = 0; i < ParticleCount; ++i)
         {
-            FMatrix ModelMatrix;
-            FVector Zero = FVector::Zero();
-            CalculateParticleTransform(FMatrix::Identity, ParticlePosition, Particle.Rotation, Particle.Velocity, Particle.Size,
-                Zero, Zero, Zero, Zero, Zero, Zero, ModelMatrix);
-            
-            FillVertex[VertexIndex].Color = Particle.Color;
-            //TODO : Transform은 나중에 받자
-            FillVertex[VertexIndex].Transform[0] = FVector4(Particle.Size.X, 0, 0, ParticlePosition.X);
-            FillVertex[VertexIndex].Transform[1] = FVector4(0, Particle.Size.Y, 0, ParticlePosition.Y);
-            FillVertex[VertexIndex].Transform[2] = FVector4(0, 0, Particle.Size.Z, ParticlePosition.Z);
-            //FillVertex[VertexIndex].Transform[0] = FVector4(ModelMatrix.M[0][0], ModelMatrix.M[0][1], ModelMatrix.M[0][2], ModelMatrix.M[0][3]);
-            //FillVertex[VertexIndex].Transform[1] = FVector4(ModelMatrix.M[1][0], ModelMatrix.M[1][1], ModelMatrix.M[1][2], ModelMatrix.M[1][3]);
-            //FillVertex[VertexIndex].Transform[2] = FVector4(ModelMatrix.M[2][0], ModelMatrix.M[2][1], ModelMatrix.M[2][2], ModelMatrix.M[2][3]);
-            UE_LOG(ELogLevel::Display, "\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f",
-                FillVertex[VertexIndex].Transform[0].X, FillVertex[VertexIndex].Transform[0].Y, FillVertex[VertexIndex].Transform[0].Z, FillVertex[VertexIndex].Transform[0].W,
-                FillVertex[VertexIndex].Transform[1].X, FillVertex[VertexIndex].Transform[1].Y, FillVertex[VertexIndex].Transform[1].Z, FillVertex[VertexIndex].Transform[1].W,
-                FillVertex[VertexIndex].Transform[2].X, FillVertex[VertexIndex].Transform[2].Y, FillVertex[VertexIndex].Transform[2].Z, FillVertex[VertexIndex].Transform[2].W);
-            FillVertex[VertexIndex].Velocity = Particle.Velocity;
-            //SubUV랑 SubUVLerp 건너뜀
-            FillVertex[VertexIndex].RelativeTime = Particle.RelativeTime;
-
-            if (bUsesDynamicParameter)
-            {
-                DynFillVertex = (FMeshParticleInstanceVertexDynamicParameter*)TempDynamicParameterVert;
-
-                DynFillVertex[VertexIndex].DynamicValue[0] = DynamicParameterValue.X;
-                DynFillVertex[VertexIndex].DynamicValue[1] = DynamicParameterValue.Y;
-                DynFillVertex[VertexIndex].DynamicValue[2] = DynamicParameterValue.Z;
-                DynFillVertex[VertexIndex].DynamicValue[3] = DynamicParameterValue.W;
-
-                TempDynamicParameterVert += VertexDynamicParameterStride;
-            }
+            DynFillVertex[i].DynamicValue[0] = DynamicParameterValue.X;
+            DynFillVertex[i].DynamicValue[1] = DynamicParameterValue.Y;
+            DynFillVertex[i].DynamicValue[2] = DynamicParameterValue.Z;
+            DynFillVertex[i].DynamicValue[3] = DynamicParameterValue.W;
         }
     }
 
