@@ -37,9 +37,14 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     //UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
     //UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
     ViewportClient->ViewFOV = 60.f;
-
     ParticleComponent = FObjectFactory::ConstructObject<UParticleSystemComponent>(this);
-    ParticleComponent->SetRelativeLocation(FVector(0, 5, 0));
+    ParticleComponent->SetRelativeLocation(FVector(0, 0, 0));
+    FVector compLoc=  ParticleComponent->GetRelativeLocation();
+
+    FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+   ViewTransform.SetLocation(
+       compLoc - (ViewTransform.GetForwardVector() * 50.0f)
+   );
 
 }
 
