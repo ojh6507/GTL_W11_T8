@@ -62,7 +62,7 @@ int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
     }
     else
     {
-            ParticleMaxLifetime = 0.0f;
+        ParticleMaxLifetime = 0.0f;
     }
 
     // --- 실제 계산 로직 ---
@@ -297,8 +297,8 @@ FArchive& operator<<(FArchive& Ar, UParticleLODLevel& LOD)
 
             if (NewModule)
             {
-                 Ar << (*NewModule); // 해당 타입의 operator<< 호출
-                 LOD.Modules.Add(NewModule);
+                Ar << (*NewModule); // 해당 타입의 operator<< 호출
+                LOD.Modules.Add(NewModule);
             }
         }
     }

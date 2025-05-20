@@ -93,7 +93,7 @@ public:
     // void AddSkeletalMesh(const FName& Key, USkeletalMesh* Mesh);
     // void AddAnimationAsset(const FName& InKey, UAnimationAsset* InValue);
     // void AddStaticMesh(const FName& InKey, UStaticMesh* InValue);
-
+    void RegisterNewlyCreatedParticleSystem(const FString& EntryPath, UParticleSystem* InParticleSystem);
 private:
     void LoadFiles(uint8 ExtensionFlags = static_cast<uint8>(EExtensionType::All));
     void LoadFile(std::filesystem::path Entry, uint8 ExtensionFlags = static_cast<uint8>(EExtensionType::All));
