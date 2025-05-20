@@ -264,8 +264,8 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
             FillVertex[VertexIndex].OldPosition = FVector(ParticleOldPosition);
             // Create a floating point particle ID from the counter, map into approximately 0-1
             FillVertex[VertexIndex].ParticleId = (Particle.Flags & STATE_CounterMask) / 10000.0f;
-            //FillVertex[VertexIndex].Size = FVector2D(GetParticleSizeWithUVFlipInSign(Particle, Size));
-            FillVertex[VertexIndex].Size = FVector2D(1.0f, 1.0f); // Size Module 없어서 임시적으로 1.0f로 설정
+            FillVertex[VertexIndex].Size = FVector2D(GetParticleSizeWithUVFlipInSign(Particle, Size));
+            //FillVertex[VertexIndex].Size = FVector2D(1.0f, 1.0f); // Size Module 없어서 임시적으로 1.0f로 설정
             FillVertex[VertexIndex].Rotation = Particle.Rotation;
             FillVertex[VertexIndex].SubImageIndex = SubImageIndex;
             FillVertex[VertexIndex].Color = Particle.Color;

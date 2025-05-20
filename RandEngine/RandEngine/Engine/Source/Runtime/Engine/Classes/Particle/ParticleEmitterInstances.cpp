@@ -552,7 +552,6 @@ void FParticleEmitterInstance::Tick(float DeltaTime)
         // 3.3. 파티클 물리/이동 업데이트 (기본 로직)
         Particle.OldLocation = Particle.Location;
         Particle.Location += Particle.Velocity * DeltaTime;
-        Particle.Location.X += DeltaTime;
         // (필요시 중력, 저항 등 다른 물리 효과 적용)
 
         END_UPDATE_LOOP;
