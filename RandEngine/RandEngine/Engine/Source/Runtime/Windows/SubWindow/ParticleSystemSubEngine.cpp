@@ -5,7 +5,10 @@
 #include "UnrealClient.h"
 #include "Actors/Cube.h"
 #include "Animation/Skeleton.h"
+
 #include "Particle/ParticleSystem.h"
+#include "Particle/ParticleSystemComponent.h"
+
 #include "Engine/AssetManager.h"
 #include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
@@ -21,21 +24,29 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     UnrealEd* InUnrealEd)
 {
     Super::Initialize(hWnd, InGraphics, InBufferManager, InSubWindow, InUnrealEd);
+    SubRenderer = new FSubRenderer;
+    SubRenderer->Initialize(InGraphics, InBufferManager, this);
 
 
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL);
 
-    UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
-    UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
-    UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
-    UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
+
+    //UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
+    //UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
+    //UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
+    //UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
     ViewportClient->ViewFOV = 60.f;
+
+    ParticleComponent = FObjectFactory::ConstructObject<UParticleSystemComponent>(this);
+    ParticleComponent->SetRelativeLocation(FVector(0, 5, 0));
+
 }
 
 void UParticleSystemSubEngine::Tick(float DeltaTime)
 {
     ViewportClient->Tick(DeltaTime);
+    ParticleComponent->TickComponent(DeltaTime);
     Input(DeltaTime);
     Render();
 }
@@ -124,7 +135,7 @@ void UParticleSystemSubEngine::Render()
         ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
         if (particlePanel) 
         {
-            particlePanel->PrepareRender(ViewportClient); // 내부적으로 멤버 변수 RenderTargetRHI 설정
+            particlePanel->PrepareRender(ViewportClient.get()); // 내부적으로 멤버 변수 RenderTargetRHI 설정
 
         }
         UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
@@ -156,7 +167,9 @@ void UParticleSystemSubEngine::Release()
 void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InParticleSystem)
 {
     ParticleSystem = InParticleSystem;
+    ParticleComponent->SetParticleTemplate(ParticleSystem);
+    ParticleComponent->InitParticles();
     ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
     particlePanel->SetEditedParticleSystem(ParticleSystem);
- 
+    
 }

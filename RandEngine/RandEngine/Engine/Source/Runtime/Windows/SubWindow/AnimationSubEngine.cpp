@@ -18,6 +18,9 @@ void UAnimationSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphics, FD
     UnrealEd* InUnrealEd)
 {
     USkeletalSubEngine::Initialize(hWnd,InGraphics, InBufferManager, InSubWindow,InUnrealEd);
+    SubRenderer = new FSubRenderer;
+    SubRenderer->Initialize(InGraphics, InBufferManager, this);
+
 }
 
 void UAnimationSubEngine::Tick(float DeltaTime)
