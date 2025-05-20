@@ -28,7 +28,7 @@ public:
     FGlobalDynamicIndexBuffer  DynamicIB;
 
     TArray<FParticleEmitterInstance*> EmitterInstances;
-    UParticleSystem* Template;
+    UParticleSystem* Template = nullptr;
 
     TArray<FDynamicEmitterDataBase*> EmitterRenderData;
 };

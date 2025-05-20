@@ -331,8 +331,8 @@ void FParticleEmitterInstance::InitParameters(UParticleEmitter* InEmitterTemplat
     bIsBeam = false; // 미지원
 
     // --- 런타임 상태 변수 초기화 ---
-    MaxActiveParticles = 5; // 임시로 5로 설정 추후 삭제
-    ActiveParticles = 5; // 임시로 5로 설정 추후 0으로 변경
+    //MaxActiveParticles = 1000; // 임시로 5로 설정 추후 삭제
+    ActiveParticles = 0; // 임시로 5로 설정 추후 0으로 변경
     ParticleCounter = 0;
     SpawnFraction = 0.0f;
     SecondsSinceCreation = 0.0f;
@@ -552,6 +552,7 @@ void FParticleEmitterInstance::Tick(float DeltaTime)
         // 3.3. 파티클 물리/이동 업데이트 (기본 로직)
         Particle.OldLocation = Particle.Location;
         Particle.Location += Particle.Velocity * DeltaTime;
+        Particle.Location.X += DeltaTime;
         // (필요시 중력, 저항 등 다른 물리 효과 적용)
 
         END_UPDATE_LOOP;
