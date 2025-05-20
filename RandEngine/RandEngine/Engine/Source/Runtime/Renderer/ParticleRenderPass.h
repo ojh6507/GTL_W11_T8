@@ -15,7 +15,7 @@ struct FSpriteParticleCameraConstants
 };
 
 class FParticleRenderPass : public IRenderPass
-{
+{  
 public:
     FParticleRenderPass();
     virtual ~FParticleRenderPass();
@@ -26,6 +26,10 @@ public:
 
     void UpdateCameraConstant(const std::shared_ptr<FEditorViewportClient>& Viewport) const;
 
+    void UpdateObjectConstant(const FVector4& UUIDColor, bool bIsSelected) const;
+
+    void UpdateLitUnlitConstant(int32 isLit) const;
+
     void PrepareSpriteParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
 
     void PrepareMeshParticleRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
@@ -34,7 +38,7 @@ public:
 
     void RenderSpriteParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicSpriteEmitterData* SpriteEmitter);
 
-    void RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter);
+    void RenderMeshParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicMeshEmitterData* MeshEmitter, const UParticleSystemComponent* Particle);
 
     virtual void ClearRenderArr() override;
 
@@ -42,11 +46,11 @@ public:
 
     void PrepareSpriteParticleShader() const;
 
-    void PrepareMeshParticleShader() const;
-
     void CreateShader();
 
     void CreateBlendStates();
+
+    void ChangeViewMode(EViewModeIndex ViewMode); // MeshParticle Prepare Shader
 
 protected:
     TArray<UParticleSystemComponent*> ParticleComps;
