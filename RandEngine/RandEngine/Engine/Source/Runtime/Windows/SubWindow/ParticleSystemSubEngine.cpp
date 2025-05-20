@@ -44,6 +44,8 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
 {
     if (::GetFocus() != *Wnd)
         return;
+    bool bCtrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
     {
         if (!bRBClicked)
@@ -96,19 +98,14 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
     }
     else
     {
-        if (GetAsyncKeyState('W') & 0x8000)
+        if (bCtrlPressed && (GetAsyncKeyState('S') & 0x8000))
         {
             if (ParticleSystem)
+            {
                 ParticleSystem->SaveParticleSystemToBinary();
+            }
         }
-        if (GetAsyncKeyState('E') & 0x8000)
-        {
-            EditorPlayer->SetMode(CM_ROTATION);
-        }
-        if (GetAsyncKeyState('R') & 0x8000)
-        {
-            EditorPlayer->SetMode(CM_SCALE);
-        }
+
     }
 }
 
