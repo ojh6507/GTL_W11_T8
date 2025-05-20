@@ -5,6 +5,10 @@
 #include "ParticleSystem.h"
 #include "UObject/Casts.h"
 #include "Editor/UnrealEd/EditorViewportClient.h"
+#include "ParticleModuleTypeDataBase.h"
+#include "ParticleModuleTypeDataMesh.h"
+#include "Components/Mesh/StaticMeshRenderData.h"
+#include "Engine/Asset/StaticMeshAsset.h"
 
 UParticleSystemComponent::UParticleSystemComponent()
 {
@@ -67,24 +71,44 @@ void UParticleSystemComponent::PrepareRenderData()
     EmitterRenderData.Reserve(EmitterInstances.Num());
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
-        FDynamicSpriteEmitterData* SpriteData = new FDynamicSpriteEmitterData(EmitterInstance->CurrentLODLevel->RequiredModule);
+        EModuleType ModuleType = EmitterInstance->CurrentLODLevel->TypeDataModule->GetModuleType();
+        if (ModuleType == EModuleType::TypeDataSprite)
+        {
+            FDynamicSpriteEmitterData* SpriteData = new FDynamicSpriteEmitterData(EmitterInstance->CurrentLODLevel->RequiredModule);
+            EmitterInstance->FillReplayData(SpriteData->Source);
 
-        EmitterInstance->FillReplayData(SpriteData->Source);
+            int VerticesPerParticle = 4;
+            SpriteData->BuildViewFillData(
+                EmitterInstance->ActiveParticles * VerticesPerParticle,
+                SpriteData->GetDynamicVertexStride(),
+                SpriteData->GetDynamicParameterVertexStride(),
+                DynamicIB,
+                DynamicVB,
+                SpriteData->VertexAllocation,
+                SpriteData->IndexAllocation,
+                &SpriteData->ParamAllocation,
+                SpriteData->AsyncFillData
+            );
+            EmitterRenderData.Add(SpriteData);
+        }
+        else if (ModuleType == EModuleType::TypeDataMesh)
+        {
+            FDynamicMeshEmitterData* SpriteData = new FDynamicMeshEmitterData(EmitterInstance->CurrentLODLevel->RequiredModule);
+            EmitterInstance->FillReplayData(SpriteData->Source);
 
-        int VerticesPerParticle = 4;
-        SpriteData->BuildViewFillData(
-            EmitterInstance->ActiveParticles * VerticesPerParticle,
-            SpriteData->GetDynamicVertexStride(),
-            SpriteData->GetDynamicParameterVertexStride(),
-            DynamicIB,
-            DynamicVB,
-            SpriteData->VertexAllocation,
-            SpriteData->IndexAllocation,
-            &SpriteData->ParamAllocation,
-            SpriteData->AsyncFillData
-        );
-
-        EmitterRenderData.Add(SpriteData);
+            SpriteData->BuildViewFillData(
+                EmitterInstance->ActiveParticles,
+                SpriteData->GetDynamicVertexStride(),
+                SpriteData->GetDynamicParameterVertexStride(),
+                DynamicIB,
+                DynamicVB,
+                SpriteData->VertexAllocation,
+                SpriteData->IndexAllocation,
+                &SpriteData->ParamAllocation,
+                SpriteData->AsyncFillData
+            );
+            EmitterRenderData.Add(SpriteData);
+        }
     }
 }
 
@@ -92,28 +116,54 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
-        FDynamicSpriteEmitterData* SpriteData = static_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]);
         FParticleEmitterInstance* EmitterInstance = EmitterInstances[Idx];
 
-        // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
-        //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
-        int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
-        FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
-        SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
-            SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
-            View.get(), GetWorldMatrix(), ParticleOrder);
+        if (FDynamicSpriteEmitterData* SpriteData = dynamic_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]))
+        {
+            // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
+            //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
+            int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
+            FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
+            SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
+                SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
+                View.get(), GetWorldMatrix(), ParticleOrder);
 
-        // 2) 실제 Vertex/Index 버퍼 채우기
-        SpriteData->GetVertexAndIndexDataNonInstanced(
-            /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
-            /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
-            /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
-            /* InParticleOrder: */     nullptr,
-            /* InViewOrigin: */        View->GetCameraLocation(),
-            /* InLocalToWorld: */      GetWorldMatrix(),
-            /* InVertsPerParticle: */  4
-        );
+            // 2) 실제 Vertex/Index 버퍼 채우기
+            SpriteData->GetVertexAndIndexDataNonInstanced(
+                /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
+                /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
+                /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
+                /* InParticleOrder: */     nullptr,
+                /* InViewOrigin: */        View->GetCameraLocation(),
+                /* InLocalToWorld: */      GetWorldMatrix(),
+                /* InVertsPerParticle: */  4
+            );
+        }
+        else if (FDynamicMeshEmitterData* SpriteData = dynamic_cast<FDynamicMeshEmitterData*>(EmitterRenderData[Idx]))
+        {
+            // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
+            //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
+            int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
+            FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
+            SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
+                SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
+                View.get(), GetWorldMatrix(), ParticleOrder);
 
+            //UStaticMesh 관련 처리 임시로 여기에 배치
+            SpriteData->StaticMesh = Cast<UParticleModuleTypeDataMesh>(EmitterInstance->CurrentLODLevel->TypeDataModule)->Mesh;
+            TArray<UMaterial*> Materials;
+            SpriteData->StaticMesh->GetUsedMaterials(Materials);
+            SpriteData->MeshMaterials = Materials;
+
+            // 2) 실제 Vertex 버퍼 채우기
+            SpriteData->GetVertexData(
+                /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
+                /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
+                /* InParticleOrder: */     nullptr,
+                /* InViewOrigin: */        View->GetCameraLocation(),
+                /* InLocalToWorld: */      GetWorldMatrix()
+            );
+        }
     }
 
     DynamicVB.Commit();
