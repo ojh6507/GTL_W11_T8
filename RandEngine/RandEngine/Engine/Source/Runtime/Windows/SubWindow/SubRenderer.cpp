@@ -15,6 +15,8 @@
 #include "SkeletalMeshDebugger.h"
 #include "PropertyEditor/ShowFlags.h"
 #include "LineRenderPass.h"
+#include "ParticleRenderPass.h"
+
 FSubRenderer::~FSubRenderer()
 {
     Release();
@@ -28,6 +30,8 @@ void FSubRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* In
 
     ShaderManager = new FDXDShaderManager(Graphics->Device);
     LineRenderPass = new FLineRenderPass();
+    ParticleRenderPass = new FParticleRenderPass();
+
     UINT MaterialBufferSize = sizeof(FMaterialConstants);
     BufferManager->CreateBufferGeneric<FMaterialConstants>("FMaterialConstants", nullptr, MaterialBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
@@ -47,6 +51,7 @@ void FSubRenderer::Initialize(FGraphicsDevice* InGraphics, FDXDBufferManager* In
     BufferManager->CreateBufferGeneric<FBonesConstants>("FBonesConstants", nullptr, BonesBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
     LineRenderPass->Initialize(BufferManager, Graphics, ShaderManager);
+    ParticleRenderPass->Initialize(BufferManager, Graphics, ShaderManager);
 
     ID3D11Buffer* ObjectBuffer = BufferManager->GetConstantBuffer(TEXT("FObjectConstantBuffer"));
     ID3D11Buffer* CameraConstantBuffer = BufferManager->GetConstantBuffer(TEXT("FCameraConstantBuffer"));
@@ -134,16 +139,21 @@ void FSubRenderer::Release()
         delete LineRenderPass;
         LineRenderPass = nullptr;
     }
+    if (ParticleRenderPass)
+    {
+        delete  ParticleRenderPass;
+        ParticleRenderPass = nullptr;
+    }
 }
 
-void FSubRenderer::PrepareRender(FEditorViewportClient* Viewport)
+void FSubRenderer::PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     const EViewModeIndex ViewMode = Viewport->GetViewMode();
-    TargetViewport = Viewport;
+    TargetViewport = Viewport.get();
     UpdateViewCamera(Viewport);
     FViewportResource* ViewportResource = Viewport->GetViewportResource();
-    FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
-    FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(EResourceType::ERT_Scene);
+    FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(EResourceType::ERT_SubScene);
+    FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(EResourceType::ERT_SubScene);
     // Set RTV + DSV
 
     // Clear RenderTarget
@@ -151,9 +161,8 @@ void FSubRenderer::PrepareRender(FEditorViewportClient* Viewport)
     //========= FOR ParticleViewr Test =============
     // 파티클 렌더패스 생겼을 시 제거
     Graphics->DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-    if (Cast<UParticleSystemSubEngine>(Engine))
+    if (UParticleSystemSubEngine* ParticleSubEngine = Cast<UParticleSystemSubEngine>(Engine))
     {
-        Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
     }
     else
     {
@@ -163,7 +172,6 @@ void FSubRenderer::PrepareRender(FEditorViewportClient* Viewport)
 
     if (Cast<UParticleSystemSubEngine>(Engine))
     {
-        Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
     }
     else
     {
@@ -184,42 +192,57 @@ void FSubRenderer::PrepareRender(FEditorViewportClient* Viewport)
     Graphics->DeviceContext->OMSetDepthStencilState(Graphics->DepthStencilState, 0);
     FEngineLoop::PrimitiveDrawBatch.InitializeGrid(0, 0, 0);
     PrepareStaticRenderArr(Viewport);
+
 }
 void FSubRenderer::Render()
 {
-    if (PreviewSkeletalMesh == nullptr)
+    if (UParticleSystemSubEngine* ParticleSubEngine = Cast<UParticleSystemSubEngine>(Engine))
     {
-        //========= FOR ParticleViewr Test =============
-        // 파티클 렌더패스 생겼을 시 제거
         D3D11_RECT scissorRect;
         scissorRect.left = 0;
         scissorRect.top = 0;
         scissorRect.right = 1024;  // 현재 렌더 타겟의 너비
         scissorRect.bottom = 1024; // 현재 렌더 타겟의 높이
-        
+
         Graphics->DeviceContext->RSSetScissorRects(1, &scissorRect);
 
-        ID3D11VertexShader* vertexShader = nullptr;
-        ID3D11InputLayout* inputLayout = nullptr;
-        
-        vertexShader = ShaderManager->GetVertexShaderByKey(L"StaticMeshVertexShader");
-        inputLayout = ShaderManager->GetInputLayoutByKey(L"StaticMeshVertexShader"); // VS와 함께 생성했으므로 같은 키 사용
-        
-        Graphics->DeviceContext->VSSetShader(vertexShader, nullptr, 0);
 
-        ID3D11PixelShader* pixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShader");
+        ParticleRenderPass->RenderSingleParticle(ParticleSubEngine->ViewportClient, ParticleSubEngine->ParticleComponent);
+    }
 
-        Graphics->DeviceContext->PSSetShader(pixelShader, nullptr, 0);
+    if (PreviewSkeletalMesh == nullptr)
+    {
+        ////========= FOR ParticleViewr Test =============
+        //// 파티클 렌더패스 생겼을 시 제거
+        //D3D11_RECT scissorRect;
+        //scissorRect.left = 0;
+        //scissorRect.top = 0;
+        //scissorRect.right = 1024;  // 현재 렌더 타겟의 너비
+        //scissorRect.bottom = 1024; // 현재 렌더 타겟의 높이
+        //
+        //Graphics->DeviceContext->RSSetScissorRects(1, &scissorRect);
 
-        Graphics->DeviceContext->IASetInputLayout(inputLayout);
+        //ID3D11VertexShader* vertexShader = nullptr;
+        //ID3D11InputLayout* inputLayout = nullptr;
+        //
+        //vertexShader = ShaderManager->GetVertexShaderByKey(L"StaticMeshVertexShader");
+        //inputLayout = ShaderManager->GetInputLayoutByKey(L"StaticMeshVertexShader"); // VS와 함께 생성했으므로 같은 키 사용
+        //
+        //Graphics->DeviceContext->VSSetShader(vertexShader, nullptr, 0);
 
-        Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //ID3D11PixelShader* pixelShader = ShaderManager->GetPixelShaderByKey(L"StaticMeshPixelShader");
 
-        UpdateObjectConstant(FMatrix::Identity, FVector4(), false);
+        //Graphics->DeviceContext->PSSetShader(pixelShader, nullptr, 0);
 
-        UpdateConstants();
+        //Graphics->DeviceContext->IASetInputLayout(inputLayout);
 
-        RenderStaticMesh();
+        //Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        //UpdateObjectConstant(FMatrix::Identity, FVector4(), false);
+
+        //UpdateConstants();
+
+        //RenderStaticMesh();
 
         Graphics->DeviceContext->OMSetRenderTargets(1, &Graphics->BackBufferRTV, Graphics->DeviceDSV);
 
@@ -316,7 +339,7 @@ void FSubRenderer::RenderMesh()
     }
 }
 
-void FSubRenderer::PrepareStaticRenderArr(FEditorViewportClient* Viewport)
+void FSubRenderer::PrepareStaticRenderArr(const std::shared_ptr<FEditorViewportClient>& Viewport)
 {
     // if (Engine->EditorPlayer->GetControlMode() == CM_TRANSLATION)
     // {
@@ -340,8 +363,8 @@ void FSubRenderer::PrepareStaticRenderArr(FEditorViewportClient* Viewport)
     }
     else if (Cast<UAnimationSubEngine>(Engine))
         StaticMeshComponents.Add(Cast<UAnimationSubEngine>(Engine)->BasePlane->GetStaticMeshComponent());
-    else if (Cast<UParticleSystemSubEngine>(Engine))
-        StaticMeshComponents.Add(Cast<UParticleSystemSubEngine>(Engine)->UnrealSphereComponent);
+    /*else if (Cast<UParticleSystemSubEngine>(Engine))
+        StaticMeshComponents.Add(Cast<UParticleSystemSubEngine>(Engine)->UnrealSphereComponent);*/
 }
 
 void FSubRenderer::RenderStaticMesh()
@@ -442,7 +465,7 @@ void FSubRenderer::UpdateBoneConstants() const
 }
 
 
-void FSubRenderer::UpdateViewCamera(FEditorViewportClient* Viewport) const
+void FSubRenderer::UpdateViewCamera(const std::shared_ptr<FEditorViewportClient>& Viewport) const
 {
     FCameraConstantBuffer CameraConstantBuffer;
     CameraConstantBuffer.ViewMatrix = Viewport->GetViewMatrix();

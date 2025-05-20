@@ -52,6 +52,9 @@ public:
 
     void ChangeViewMode(EViewModeIndex ViewMode); // MeshParticle Prepare Shader
 
+    //for Viewer
+    void PrepareRenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent);
+    void RenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent);
 protected:
     TArray<UParticleSystemComponent*> ParticleComps;
 
