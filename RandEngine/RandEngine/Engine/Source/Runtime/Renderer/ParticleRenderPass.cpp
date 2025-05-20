@@ -146,94 +146,28 @@ void FParticleRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& V
             }
         }
 
-        PrepareSpriteParticleRender(Viewport);
-        for (const auto& SpriteRenderData : SpriteRenderDatas)
+        if (SpriteRenderDatas.Num() > 0)
         {
-            RenderSpriteParticle(Viewport, SpriteRenderData);
+            PrepareSpriteParticleRender(Viewport);
+            for (const auto& SpriteRenderData : SpriteRenderDatas)
+            {
+                RenderSpriteParticle(Viewport, SpriteRenderData);
+            }
         }
 
-        PrepareMeshParticleRender(Viewport);
-        for (const auto& MeshRenderData : MeshRenderDatas)
+        if (MeshRenderDatas.Num() > 0)
         {
-            RenderMeshParticle(Viewport, MeshRenderData, Particle);
+            PrepareMeshParticleRender(Viewport);
+            for (const auto& MeshRenderData : MeshRenderDatas)
+            {
+                RenderMeshParticle(Viewport, MeshRenderData, Particle);
+            }
         }
     }
 }
 
 void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, const FDynamicSpriteEmitterData* SpriteEmitter)
 {
-    /*
-    //테스트용 코드
-    ID3D11Buffer* VB = nullptr;
-    ID3D11Buffer* IB = nullptr;
-
-    TArray<FParticleSpriteVertex> Vertices;
-    TArray<uint32> Indices;
-
-    for (int i = 0; i < 10; ++i)
-    {
-        FVector Center = FVector(0, i * 5.f, 0);
-        for (int j = 0; j < 4; ++j)
-        {
-            FParticleSpriteVertex Vertex =
-            {
-                Center,
-                0.f,
-                FVector(0, 0, 0),
-                i,
-                FVector2D(i+1, i+1),
-                FMath::DegreesToRadians(i * 10.f),
-                0.f,
-                FLinearColor(i/10.f, j/10.f, 1, 1)
-            };
-            Vertices.Add(Vertex);
-        }
-        Indices.Add(0 + i * 4);
-        Indices.Add(1 + i * 4);
-        Indices.Add(2 + i * 4);
-        Indices.Add(0 + i * 4);
-        Indices.Add(2 + i * 4);
-        Indices.Add(3 + i * 4);
-    }
-
-    UINT Stride = sizeof(FParticleSpriteVertex);
-    UINT Offset = 0;
-
-    D3D11_BUFFER_DESC VBDesc = {};
-    VBDesc.ByteWidth = Vertices.Num() * sizeof(FParticleSpriteVertex);
-    VBDesc.Usage = D3D11_USAGE_DEFAULT;
-    VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    VBDesc.CPUAccessFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA VBInitData = {};
-    VBInitData.pSysMem = Vertices.GetData();
-
-    HRESULT hr = Graphics->Device->CreateBuffer(&VBDesc, &VBInitData, &VB);
-    if (FAILED(hr))
-    {
-        UE_LOG(ELogLevel::Error, TEXT("Failed to create VertexBuffer"));
-    }
-
-    D3D11_BUFFER_DESC IBDesc = {};
-    IBDesc.ByteWidth = Indices.Num() * sizeof(uint32);
-    IBDesc.Usage = D3D11_USAGE_DEFAULT;
-    IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    IBDesc.CPUAccessFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA IBInitData = {};
-    IBInitData.pSysMem = Indices.GetData();
-
-    hr = Graphics->Device->CreateBuffer(&IBDesc, &IBInitData, &IB);
-    if (FAILED(hr))
-    {
-        UE_LOG(ELogLevel::Error, TEXT("Failed to create IndexBuffer"));
-    }
-
-    Graphics->DeviceContext->IASetVertexBuffers(0, 1, &VB, &Stride, &Offset);
-    Graphics->DeviceContext->IASetIndexBuffer(IB, DXGI_FORMAT_R32_UINT, 0);
-
-    Graphics->DeviceContext->DrawIndexed(Indices.Num(), 0, 0);
-    */
     if (!SpriteEmitter || !SpriteEmitter->VertexAllocation.IsValid() || !SpriteEmitter->IndexAllocation.IsValid())
         return;
     
@@ -259,28 +193,33 @@ void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewpo
 {
     UEditorEngine* Engine = Cast<UEditorEngine>(GEngine);
 
-    USceneComponent* SelectedComponent = Engine->GetSelectedComponent();
-    AActor* SelectedActor = Engine->GetSelectedActor();
+    //USceneComponent* SelectedComponent = Engine->GetSelectedComponent();
+    //AActor* SelectedActor = Engine->GetSelectedActor();
 
-    USceneComponent* TargetComponent = nullptr;
+    //USceneComponent* TargetComponent = nullptr;
 
-    if (SelectedComponent != nullptr)
-    {
-        TargetComponent = SelectedComponent;
-    }
-    else if (SelectedActor != nullptr)
-    {
-        TargetComponent = SelectedActor->GetRootComponent();
-    }
+    //if (SelectedComponent != nullptr)
+    //{
+    //    TargetComponent = SelectedComponent;
+    //}
+    //else if (SelectedActor != nullptr)
+    //{
+    //    TargetComponent = SelectedActor->GetRootComponent();
+    //}
 
     FVector4 UUIDColor = Particle->EncodeUUID() / 255.0f;
-    const bool bIsSelected = (Engine && TargetComponent == Particle);
-
-    UpdateObjectConstant(UUIDColor, bIsSelected);
+    
+    UpdateObjectConstant(UUIDColor, false);
 
     ID3D11Buffer* InstanceBuffer = MeshEmitter->VertexAllocation.VertexBuffer;
     UINT VBStride = sizeof(FStaticMeshVertex);
     UINT Offset = 0;
+
+    if (!MeshEmitter->StaticMesh)
+    {
+        UE_LOG(ELogLevel::Error, "No Static Mesh in Mesh Emitter!");
+        return;
+    }
 
     FStaticMeshRenderData* RenderData = MeshEmitter->StaticMesh->GetRenderData();
 
@@ -318,7 +257,6 @@ void FParticleRenderPass::RenderMeshParticle(const std::shared_ptr<FEditorViewpo
 
         uint32 StartIndex = RenderData->MaterialSubsets[SubMeshIndex].IndexStart;
         uint32 IndexCount = RenderData->MaterialSubsets[SubMeshIndex].IndexCount;
-        Graphics->DeviceContext->DrawIndexed(IndexCount, StartIndex, 0);
         Graphics->DeviceContext->DrawIndexedInstanced(IndexCount, MeshEmitter->GetSourceData()->ActiveParticleCount,
             StartIndex, 0, 0);
     }
@@ -397,14 +335,14 @@ void FParticleRenderPass::CreateShader()
         { "TEXCOORD",        0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
         { "MATERIAL_INDEX",  0, DXGI_FORMAT_R32_UINT,           0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA,   0 },
 
-        { "COLOR",           1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-        { "TEXCOORD",        1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[0]
-        { "TEXCOORD",        2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[1]
-        { "TEXCOORD",        3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[2]
-        { "TEXCOORD",        4, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Velocity
-        { "TEXCOORD",        5, DXGI_FORMAT_R16G16B16A16_SINT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // SUBUV Params
-        { "TEXCOORD",        6, DXGI_FORMAT_R32_FLOAT,          0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // SUBUV Lerp
-        { "TEXCOORD",        7, DXGI_FORMAT_R32_FLOAT,          0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Relative Time
+        { "COLOR",           1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "TEXCOORD",        1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[0]
+        { "TEXCOORD",        2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[1]
+        { "TEXCOORD",        3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Transform[2]
+        { "TEXCOORD",        4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Velocity
+        { "TEXCOORD",        5, DXGI_FORMAT_R16G16B16A16_SINT,  1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // SUBUV Params
+        { "TEXCOORD",        6, DXGI_FORMAT_R32_FLOAT,          1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // SUBUV Lerp
+        { "TEXCOORD",        7, DXGI_FORMAT_R32_FLOAT,          1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }, // Relative Time
     };
     D3D_SHADER_MACRO DefinesGouraud[] =
     {
@@ -414,17 +352,14 @@ void FParticleRenderPass::CreateShader()
     hr = ShaderManager->AddVertexShaderAndInputLayout(L"GOURAUD_MeshParticleVertexShader", L"Shaders/MeshParticleVertexShader.hlsl", "mainVS", MeshParticleLayoutDesc, ARRAYSIZE(MeshParticleLayoutDesc), DefinesGouraud);
     if (FAILED(hr))
     {
+        UE_LOG(ELogLevel::Error, "Gouraud Mesh Particle Vertex Shader Add Failed");
         return;
     }
     hr = ShaderManager->AddVertexShaderAndInputLayout
     (L"MeshParticleVertexShader", L"Shaders/MeshParticleVertexShader.hlsl", "mainVS", MeshParticleLayoutDesc, ARRAYSIZE(MeshParticleLayoutDesc));
     if (FAILED(hr))
     {
-        return;
-    }
-    hr = ShaderManager->AddPixelShader(L"MeshParticlePixelShader", L"Shaders/MeshParticlePixelShader.hlsl", "mainPS");
-    if (FAILED(hr))
-    {
+        UE_LOG(ELogLevel::Error, "Mesh Particle Vertex Shader Add Failed");
         return;
     }
 }
@@ -540,4 +475,61 @@ void FParticleRenderPass::ChangeViewMode(EViewModeIndex ViewMode)
     Graphics->DeviceContext->VSSetShader(VertexShader, nullptr, 0);
     Graphics->DeviceContext->IASetInputLayout(InputLayout);
     Graphics->DeviceContext->PSSetShader(PixelShader, nullptr, 0);
+}
+
+void FParticleRenderPass::PrepareRenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
+{
+
+    const EResourceType ResourceType = EResourceType::ERT_SubScene;
+    FViewportResource* ViewportResource = Viewport->GetViewportResource();
+    ViewportResource->ClearDepthStencils(Graphics->DeviceContext);
+    ViewportResource->ClearRenderTargets(Graphics->DeviceContext);
+
+    FRenderTargetRHI* RenderTargetRHI = ViewportResource->GetRenderTarget(ResourceType);
+    FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
+   
+    Graphics->DeviceContext->ClearRenderTargetView(RenderTargetRHI->RTV, Graphics->ClearColor);
+    Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, nullptr);
+
+    InParticleComponent->PrepareRenderData();
+    InParticleComponent->FillRenderData(Viewport);
+
+}
+
+void FParticleRenderPass::RenderSingleParticle(const std::shared_ptr<FEditorViewportClient>& Viewport, UParticleSystemComponent* InParticleComponent)
+{
+    PrepareRenderSingleParticle(Viewport, InParticleComponent);
+    Graphics->DeviceContext->OMSetDepthStencilState(Graphics->DepthStencilState, 0);
+    TArray<FDynamicMeshEmitterData*> MeshRenderDatas;
+    TArray<FDynamicSpriteEmitterData*> SpriteRenderDatas;
+    for (const auto& RenderData : InParticleComponent->EmitterRenderData)
+    {
+        if (FDynamicSpriteEmitterData* SpriteRenderData = dynamic_cast<FDynamicSpriteEmitterData*>(RenderData))
+        {
+            SpriteRenderDatas.Add(SpriteRenderData);
+        }
+        else if (FDynamicMeshEmitterData* MeshRenderData = dynamic_cast<FDynamicMeshEmitterData*>(RenderData))
+        {
+            MeshRenderDatas.Add(MeshRenderData);
+        }
+    }
+
+    if (SpriteRenderDatas.Num() > 0)
+    {
+        PrepareSpriteParticleRender(Viewport);
+        for (const auto& SpriteRenderData : SpriteRenderDatas)
+        {
+            RenderSpriteParticle(Viewport, SpriteRenderData);
+        }
+    }
+
+    if (MeshRenderDatas.Num() > 0)
+    {
+        PrepareMeshParticleRender(Viewport);
+        UpdateLitUnlitConstant(false);
+        for (const auto& MeshRenderData : MeshRenderDatas)
+        {
+            RenderMeshParticle(Viewport, MeshRenderData, InParticleComponent);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 #include "ParticleHelper.h"
 #include "ParticleModuleRequired.h"
 #include "Editor/UnrealEd/EditorViewportClient.h"
+#include "Math/JungleMath.h"
 
 FVector2D GetParticleSize(const FBaseParticle& Particle, const FDynamicSpriteEmitterReplayDataBase& Source)
 {
@@ -303,6 +304,117 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
     return true;
 }
 
+bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParameterVertexData, FParticleOrder* ParticleOrder, const FVector& InCameraPosition, const FMatrix& InLocalToWorld) const
+{
+    int32 ParticleCount = Source.ActiveParticleCount;
+    // 'clamp' the number of particles actually drawn
+    //@todo.SAS. If sorted, we really want to render the front 'N' particles...
+    // right now it renders the back ones. (Same for SubUV draws)
+    if ((Source.MaxDrawCount >= 0) && (ParticleCount > Source.MaxDrawCount))
+    {
+        ParticleCount = Source.MaxDrawCount;
+    }
+
+    // Put the camera origin in the appropriate coordinate space.
+    FVector CameraPosition = InCameraPosition;
+    if (Source.bUseLocalSpace)
+    {
+        FMatrix InvSelf = FMatrix::Inverse(InLocalToWorld);
+        CameraPosition = InvSelf.TransformPosition(InCameraPosition);
+    }
+
+    // Pack the data
+    int32	ParticleIndex;
+    int32	ParticlePackingIndex = 0;
+    int32	IndexPackingIndex = 0;
+
+    int32 VertexStride = sizeof(FMeshParticleInstanceVertex);
+    int32 VertexDynamicParameterStride = sizeof(FMeshParticleInstanceVertexDynamicParameter);
+
+    uint8* TempVert = (uint8*)VertexData;
+    uint8* TempDynamicParameterVert = (uint8*)DynamicParameterVertexData;
+    FMeshParticleInstanceVertex* FillVertex;
+    FMeshParticleInstanceVertexDynamicParameter* DynFillVertex;
+
+    FVector4 DynamicParameterValue(1.0f, 1.0f, 1.0f, 1.0f);
+    FVector ParticlePosition;
+    FVector ParticleOldPosition;
+
+    const uint8* ParticleData = Source.DataContainer.ParticleData;
+    const uint16* ParticleIndices = Source.DataContainer.ParticleIndices;
+    const FParticleOrder* OrderedIndices = ParticleOrder;
+
+    FillVertex = (FMeshParticleInstanceVertex*)TempVert;
+
+    for (int32 i = 0; i < ParticleCount; i++)
+    {
+        ParticleIndex = OrderedIndices ? OrderedIndices[i].ParticleIndex : i;
+        DECLARE_PARTICLE_CONST(Particle, ParticleData + Source.ParticleStride * ParticleIndices[ParticleIndex]);
+        if (i + 1 < ParticleCount)
+        {
+            int32 NextIndex = OrderedIndices ? OrderedIndices[i + 1].ParticleIndex : (i + 1);
+            DECLARE_PARTICLE_CONST(NextParticle, ParticleData + Source.ParticleStride * ParticleIndices[NextIndex]);
+        }
+
+        ParticlePosition = Particle.Location;
+        ParticleOldPosition = Particle.OldLocation;
+
+        ApplyOrbitToPosition(Particle, Source, InLocalToWorld, ParticlePosition, ParticleOldPosition);
+
+        if (Source.CameraPayloadOffset != 0)
+        {
+            FVector CameraOffset = GetCameraOffsetFromPayload(Source.CameraPayloadOffset, Particle, ParticlePosition, CameraPosition);
+            ParticlePosition += CameraOffset;
+            ParticleOldPosition += CameraOffset;
+        }
+
+        if (Source.DynamicParameterDataOffset > 0)
+        {
+            GetDynamicValueFromPayload(Source.DynamicParameterDataOffset, Particle, DynamicParameterValue);
+        }
+
+        
+        FMatrix ModelMatrix;
+        FVector Zero = FVector::Zero();
+        CalculateParticleTransform(FMatrix::Identity, ParticlePosition, Particle.Rotation, Particle.Velocity, Particle.Size,
+            Zero, Zero, Zero, Zero, Zero, Zero, ModelMatrix);
+
+        FillVertex[i].Color = Particle.Color;
+        //TODO : Transform은 나중에 받자
+        FillVertex[i].Transform[0] = FVector4(Particle.Size.X, 0, 0, ParticlePosition.X);
+        FillVertex[i].Transform[1] = FVector4(0, Particle.Size.Y, 0, ParticlePosition.Y);
+        FillVertex[i].Transform[2] = FVector4(0, 0, Particle.Size.Z, ParticlePosition.Z);
+
+        FillVertex[i].Velocity = Particle.Velocity;
+        //SubUV랑 SubUVLerp 건너뜀
+        FillVertex[i].RelativeTime = Particle.RelativeTime;
+    }
+
+    if (bUsesDynamicParameter)
+    {
+        DynFillVertex = (FMeshParticleInstanceVertexDynamicParameter*)TempDynamicParameterVert;
+        for (int i = 0; i < ParticleCount; ++i)
+        {
+            DynFillVertex[i].DynamicValue[0] = DynamicParameterValue.X;
+            DynFillVertex[i].DynamicValue[1] = DynamicParameterValue.Y;
+            DynFillVertex[i].DynamicValue[2] = DynamicParameterValue.Z;
+            DynFillVertex[i].DynamicValue[3] = DynamicParameterValue.W;
+        }
+    }
+
+    return true;
+}
+
+void FDynamicMeshEmitterData::CalculateParticleTransform(const FMatrix& ProxyLocalToWorld, const FVector& ParticleLocation, float ParticleRotation, const FVector& ParticleVelocity, const FVector& ParticleSize, const FVector& ParticlePayloadInitialOrientation, const FVector& ParticlePayloadRotation, const FVector& ParticlePayloadCameraOffset, const FVector& ParticlePayloadOrbitOffset, const FVector& ViewOrigin, const FVector& ViewDirection, FMatrix& OutTransformMat) const
+{
+    FMatrix ScaleMat = FMatrix::GetScaleMatrix(ParticleSize);
+    FMatrix RotationMat = FMatrix::Identity;
+    FMatrix TranslationMat = FMatrix::GetTranslationMatrix(ParticleLocation);
+
+    FMatrix RTMat = RotationMat * TranslationMat;
+
+    OutTransformMat =  ScaleMat * RTMat;
+}
 
 void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLocalSpace,
     int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,

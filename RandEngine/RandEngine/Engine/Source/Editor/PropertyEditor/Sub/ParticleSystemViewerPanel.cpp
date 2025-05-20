@@ -86,8 +86,8 @@ void ParticleSystemViewerPanel::PrepareRender(FEditorViewportClient* ViewportCli
 {
 	const EViewModeIndex ViewMode = ViewportClient->GetViewMode();
 	FViewportResource* ViewportResource = ViewportClient->GetViewportResource();
-	RenderTargetRHI = ViewportResource->GetRenderTarget(EResourceType::ERT_Scene);
-	DepthStencilRHI = ViewportResource->GetDepthStencil(EResourceType::ERT_Scene);
+	RenderTargetRHI = ViewportResource->GetRenderTarget(EResourceType::ERT_SubScene);
+	DepthStencilRHI = ViewportResource->GetDepthStencil(EResourceType::ERT_SubScene);
 
 }
 

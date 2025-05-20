@@ -1680,6 +1680,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleTypeDataSprite.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystemComponent.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleSystemRender.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Renderer\ParticleRenderPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="RandEngine.natvis" />
@@ -2058,6 +2059,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleTypeDataBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleTypeDataMesh.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Particle\ParticleModuleTypeDataSprite.h" />
+    <ClInclude Include="Engine\Source\Runtime\Renderer\ParticleRenderPass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\CompositingShader.hlsl" />

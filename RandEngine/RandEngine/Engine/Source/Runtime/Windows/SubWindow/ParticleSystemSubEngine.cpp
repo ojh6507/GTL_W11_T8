@@ -5,7 +5,10 @@
 #include "UnrealClient.h"
 #include "Actors/Cube.h"
 #include "Animation/Skeleton.h"
+
 #include "Particle/ParticleSystem.h"
+#include "Particle/ParticleSystemComponent.h"
+
 #include "Engine/AssetManager.h"
 #include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
@@ -21,21 +24,34 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     UnrealEd* InUnrealEd)
 {
     Super::Initialize(hWnd, InGraphics, InBufferManager, InSubWindow, InUnrealEd);
+    SubRenderer = new FSubRenderer;
+    SubRenderer->Initialize(InGraphics, InBufferManager, this);
 
 
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL);
 
-    UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
-    UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
-    UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
-    UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
+
+    //UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
+    //UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
+    //UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
+    //UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
     ViewportClient->ViewFOV = 60.f;
+    ParticleComponent = FObjectFactory::ConstructObject<UParticleSystemComponent>(this);
+    ParticleComponent->SetRelativeLocation(FVector(0, 0, 0));
+    FVector compLoc=  ParticleComponent->GetRelativeLocation();
+
+    FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+   ViewTransform.SetLocation(
+       compLoc - (ViewTransform.GetForwardVector() * 50.0f)
+   );
+
 }
 
 void UParticleSystemSubEngine::Tick(float DeltaTime)
 {
     ViewportClient->Tick(DeltaTime);
+    ParticleComponent->TickComponent(DeltaTime);
     Input(DeltaTime);
     Render();
 }
@@ -44,6 +60,8 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
 {
     if (::GetFocus() != *Wnd)
         return;
+    bool bCtrlPressed = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
     if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
     {
         if (!bRBClicked)
@@ -96,19 +114,14 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
     }
     else
     {
-        if (GetAsyncKeyState('W') & 0x8000)
+        if (bCtrlPressed && (GetAsyncKeyState('S') & 0x8000))
         {
             if (ParticleSystem)
+            {
                 ParticleSystem->SaveParticleSystemToBinary();
+            }
         }
-        if (GetAsyncKeyState('E') & 0x8000)
-        {
-            EditorPlayer->SetMode(CM_ROTATION);
-        }
-        if (GetAsyncKeyState('R') & 0x8000)
-        {
-            EditorPlayer->SetMode(CM_SCALE);
-        }
+
     }
 }
 
@@ -127,7 +140,7 @@ void UParticleSystemSubEngine::Render()
         ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
         if (particlePanel) 
         {
-            particlePanel->PrepareRender(ViewportClient); // 내부적으로 멤버 변수 RenderTargetRHI 설정
+            particlePanel->PrepareRender(ViewportClient.get()); // 내부적으로 멤버 변수 RenderTargetRHI 설정
 
         }
         UnrealEditor->Render(EWindowType::WT_ParticleSubWindow);
@@ -159,7 +172,9 @@ void UParticleSystemSubEngine::Release()
 void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InParticleSystem)
 {
     ParticleSystem = InParticleSystem;
+    ParticleComponent->SetParticleTemplate(ParticleSystem);
+    ParticleComponent->InitParticles();
     ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
     particlePanel->SetEditedParticleSystem(ParticleSystem);
- 
+    
 }

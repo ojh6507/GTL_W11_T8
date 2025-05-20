@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "WindowsCursor.h"
 #include "BaseGizmos/GizmoBaseComponent.h"
 #include "Engine/EditorEngine.h"
@@ -34,7 +34,7 @@ public:
     POINT LastMousePos;
     bool bRBClicked =false;
 
-    FEditorViewportClient* ViewportClient;
+    std::shared_ptr<FEditorViewportClient> ViewportClient;
     bool bIsShowSubWindow;
     bool bIsShowing = false;
 
