@@ -264,7 +264,8 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
             FillVertex[VertexIndex].OldPosition = FVector(ParticleOldPosition);
             // Create a floating point particle ID from the counter, map into approximately 0-1
             FillVertex[VertexIndex].ParticleId = (Particle.Flags & STATE_CounterMask) / 10000.0f;
-            FillVertex[VertexIndex].Size = FVector2D(GetParticleSizeWithUVFlipInSign(Particle, Size));
+            //FillVertex[VertexIndex].Size = FVector2D(GetParticleSizeWithUVFlipInSign(Particle, Size));
+            FillVertex[VertexIndex].Size = FVector2D(1.0f, 1.0f); // Size Module 없어서 임시적으로 1.0f로 설정
             FillVertex[VertexIndex].Rotation = Particle.Rotation;
             FillVertex[VertexIndex].SubImageIndex = SubImageIndex;
             FillVertex[VertexIndex].Color = Particle.Color;
@@ -284,6 +285,19 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
             TempDynamicParameterVert += VertexDynamicParameterStride;
         }
         TempVert += VertexStride;
+
+        uint16* TempIndices = reinterpret_cast<uint16*>(FillIndexData);
+        const int32 IndicesPerParticle = 6;  // 2개의 삼각형
+
+        uint16 BaseVert = static_cast<uint16>(i * NumVerticesPerParticle);
+        // 삼각형 (0,1,2)
+        TempIndices[i * IndicesPerParticle + 0] = BaseVert + 0;
+        TempIndices[i * IndicesPerParticle + 1] = BaseVert + 1;
+        TempIndices[i * IndicesPerParticle + 2] = BaseVert + 2;
+        // 삼각형 (0,2,3)
+        TempIndices[i * IndicesPerParticle + 3] = BaseVert + 0;
+        TempIndices[i * IndicesPerParticle + 4] = BaseVert + 2;
+        TempIndices[i * IndicesPerParticle + 5] = BaseVert + 3;
     }
 
     return true;
