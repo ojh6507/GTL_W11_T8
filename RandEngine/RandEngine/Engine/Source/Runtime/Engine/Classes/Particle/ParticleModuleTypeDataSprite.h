@@ -12,7 +12,7 @@ public:
     FString TextureAssetPath;
     FTexture* CachedTexture = nullptr;
     virtual void Build(const FParticleEmitterBuildInfo& EmitterBuildInfo) override;
-    virtual int32 RequiredBytes(UParticleModuleTypeDataBase* SpawningTypeData) const override { return true; }
+    virtual int32 RequiredBytes(UParticleModuleTypeDataBase* SpawningTypeData) const override { return 0; }
     virtual int32 RequiredBytesPerInstance() const override { return 0; }
  
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleTypeDataSprite& M);
