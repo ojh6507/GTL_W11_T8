@@ -24,6 +24,8 @@ void UParticleModuleVelocity::UpdateParticle(FParticleEmitterInstance* Owner, FB
 
 void UParticleModuleVelocity::Serialize(FArchive& Ar)
 {
+    Super::Serialize(Ar);
+
     Ar << MinStartVelocity;
 
     Ar << MaxStartVelocity;

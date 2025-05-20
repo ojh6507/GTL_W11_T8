@@ -1,26 +1,37 @@
 #include "ParticleSystemViewerPanel.h"
 #include "Define.h"
-#include "SubWindow/SubEngine.h"
-#include "PropertyEditor/ShowFlags.h"
-#include "Renderer/RendererHelpers.h"
+
+#include "Engine/AssetManager.h"
 #include "Engine/UnrealClient.h"
+
 #include "UnrealEd/EditorViewportClient.h"
+
+#include "PropertyEditor/ShowFlags.h"
+
+#include "Renderer/RendererHelpers.h"
+
+#include "SubWindow/SubEngine.h"
+
+
+#include "Components/Material/Material.h"
 
 #include "Particle/ParticleSystem.h"
 #include "Particle/ParticleEmitter.h"
 #include "Particle/ParticleLODLevel.h"
+
 #include "Particle/ParticleModule.h"
 #include "Particle/ParticleModuleRequired.h"
-
 #include "Particle/ParticleModuleTypeDataSprite.h"
 #include "Particle/ParticleModuleTypeDataMesh.h"
-
 #include "Particle/ParticleModuleSpawn.h"
 #include "Particle/ParticleModuleLifetime.h"
+#include "Particle/ParticleModuleColor.h"
+#include "Particle/ParticleModuleLocation.h"
+#include "Particle/ParticleModuleSize.h"
+#include "Particle/ParticleModuleVelocity.h"
 
-#include "Engine/AssetManager.h"
 
-#include "Components/Material/Material.h"
+
 
 float ParticleSystemViewerPanel::LeftAreaTotalRatio = 0.7f;
 float ParticleSystemViewerPanel::ViewportInLeftRatio = 0.6f;
@@ -287,7 +298,10 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 			}
 			else if (UParticleModuleLifetime* LifetimeModule = Cast<UParticleModuleLifetime>(ActualSelectedModule))
 			{
-				// ... (라이프타임 모듈 프로퍼티 UI) ...
+                if (ImGui::DragFloat("Lifetime", &LifetimeModule->Lifetime.Constant, 0.1f, 0.0f, 1000.0f))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 값 변경 시 재빌드
+                }
 			}
 			else if (UParticleModuleRequired* RequiredMod = Cast<UParticleModuleRequired>(ActualSelectedModule))
 			{
@@ -412,7 +426,122 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 				ImGui::Separator();
 				// --- Texture 선택 UI 끝 ---
 			}
-			else
+            else if (UParticleModuleColor* ColorModule = Cast<UParticleModuleColor>(ActualSelectedModule))
+            {
+                ImGui::SeparatorText("Color Over Life Module");
+                if (ImGui::CollapsingHeader("Start Color", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::ColorEdit4("Start Color##ColMod", &ColorModule->StartColor.R))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+                if (ImGui::CollapsingHeader("End Color", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::ColorEdit4("End Color##ColMod", &ColorModule->EndColor.R))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+                if (ImGui::Checkbox("Interpolate Color", &ColorModule->bInterpolateColor))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+            }
+            else if (UParticleModuleLocation* LocationModule = Cast<UParticleModuleLocation>(ActualSelectedModule))
+            {
+                ImGui::SeparatorText("Location Module");
+
+                // Shape 편집 (Enum)
+                const char* shapeNames[] = { "Point", "Box", "Sphere" };
+                int currentShapeIndex = static_cast<int>(LocationModule->Shape);
+
+                if (ImGui::Combo("Shape", &currentShapeIndex, shapeNames, IM_ARRAYSIZE(shapeNames)))
+                {
+                    LocationModule->Shape = static_cast<ELocationShape>(currentShapeIndex);
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+
+                if (ImGui::DragFloat3("Start Location", &LocationModule->StartLocation.X, 0.1f))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+
+                switch (LocationModule->Shape)
+                {
+                case ELocationShape::Point:
+                    // Point는 StartLocation 외에 추가 파라미터 없음
+                    ImGui::TextDisabled("Spawns particles at the Start Location.");
+                    break;
+
+                case ELocationShape::Box:
+                    ImGui::Text("Box Shape Parameters:");
+                    if (ImGui::DragFloat3("Box Extent", &LocationModule->BoxExtent.X, 0.1f, 0.0f, 1000.0f, "%.2f")) // 최소 0.0f, 최대 1000.0f
+                    {
+                        // BoxExtent는 음수 값을 가지면 안 되므로, 필요하다면 입력 후 양수로 클램핑
+                        LocationModule->BoxExtent.X = FMath::Max(0.0f, LocationModule->BoxExtent.X);
+                        LocationModule->BoxExtent.Y = FMath::Max(0.0f, LocationModule->BoxExtent.Y);
+                        LocationModule->BoxExtent.Z = FMath::Max(0.0f, LocationModule->BoxExtent.Z);
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                    ImGui::TextDisabled("Half the size of the box in each axis direction from Start Location.");
+                    break;
+
+                case ELocationShape::Sphere:
+                    ImGui::Text("Sphere Shape Parameters:");
+                    if (ImGui::DragFloat("Sphere Radius", &LocationModule->SphereRadius, 0.1f, 0.0f, 1000.0f, "%.2f")) // 최소 0.0f, 최대 1000.0f
+                    {
+                        // Radius는 음수 값을 가지면 안 되므로, 필요하다면 입력 후 양수로 클램핑
+                        LocationModule->SphereRadius = FMath::Max(0.0f, LocationModule->SphereRadius);
+
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                    ImGui::TextDisabled("Radius of the sphere centered at Start Location.");
+                    break;
+                }
+            }
+            else if (UParticleModuleSize* SizeModule = Cast<UParticleModuleSize>(ActualSelectedModule))
+            {
+                ImGui::SeparatorText("Size Module");
+                if (ImGui::CollapsingHeader("Start Size", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::DragFloat3("Start Size##SizeMod", &SizeModule->StartSize.X))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+                if (ImGui::CollapsingHeader("End Size", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::DragFloat3("End Size##SizeMod", &SizeModule->EndSize.X))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+                if (ImGui::Checkbox("Interpolate Size", &SizeModule->bInterpolateSize))
+                {
+                    if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                }
+            }
+            else if (UParticleModuleVelocity* VelocityModule = Cast<UParticleModuleVelocity>(ActualSelectedModule))
+            {
+                ImGui::SeparatorText("Start Velocity Module");
+                if (ImGui::CollapsingHeader("Max Start Velocity", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::DragFloat3("Max Start Velocity##VelMod", &VelocityModule->MaxStartVelocity.X))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+                if (ImGui::CollapsingHeader("Min Start Velocity", ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    if (ImGui::DragFloat3("Min Start Velocity##VelMod", &VelocityModule->MinStartVelocity.X))
+                    {
+                        if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                    }
+                }
+            }
+
+            else
 			{
 				ImGui::Text("Selected module type has no specific properties exposed for editing yet.");
 			}
@@ -681,21 +810,29 @@ void ParticleSystemViewerPanel::HandleAddModuleMenu(UParticleEmitter* TargetEmit
 	UParticleLODLevel* TargetLOD = TargetEmitter->LODLevels[0];
 
 	// 이미터 블록 내부(예: 모듈 목록 아래 빈 공간) 우클릭 시 팝업
-	// RenderEmitterBlockContents 함수 내부의 적절한 위치에서 이 함수를 호출하거나,
-	// 또는 모듈 목록 영역에 대한 컨텍스트 메뉴로 처리
-	if (ImGui::BeginPopupContextItem("AddModuleContextItem")) // 특정 아이템(이미터 블록)에 대한 컨텍스트 메뉴
+	
+    if (ImGui::BeginPopupContextItem("AddModuleContextItem")) // 특정 아이템(이미터 블록)에 대한 컨텍스트 메뉴
 	{
-		if (ImGui::Selectable("Add Lifetime Module"))
+		if (ImGui::Selectable("Add Color Module"))
 		{
-			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(TargetLOD));
+			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleColor>(TargetLOD));
 			if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 또는 TargetEmitter->Build();
 		}
-		if (ImGui::Selectable("Add Spawn Module")) // 이미 있다면 중복 추가 방지 로직 필요할 수 있음
+		if (ImGui::Selectable("Add Location Module"))
 		{
-			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(TargetLOD));
+			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLocation>(TargetLOD));
 			if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
 		}
-		// ... 기타 모듈 추가 ...
+        if (ImGui::Selectable("Add Size Module"))
+        {
+            TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSize>(TargetLOD));
+            if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+        }
+        if (ImGui::Selectable("Add Velocity Module"))
+        {
+            TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleVelocity>(TargetLOD));
+            if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+        }
 		ImGui::EndPopup();
 	}
 }

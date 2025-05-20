@@ -202,6 +202,20 @@ void UAssetManager::AddMaterial(UMaterial* InMaterial)
 //     StaticMeshMap.Add(InKey, InValue);
 // }
 
+void UAssetManager::RegisterNewlyCreatedParticleSystem(const FString& EntryPath, UParticleSystem* InParticleSystem)
+{
+    std::filesystem::path NewEntryPath(GetData(EntryPath));
+
+    FAssetInfo Info = {};
+    Info.PackagePath = FName(NewEntryPath.parent_path().wstring());
+    Info.Size = static_cast<uint32>(std::filesystem::file_size(NewEntryPath));
+    Info.AssetName = FName(NewEntryPath.filename().string());
+    Info.AssetType = EAssetType::ParticleSystem;
+    AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
+
+    ParticleSystemMap.Add(EntryPath, InParticleSystem);
+}
+
 void UAssetManager::LoadFiles(uint8 ExtensionFlags)
 {
     const std::string BasePathName = "Contents/";
@@ -358,8 +372,13 @@ void UAssetManager::LoadFile(std::filesystem::path Entry, uint8 ExtensionFlags)
             Info.AssetName = FName(Entry.filename().string());
             Info.AssetType = EAssetType::ParticleSystem;
             AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
+
+            LoadedSystem->ParticleSystemFileName = Entry.filename().stem().string();
+            
+            
             FString Key = Info.PackagePath.ToString() + "/" + Info.AssetName.ToString();
             ParticleSystemMap.Add(Key, LoadedSystem);
+
 
         }
     }
