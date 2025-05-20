@@ -29,7 +29,8 @@ class UParticleModuleRequired : public UParticleModule
     DECLARE_CLASS(UParticleModuleRequired, UParticleModule);
 
 public:
-   
+    UMaterial* Material; // 파티클에 적용할 머티리얼
+
     // 이미터 지속 시간 (0이면 무한)
     float EmitterDuration;
     // 이미터 반복 횟수 (0이면 무한 반복, 1이면 한 번 실행 후 종료 등)
