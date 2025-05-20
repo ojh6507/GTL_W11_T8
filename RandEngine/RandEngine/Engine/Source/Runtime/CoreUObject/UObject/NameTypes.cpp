@@ -1,6 +1,6 @@
 #include "NameTypes.h"
 
-#include <assert.h>
+#include <cassert>
 #include <atomic>
 #include <cwchar>
 #include <mutex>
@@ -329,9 +329,11 @@ private:
 
 public:
 	/** Hash로 원본 문자열을 가져옵니다. */
-	FNameEntry Resolve(uint32 Hash) const
+	const FNameEntry& Resolve(uint32 Hash) const
 	{
-		return *DisplayPool.Find(Hash);
+        const FNameEntry* Entry = DisplayPool.Find(Hash);
+        assert(Entry && "Failed to resolve FNameEntry for the given Hash. The Hash might not exist in the DisplayPool.");
+        return *Entry;
 	}
 
 	/**
@@ -396,6 +398,9 @@ struct FNameHelper
 		FName Result;
 		Result.DisplayIndex = DisplayId.Value;
 		Result.ComparisonIndex = ResolveComparisonId(DisplayId).Value;
+#if defined(_DEBUG)
+        Result.DebugEntryPtr = &FNamePool::Get().Resolve(DisplayId.Value);
+#endif
 		return Result;
 	}
 
@@ -436,7 +441,6 @@ FString FName::ToString() const
 		return {TEXT("None")};
 	}
 
-	// TODO: WIDECHAR에 대응 해야함
 	FNameEntry Entry = FNamePool::Get().Resolve(DisplayIndex);
     if (Entry.Header.IsWide)
     {
