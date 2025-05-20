@@ -8,14 +8,18 @@ FGlobalDynamicVertexBuffer::FAllocation FGlobalDynamicVertexBuffer::Allocate(uin
 {
     FAllocation Allocation;
 
-    if (VertexBuffers.IsEmpty() || VertexBuffers.Last()->AllocatedByteCount + SizeInBytes > VertexBuffers.Last()->BufferSize)
+    if (VertexBuffers.IsEmpty())
     {
         VertexBuffers.Emplace(GDynamicVertexBufferPool.Acquire(SizeInBytes, 0));
+    }
+    else if (VertexBuffers.Last()->AllocatedByteCount + SizeInBytes > VertexBuffers.Last()->BufferSize)
+    {
+        VertexBuffers.Emplace(GDynamicVertexBufferPool.Acquire(VertexBuffers.Last()->AllocatedByteCount + SizeInBytes, 0));
     }
 
     FDynamicVertexBuffer* VertexBuffer = VertexBuffers.Last();
 
-    if (!(VertexBuffer->AllocatedByteCount + SizeInBytes <= VertexBuffer->BufferSize))
+    if (VertexBuffer->AllocatedByteCount + SizeInBytes > VertexBuffer->BufferSize)
     {
         UE_LOG(ELogLevel::Error, TEXT("Global vertex buffer allocation failed : BufferSize = % d AllocatedByteCount = % d SizeInBytes = % d"), VertexBuffer->BufferSize, VertexBuffer->AllocatedByteCount, SizeInBytes);
         return Allocation;

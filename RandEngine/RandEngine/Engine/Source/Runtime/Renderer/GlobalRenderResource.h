@@ -96,7 +96,7 @@ public:
 template <typename DynamicBufferType>
 struct TDynamicBufferPool
 {
-    TArray<DynamicBufferType> PoolBuffers;
+    TArray<DynamicBufferType*> PoolBuffers;
     DynamicBufferType* CurrentBuffer = nullptr;
 
     ID3D11Device* Device;
@@ -115,40 +115,30 @@ struct TDynamicBufferPool
         const uint32 MinimumBufferSize = 65536u;
         SizeInBytes = FMath::Max(SizeInBytes, MinimumBufferSize);
 
-        // (1) 현재 버퍼가 유효하지 않거나, 크기가 작거나, 스트라이드가 다르면
-        if (!CurrentBuffer
-            || CurrentBuffer->BufferSize < SizeInBytes
-            || CurrentBuffer->Stride != Stride)
+        for (DynamicBufferType* Buf : PoolBuffers)
         {
-            // (2) 재사용 가능한 버퍼 탐색
-            for (DynamicBufferType& Buf : PoolBuffers)
+            if (Buf->BufferSize >= SizeInBytes && Buf->Stride == Stride)
             {
-                if (Buf.BufferSize >= SizeInBytes && Buf.Stride == Stride)
-                {
-                    CurrentBuffer = &Buf;
+                CurrentBuffer = Buf;
 
+                if (!CurrentBuffer->MappedBuffer)
+                {
                     D3D11_MAPPED_SUBRESOURCE MappedRes;
                     Context->Map(CurrentBuffer->GPUBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedRes);
                     CurrentBuffer->MappedBuffer = reinterpret_cast<uint8*>(MappedRes.pData);
-
                     CurrentBuffer->AllocatedByteCount = 0;
-                    break;
                 }
-            }
 
-            // (3) 못 찾았으면 새로 생성
-            if (!CurrentBuffer
-                || CurrentBuffer->BufferSize < SizeInBytes
-                || CurrentBuffer->Stride != Stride)
-            {
-                PoolBuffers.Emplace(SizeInBytes, Stride);
-                CurrentBuffer = &PoolBuffers.Last();
-
-                // GPU 버퍼 생성 + 맵
-                CurrentBuffer->Init(Device, Context);
-                CurrentBuffer->AllocatedByteCount = 0;
+                return CurrentBuffer;
             }
         }
+
+        DynamicBufferType* NewBuffer = new DynamicBufferType(SizeInBytes, Stride);
+        PoolBuffers.Emplace(NewBuffer);
+        CurrentBuffer = PoolBuffers.Last();
+
+        // GPU 버퍼 생성 + 맵
+        CurrentBuffer->Init(Device, Context);
 
         return CurrentBuffer;
     }
