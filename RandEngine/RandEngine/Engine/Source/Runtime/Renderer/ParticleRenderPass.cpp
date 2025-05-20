@@ -339,6 +339,11 @@ void FParticleRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportCli
     FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
+    for (UParticleSystemComponent* ParticleComp : ParticleComps)
+    {
+        ParticleComp->PrepareRenderData();
+        ParticleComp->FillRenderData(Viewport);
+    }
 }
 
 void FParticleRenderPass::PrepareSpriteParticleShader() const

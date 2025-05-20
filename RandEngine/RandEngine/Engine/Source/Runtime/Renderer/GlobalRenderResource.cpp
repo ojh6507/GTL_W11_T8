@@ -41,7 +41,8 @@ void FGlobalDynamicVertexBuffer::Commit()
     }
 
     // 2) 다음 프레임을 위해 할당 기록 리셋
-    VertexBuffers.Empty();
+    VertexBuffers.Empty(); 
+    GDynamicVertexBufferPool.CurrentBuffer = nullptr;
 }
 
 FGlobalDynamicIndexBuffer::FAllocation FGlobalDynamicIndexBuffer::Allocate(uint32 NumIndices, uint32 IndexStride)
@@ -101,5 +102,7 @@ void FGlobalDynamicIndexBuffer::Commit()
         }
     }
     IndexBuffers32.Empty();
+
+    GDynamicIndexBufferPool.CurrentBuffer = nullptr;
 }
 

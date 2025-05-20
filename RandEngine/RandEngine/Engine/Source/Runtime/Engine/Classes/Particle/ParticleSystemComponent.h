@@ -19,7 +19,7 @@ public:
 
     void InitParticles();
     void PrepareRenderData();
-    void FillRenderData(const FEditorViewportClient* View);
+    void FillRenderData(const std::shared_ptr<FEditorViewportClient>& View);
 
     void SetParticleTemplate(UParticleSystem* InTemplate);
    
