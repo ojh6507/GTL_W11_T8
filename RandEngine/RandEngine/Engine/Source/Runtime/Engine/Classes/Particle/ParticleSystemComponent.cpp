@@ -73,6 +73,9 @@ void UParticleSystemComponent::PrepareRenderData()
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
         FDynamicSpriteEmitterData* SpriteData = new FDynamicSpriteEmitterData(EmitterInstance->CurrentLODLevel->RequiredModule);
+
+        EmitterInstance->FillReplayData(SpriteData->Source);
+
         int VerticesPerParticle = 4;
         SpriteData->BuildViewFillData(
             EmitterInstance->ActiveParticles * VerticesPerParticle,
@@ -90,14 +93,12 @@ void UParticleSystemComponent::PrepareRenderData()
     }
 }
 
-void UParticleSystemComponent::FillRenderData(const FEditorViewportClient* View)
+void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewportClient>& View)
 {
     for (int32 Idx = 0; Idx < EmitterRenderData.Num(); ++Idx)
     {
         FDynamicSpriteEmitterData* SpriteData = static_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]);
         FParticleEmitterInstance* EmitterInstance = EmitterInstances[Idx];
-
-        EmitterInstance->FillReplayData(SpriteData->Source);
 
         // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
         //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
@@ -105,7 +106,7 @@ void UParticleSystemComponent::FillRenderData(const FEditorViewportClient* View)
         FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
         SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
             SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
-            View, GetWorldMatrix(), ParticleOrder);
+            View.get(), GetWorldMatrix(), ParticleOrder);
 
         // 2) 실제 Vertex/Index 버퍼 채우기
         SpriteData->GetVertexAndIndexDataNonInstanced(
@@ -119,6 +120,9 @@ void UParticleSystemComponent::FillRenderData(const FEditorViewportClient* View)
         );
 
     }
+
+    DynamicVB.Commit();
+    DynamicIB.Commit();
 }
 
 void UParticleSystemComponent::SetParticleTemplate(UParticleSystem* InTemplate)
