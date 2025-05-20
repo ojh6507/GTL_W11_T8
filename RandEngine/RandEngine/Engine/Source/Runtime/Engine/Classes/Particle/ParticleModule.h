@@ -25,27 +25,28 @@ public:
     {
         switch (GetModuleType())
         {
-            case EModuleType::Required:
-                return TEXT("Required");
-            case EModuleType::Base:
-                return TEXT("Base");
-            case EModuleType::Spawn:
-                return TEXT("Spawn");
-            case EModuleType::Color:
-                return TEXT("Color");
-            case EModuleType::Velocity:
-                return TEXT("Velocity");
-            case EModuleType::Size:
-                return TEXT("Size");
-            case EModuleType::Lifetime:
-                return TEXT("Lifetime");
-            case EModuleType::TypeDataMesh:
-                return TEXT("TypeDataMesh");
-            case EModuleType::TypeDataSprite:
-                return TEXT("TypeDataSprite");
-            default:
-                return TEXT("Unknown");
-
+        case EModuleType::Required:
+            return TEXT("Required Module");
+        case EModuleType::Base:
+            return TEXT("Base Module");
+        case EModuleType::Spawn:
+            return TEXT("Spawn Module");
+        case EModuleType::Color:
+            return TEXT("Color Over Life");
+        case EModuleType::Velocity:
+            return TEXT("Initial Velocity");
+        case EModuleType::Size:
+            return TEXT("Initial Size");
+        case EModuleType::Lifetime:
+            return TEXT("Lifetime Module");
+        case EModuleType::Location:
+            return TEXT("Initial Location");
+        case EModuleType::TypeDataMesh:
+            return TEXT("Mesh TypeData");
+        case EModuleType::TypeDataSprite:
+            return TEXT("Sprite TypeData");
+        default:
+            return TEXT("Unknown Module");
         }
     }
     // --- 파티클 데이터 요구량 ---
@@ -85,7 +86,7 @@ public:
     // 파티클 소멸 시 호출 (필요하다면)
     virtual void FinalUpdate(FParticleEmitterInstance* Owner, int32 Offset, float DeltaTime) {}
     friend FArchive& operator<<(FArchive& Ar, UParticleModule& M);
-    virtual void Serialize(FArchive& Ar) // 가상 멤버 함수로 변경
+    virtual void Serialize(FArchive& Ar)
     {
         Ar << bEnabled;
     }

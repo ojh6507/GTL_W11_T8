@@ -11,7 +11,8 @@
 #include "SubWindow/SubRenderer.h"
 #include "UObject/UObjectIterator.h"
 
- #include "Particle/ParticleSystem.h"
+#include "Particle/ParticleSystem.h"
+#include "Engine/AssetManager.h"
 
 void FDrawer::Toggle()
 {
@@ -113,46 +114,93 @@ void FDrawer::RenderSkeletalMeshContentDrawer()
 
 void FDrawer::RenderParticleSytemContentDrawer()
 {
-    // 1. "새 파티클 시스템" 생성 컨텍스트 메뉴
-    if (ImGui::BeginPopupContextWindow("ParticleSystemContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    if (ImGui::BeginPopupContextWindow("ParticleSystemList_ContextMenu", ImGuiPopupFlags_MouseButtonRight /*| ImGuiPopupFlags_NoOpenOverItems*/))
     {
-        if (ImGui::Selectable("Create New Particle System"))
+        if (ImGui::Selectable("Create New Particle System..."))
         {
-            UParticleSystem* NewSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
-            if (NewSystem)
+            bShowCreateParticleSystemPopup = true; // 이름 입력 팝업을 띄우도록 플래그 설정
+            memset(NewParticleSystemNameBuffer, 0, sizeof(NewParticleSystemNameBuffer)); // 입력 버퍼 초기화
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    // 새 파티클 시스템 이름 입력 팝업 모달
+    if (bShowCreateParticleSystemPopup)
+    {
+        // 모달을 화면 중앙에 위치시키도록 설정 (처음 나타날 때만)
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGui::OpenPopup("Create New Particle System"); // 팝업 열기 요청
+    }
+
+    // BeginPopupModal은 OpenPopup이 호출된 프레임부터 true를 반환하기 시작합니다.
+    // &GbShowCreateParticleSystemPopup을 통해 팝업의 X 버튼이나 ESC로 닫힐 때 플래그가 false로 설정됩니다.
+    if (ImGui::BeginPopupModal("Create New Particle System", &bShowCreateParticleSystemPopup, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Enter a name for the new Particle System:");
+        ImGui::InputText("##ParticleSystemNameInput", NewParticleSystemNameBuffer, IM_ARRAYSIZE(NewParticleSystemNameBuffer));
+        ImGui::Separator();
+
+        if (ImGui::Button("Create", ImVec2(120, 0)))
+        {
+            if (strlen(NewParticleSystemNameBuffer) > 0)
             {
-                NewSystem->InitializeSystem(); 
+                FString AssetNameString = FString(NewParticleSystemNameBuffer);
+                FName AssetFName(*AssetNameString);
+
+                // Outer를 nullptr로 하면 TransientPackage에 생성됩니다.
+                // 실제 에셋으로 저장하려면 UPackage를 생성하고 Outer로 지정해야 합니다.
+                UParticleSystem* NewSystem = FObjectFactory::ConstructObject<UParticleSystem>(nullptr);
+
+                if (NewSystem)
+                {
+                    NewSystem->InitializeSystem();
+                    NewSystem->ParticleSystemFileName = AssetNameString;
+                    NewSystem->SaveParticleSystemToBinary();
+                   
+                    FString SaveFilePath = FString(TEXT("Contents/Particle/")) + NewSystem->ParticleSystemFileName +".myparticle";
+                    UAssetManager::Get().RegisterNewlyCreatedParticleSystem(SaveFilePath, NewSystem);
+                }
+                else
+                {
+                    UE_LOG(ELogLevel::Error, TEXT("Failed to create Particle System with name: %s. It might already exist or be invalid."), *AssetNameString);
+                }
+                bShowCreateParticleSystemPopup = false;
+                ImGui::CloseCurrentPopup();
             }
+            else
+                ImGui::TextColored;
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            bShowCreateParticleSystemPopup = false; // 팝업 닫기
+            ImGui::CloseCurrentPopup(); // 모달 닫기
         }
         ImGui::EndPopup();
     }
 
 
-    for (UParticleSystem* PSA : TObjectRange<UParticleSystem>()) // 모든 UParticleSystem 객체 순회
+    // 기존 파티클 시스템 목록 표시
+    for (UParticleSystem* PSA : TObjectRange<UParticleSystem>())
     {
-        if (!PSA) 
+        if (!PSA)
+        {
             continue;
-
-        FString AssetName = PSA->GetFName().ToString();
-        ImGui::Selectable(AssetName.ToAnsiString().c_str());
-
+        }
+        ImGui::PushID(PSA);
+        FString AssetName = PSA->ParticleSystemFileName;
+        ImGui::Selectable(GetData(AssetName));
+        ImGui::PopID();
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
         {
             if (GEngineLoop.ParticleSystemViewerSubEngine)
             {
                 static_cast<UParticleSystemSubEngine*>(GEngineLoop.ParticleSystemViewerSubEngine)->OpenParticleSystemForEditing(PSA);
                 GEngineLoop.ParticleSystemViewerSubEngine->RequestShowWindow(true);
-              
             }
         }
     }
-    //// 만약 특정 경로의 에셋만 표시하고 싶다면, 에셋 매니저를 통해 해당 경로의 에셋 목록을 가져와야 합니다.
-    //// 예: TArray<FAssetData> ParticleSystemAssets;
-    ////     UAssetManager::Get().GetAssetsByPath(TEXT("/Game/Particles"), ParticleSystemAssets, true);
-    ////     for (const FAssetData& AssetData : ParticleSystemAssets) {
-    ////         if (AssetData.AssetClassPath == UParticleSystem::StaticClass()->GetClassPathName()) { // 클래스 경로 이름으로 비교
-    ////             UParticleSystem* PSA = Cast<UParticleSystem>(AssetData.GetAsset());
-    ////             if (PSA) { /* ImGui::Selectable 등 */ }
-    ////         }
-    ////     }
 }

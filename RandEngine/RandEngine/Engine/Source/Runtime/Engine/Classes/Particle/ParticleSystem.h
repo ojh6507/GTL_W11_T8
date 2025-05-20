@@ -16,6 +16,7 @@ public:
 
     bool bAutoActivate; // 컴포넌트에 의해 활성화될 때 자동으로 시작할지 여부
     bool bIsLooping_Computed = false;
+    FString ParticleSystemFileName = "";
 public:
     UParticleSystem();
     virtual ~UParticleSystem() = default;
@@ -29,7 +30,6 @@ public:
 
 
     void PostLoad();
-
     void SaveParticleSystemToBinary();
 
     static UParticleSystem* LoadParticleSystemFromBinary(const FString& FilePath, UObject* OuterForSystem);

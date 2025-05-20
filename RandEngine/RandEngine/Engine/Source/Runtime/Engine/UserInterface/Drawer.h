@@ -34,4 +34,7 @@ private:
     bool bFirstOpenFrame = true;
     
     float Width = 0.0f, Height = 0.0f;
+
+    char NewParticleSystemNameBuffer[128] = "";
+    bool bShowCreateParticleSystemPopup = false;
 };
