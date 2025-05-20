@@ -21,8 +21,10 @@ USkeletalSubEngine::~USkeletalSubEngine()
 void USkeletalSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphics, FDXDBufferManager* InBufferManager, UImGuiManager* InSubWindow,
                                     UnrealEd* InUnrealEd)
 {
-    Super::Initialize(hWnd, InGraphics, InBufferManager, InSubWindow, InUnrealEd);
+    SubRenderer = new FSubRenderer;
+    SubRenderer->Initialize(InGraphics, InBufferManager, this);
 
+    Super::Initialize(hWnd, InGraphics, InBufferManager, InSubWindow, InUnrealEd);
     
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL); 

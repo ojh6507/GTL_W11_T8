@@ -12,6 +12,8 @@ public:
     UParticleModuleSize();
     ~UParticleModuleSize() override = default;
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleSize& M);
+    virtual EModuleType GetModuleType() const override { return EModuleType::Size; }
+
     virtual void SpawnParticle(FParticleEmitterInstance* Owner, int32 Offset, float SpawnTime, FBaseParticle& ParticleBase) override;
     virtual void UpdateParticle(FParticleEmitterInstance* Owner, FBaseParticle& Particle, const uint8* ParticleBaseForPayload, int32 PayloadRelativeOffset, float DeltaTime) override;
     virtual void Serialize(FArchive& Ar) override;

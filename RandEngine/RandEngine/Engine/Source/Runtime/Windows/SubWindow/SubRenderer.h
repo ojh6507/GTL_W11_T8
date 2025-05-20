@@ -19,6 +19,8 @@ class FDXDBufferManager;
 class FGraphicsDevice;
 class FLineRenderPass;
 class USkeletalMeshComponent;
+class FParticleRenderPass;
+
 class FSubRenderer
 {
 public:
@@ -33,10 +35,10 @@ public:
     // void PrepareRender(const FSubCamera& Camera) const;
     // void Render(FSubCamera& Camera);
     // void RenderMesh(FSubCamera& Camera);
-    void PrepareRender(FEditorViewportClient* Viewport);
+    void PrepareRender(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void Render();
     void RenderMesh();
-    void PrepareStaticRenderArr(FEditorViewportClient* Viewport);
+    void PrepareStaticRenderArr(const std::shared_ptr<FEditorViewportClient>& Viewport);
     void RenderStaticMesh();
     void ClearRender();
 
@@ -46,7 +48,7 @@ public:
     void UpdateConstants() const;
     void UpdateBoneConstants() const;
     /** Update Buffer */
-    void UpdateViewCamera(FEditorViewportClient* Viewport) const;
+    void UpdateViewCamera(const std::shared_ptr<FEditorViewportClient>& Viewport) const;
     /** Set */
     void SetPreviewSkeletalMesh(USkeletalMesh* InPreviewSkeletalMesh);
     void SetPreviewSkeletalMeshComponent(USkeletalMeshComponent* InPreviewSkeletalMeshComp);
@@ -59,8 +61,10 @@ private:
     TArray<UStaticMeshComponent*> StaticMeshComponents;
     USkeletalMesh* PreviewSkeletalMesh = nullptr;
     USkeletalMeshComponent* PreviewSkeletalMeshComp = nullptr;
-    FEditorViewportClient* TargetViewport = nullptr;
+    FEditorViewportClient* TargetViewport;
     FLineRenderPass* LineRenderPass = nullptr;
+
+    FParticleRenderPass* ParticleRenderPass = nullptr;
 private:
     /** TargetPos & MaxZ Offset */
     bool bOnlyOnce = false;
