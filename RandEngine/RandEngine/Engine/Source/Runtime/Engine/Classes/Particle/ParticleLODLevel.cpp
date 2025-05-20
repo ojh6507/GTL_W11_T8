@@ -62,11 +62,7 @@ int32 UParticleLODLevel::CalculateMaxActiveParticleCount()
     }
     else
     {
-        // 라이프타임 모듈이 없으면 파티클이 즉시 사라지거나,
-        // RequiredModule에 기본 수명이 있다면 그것을 사용할 수 있음.
-        // 여기서는 0으로 처리하여, 버스트가 없다면 파티클이 없는 것으로 간주.
-        // UE_LOG(LogTemp, Warning, TEXT("CalculateMaxActiveParticleCount: LifetimeModule not found or disabled. Particle lifetime will be 0."));
-        ParticleMaxLifetime = 0.0f; // 또는 적절한 기본값 (예: 1.0f)
+            ParticleMaxLifetime = 0.0f;
     }
 
     // --- 실제 계산 로직 ---

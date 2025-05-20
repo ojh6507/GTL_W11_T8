@@ -34,19 +34,10 @@ public:
     bool bProcessSpawnRate; // Rate를 사용할지 여부
     bool bProcessBurstList; // BurstList를 사용할지 여부
 
-    UParticleModuleSpawn()
-        : bProcessSpawnRate(true)
-        , bProcessBurstList(true)
-    {
-        Rate.DistributionType = EDistributionType::Constant;
-        Rate.Constant = 10.0f;
-
-        RateScale.DistributionType = EDistributionType::Constant;
-        RateScale.Constant = 1.0f;
-    }
+    UParticleModuleSpawn();
 
     virtual EModuleType GetModuleType() const override { return EModuleType::Spawn; }
-
+    
     /**
    * 현재 이미터 시간(EmitterTime)를 기준으로
    * 초당 파티클 생성률을 반환합니다. Rate 및 RateScale 분포 설정을 고려합니다.
@@ -66,48 +57,7 @@ public:
      */
     int32 GetTotalBurstAmountSimple() const;
 
-    virtual void Serialize(FArchive& Ar) override
-    {
-        // 1. 부모 클래스(UParticleModule)의 Serialize 호출
-        Super::Serialize(Ar);
-
-        // 2. Rate (FDistributionFloat) 직렬화
-        Ar << Rate;
-
-        // 3. RateScale (FDistributionFloat) 직렬화
-        Ar << RateScale;
-
-        // 4. BurstList (TArray<FParticleBurst>) 직렬화
-        if (Ar.IsLoading())
-        {
-            int32 NumBursts = 0;
-            Ar << NumBursts; // 배열 크기 읽기
-            BurstList.Empty();
-             BurstList.Reserve(NumBursts);
-            for (int32 i = 0; i < NumBursts; ++i)
-            {
-                FParticleBurst NewBurst;
-                Ar << NewBurst;   
-                BurstList.Add(NewBurst); 
-            }
-        }
-        else // Saving
-        {
-            int32 NumBursts = BurstList.Num();
-            Ar << NumBursts; // 배열 크기 쓰기
-            for (const FParticleBurst& Burst : BurstList)
-            {
-                FParticleBurst TempBurst = Burst; 
-                Ar << TempBurst;
-            }
-        }
-
-        // 5. bProcessSpawnRate (bool) 직렬화
-        Ar << bProcessSpawnRate;
-
-        // 6. bProcessBurstList (bool) 직렬화
-        Ar << bProcessBurstList;
-    }
+    virtual void Serialize(FArchive& Ar) override;
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleSpawn& M);
 
 

@@ -18,5 +18,6 @@ public:
     bool bInterpolateColor;
 public:
     virtual EModuleType GetModuleType() const override { return EModuleType::Color; }
+    virtual void UpdateParticle(FParticleEmitterInstance* Owner, FBaseParticle& Particle, const uint8* ParticleBaseForPayload, int32 PayloadRelativeOffset,  float DeltaTime) override;
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleColor& M);
 };

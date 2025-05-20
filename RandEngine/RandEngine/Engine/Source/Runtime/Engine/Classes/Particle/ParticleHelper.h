@@ -3,6 +3,12 @@
 #include "Components/Material/Material.h"
 #include "Renderer/GlobalRenderResource.h"
 
+#include <cassert>
+#include <cstddef>
+
+#ifndef check
+#define check(expr) assert(expr)
+#endif
 // UE5에서 일부 가져옴
 
 class UStaticMesh;
@@ -21,7 +27,6 @@ struct FParticleMeshEmitterInstance;
 	{																													\
 		check((Owner != NULL) && (Owner->Component != NULL));															\
 		int32&			ActiveParticles = Owner->ActiveParticles;														\
-		uint32			CurrentOffset	= Offset;																		\
 		const uint8*		ParticleData	= Owner->ParticleData;															\
 		const uint32		ParticleStride	= Owner->ParticleStride;														\
 		uint16*			ParticleIndices	= Owner->ParticleIndices;														\
@@ -35,12 +40,10 @@ struct FParticleMeshEmitterInstance;
 
 #define END_UPDATE_LOOP																									\
 			}																											\
-			CurrentOffset				= Offset;																		\
 		}																												\
 	}
 
 #define CONTINUE_UPDATE_LOOP																							\
-		CurrentOffset = Offset;																							\
 		continue;
 
 #define SPAWN_INIT																										\
@@ -60,6 +63,16 @@ struct FParticleMeshEmitterInstance;
 		ParticleIndices[ActiveParticles-1]	= CurrentIndex;																\
 		ActiveParticles--;																								\
 	}
+
+enum class EParticleFlags : uint32 
+{
+    None = 0,
+    Freeze = 1 << 0,
+    Death = 1 << 1,
+    Collision = 1 << 2,
+    DisableGravity = 1 << 3,
+    IsLit = 1 << 4,
+};
 
 /*-----------------------------------------------------------------------------
     FBaseParticle
@@ -372,10 +385,10 @@ struct FOrbitChainModuleInstancePayload
 
 struct FParticleEventInstancePayload
 {
-    uint32 bSpawnEventsPresent : 1;
-    uint32 bDeathEventsPresent : 1;
-    uint32 bCollisionEventsPresent : 1;
-    uint32 bBurstEventsPresent : 1;
+    bool bSpawnEventsPresent = false;
+    bool bDeathEventsPresent = false;
+    bool bCollisionEventsPresent = false;
+    bool bBurstEventsPresent = false;
 
     int32 SpawnTrackingCount;
     int32 DeathTrackingCount;
@@ -476,7 +489,7 @@ struct FDynamicSpriteEmitterReplayDataBase
     uint8						LockAxisFlag;
     uint8						EmitterRenderMode;
     uint8						EmitterNormalsMode;
-    FVector     				PivotOffset;
+    FVector2D     				PivotOffset;
     bool						bUseVelocityForMotionBlur;
     bool						bRemoveHMDRoll;
     float						MinFacingCameraBlendDistance;
@@ -510,9 +523,9 @@ struct FDynamicEmitterDataBase
     /** Stat id of this object, 0 if nobody asked for it yet */
     mutable TStatId StatID;
     /** true if this emitter is currently selected */
-    uint32	bSelected : 1;
+    bool bSelected = false;
     /** true if this emitter has valid rendering data */
-    uint32	bValid : 1;
+    bool bValid = false;
 
     int32  EmitterIndex;
 
@@ -620,7 +633,7 @@ struct FDynamicSpriteEmitterDataBase : public FDynamicEmitterDataBase
     const UMaterial* MaterialResource;
 
     /** true if the particle emitter utilizes the DynamicParameter module */
-    uint32 bUsesDynamicParameter : 1;
+    bool bUsesDynamicParameter = false;
 
     FAsyncBufferFillData AsyncFillData;
 };
@@ -896,21 +909,21 @@ struct FDynamicMeshEmitterData : public FDynamicSpriteEmitterDataBase
     // 'orientation' items...
     // These don't need to go into the replay data, as they are constant over the life of the emitter
     /** If true, apply the 'pre-rotation' values to the mesh. */
-    uint32 bApplyPreRotation : 1;
+    bool bApplyPreRotation = false;
     /** If true, then use the locked axis setting supplied. Trumps locked axis module and/or TypeSpecific mesh settings. */
-    uint32 bUseMeshLockedAxis : 1;
+    bool bUseMeshLockedAxis = false;
     /** If true, then use the camera facing options supplied. Trumps all other settings. */
-    uint32 bUseCameraFacing : 1;
+    bool bUseCameraFacing = false;
     /**
      *	If true, apply 'sprite' particle rotation about the orientation axis (direction mesh is pointing).
      *	If false, apply 'sprite' particle rotation about the camera facing axis.
      */
-    uint32 bApplyParticleRotationAsSpin : 1;
+    bool bApplyParticleRotationAsSpin = false;
     /**
     *	If true, all camera facing options will point the mesh against the camera's view direction rather than pointing at the cameras location.
     *	If false, the camera facing will point to the cameras position as normal.
     */
-    uint32 bFaceCameraDirectionRatherThanPosition : 1;
+    bool bFaceCameraDirectionRatherThanPosition = false;
     /** The EMeshCameraFacingOption setting to use if bUseCameraFacing is true. */
     uint8 CameraFacingOption;
 

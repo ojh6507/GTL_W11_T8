@@ -2,6 +2,16 @@
 #include "ParticleModule.h"
 #include "Container/String.h" 
 
+enum EParticleSortMode : int
+{
+    PSORTMODE_None,
+    PSORTMODE_ViewProjDepth,
+    PSORTMODE_DistanceToView,
+    PSORTMODE_Age_OldestFirst,
+    PSORTMODE_Age_NewestFirst,
+    PSORTMODE_MAX,
+};
+
 struct FParticleRequiredModule
 {
     uint32 NumFrames;
@@ -10,8 +20,8 @@ struct FParticleRequiredModule
     float AlphaThreshold;
     TArray<FVector2D> FrameData;
     //FRHIShaderResourceView* BoundingGeometryBufferSRV;
-    uint8 bCutoutTexureIsValid : 1;
-    uint8 bUseVelocityForMotionBlur : 1;
+    bool bCutoutTexureIsValid = false;
+    bool bUseVelocityForMotionBlur = false;
 };
 
 class UParticleModuleRequired : public UParticleModule
@@ -56,24 +66,6 @@ public:
     }
 
     virtual EModuleType GetModuleType() const override { return EModuleType::Required; }
-
     friend FArchive& operator<<(FArchive& Ar, UParticleModuleRequired& M);
-
-    virtual void Serialize(FArchive& Ar) override
-    {
-
-        Super::Serialize(Ar);
-
-        // --- UParticleModuleRequired 고유 멤버 직렬화 ---
-        Ar << EmitterDuration;
-        Ar << EmitterLoops;
-        Ar << SubImages_Horizontal;
-        Ar << SubImages_Vertical;
-        Ar << bKillOnDeactivate;
-        Ar << bKillOnCompleted;
-        Ar << bRequiresSorting;
-        Ar << SortMode;
-        Ar << bIgnoreComponentScale;
-
-    }
+    virtual void Serialize(FArchive& Ar) override;
 };

@@ -84,6 +84,7 @@ public:
     USkeletalMesh* GetSkeletalMesh(const FName& Name);
     UAnimationAsset* GetAnimationAsset(const FName& Name);
     UStaticMesh* GetStaticMesh(const FName& Name);
+    UParticleSystem* GetParticleSystem(const FName& Name);
 
     void AddMaterial(UMaterial* InMaterial);
 
@@ -102,5 +103,5 @@ private:
     inline static TMap<FName, USkeleton*> SkeletonMap;
     inline static TMap<FName, USkeletalMesh*> SkeletalMeshMap;
     inline static TMap<FName, UAnimationAsset*> AnimationMap;
-    inline static TMap<FString, UParticleSystem*> ParticleSystemMap;
+    inline static TMap<FName, UParticleSystem*> ParticleSystemMap;
 };

@@ -1,4 +1,4 @@
-﻿#include "MathUtility.h"
+#include "MathUtility.h"
 #include "Color.h"
 #include "Quat.h"
 #include "Vector.h"
@@ -224,4 +224,24 @@ FQuat FMath::QInterpTo(const FQuat& Current, const FQuat& Target, float DeltaTim
 	}
 
 	return FQuat::Slerp(Current, Target, FMath::Clamp<float>(InterpSpeed * DeltaTime, 0.f, 1.f));
+}
+
+FVector FMath::VRand()
+{
+    // z 좌표를 [-1, 1] 범위에서 균일하게 선택
+    // cos(theta) = z 이므로, theta는 [0, PI] 범위에서 적절히 분포됨
+    float Z = FRandRange(-1.0f, 1.0f);
+
+    // 방위각 phi를 [0, 2*PI) 범위에서 균일하게 선택
+    float Phi = FRandRange(0.0f, TWO_PI); // TWO_PI는 2.0f * PI
+
+    // sin(theta) 계산. sin^2(theta) + cos^2(theta) = 1 이므로,
+    // sin(theta) = sqrt(1 - cos^2(theta)) = sqrt(1 - Z*Z)
+    float SinTheta = Sqrt(1.0f - Z * Z); // Z*Z는 항상 <= 1.0 이므로 Sqrt는 안전
+
+    float X = SinTheta * Cos(Phi);
+    float Y = SinTheta * Sin(Phi);
+
+    // 결과 벡터는 이미 정규화되어 있음 (길이 1)
+    return FVector(X, Y, Z);
 }

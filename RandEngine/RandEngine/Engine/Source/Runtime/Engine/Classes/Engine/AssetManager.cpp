@@ -156,6 +156,17 @@ UStaticMesh* UAssetManager::GetStaticMesh(const FName& Name)
     return nullptr;
 }
 
+UParticleSystem* UAssetManager::GetParticleSystem(const FName& Name)
+{
+    FString Path = "Contents/Particle/" + Name.ToString();
+    FName NameWithoutExt = Path;
+    if (ParticleSystemMap.Contains(NameWithoutExt))
+    {
+        return ParticleSystemMap[NameWithoutExt];
+    }
+    return nullptr;
+}
+
 void UAssetManager::AddMaterial(UMaterial* InMaterial)
 {
     FString BaseAssetName = InMaterial->GetMaterialInfo().MaterialName;
@@ -344,7 +355,7 @@ void UAssetManager::LoadFile(std::filesystem::path Entry, uint8 ExtensionFlags)
             FAssetInfo Info = {};
             Info.PackagePath = FName(Entry.parent_path().wstring());
             Info.Size = static_cast<uint32>(std::filesystem::file_size(Entry));
-            Info.AssetName = FName(Entry.filename().wstring().c_str());
+            Info.AssetName = FName(Entry.filename().string());
             Info.AssetType = EAssetType::ParticleSystem;
             AssetRegistry->PathNameToAssetInfo.Add(Info.AssetName, Info);
             FString Key = Info.PackagePath.ToString() + "/" + Info.AssetName.ToString();
