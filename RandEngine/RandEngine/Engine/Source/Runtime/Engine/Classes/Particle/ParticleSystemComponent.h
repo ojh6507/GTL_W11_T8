@@ -17,6 +17,8 @@ public:
     virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
 
+    virtual int CheckRayIntersection(const FVector& InRayOrigin, const FVector& InRayDirection, float& OutHitDistance) const override;
+
     void InitParticles();
     void PrepareRenderData();
     void FillRenderData(const std::shared_ptr<FEditorViewportClient>& View);

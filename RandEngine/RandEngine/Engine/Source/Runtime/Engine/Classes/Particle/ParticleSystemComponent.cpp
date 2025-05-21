@@ -13,6 +13,8 @@
 
 UParticleSystemComponent::UParticleSystemComponent()
 {
+    AABB.MaxLocation = { 1.f, 1.f, 1.f };
+    AABB.MinLocation = { -1.f, -1.f, -1.f };
 }
 
 void UParticleSystemComponent::InitializeComponent()
@@ -24,7 +26,6 @@ void UParticleSystemComponent::InitializeComponent()
 void UParticleSystemComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
-
     // 파티클 시스템의 모든 이미터 인스턴스에 대해 Tick 호출
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
@@ -33,6 +34,11 @@ void UParticleSystemComponent::TickComponent(float DeltaTime)
             EmitterInstance->Tick(DeltaTime);
         }
     }
+}
+
+int UParticleSystemComponent::CheckRayIntersection(const FVector& InRayOrigin, const FVector& InRayDirection, float& OutHitDistance) const
+{
+    return AABB.Intersect(InRayOrigin, InRayDirection, OutHitDistance);
 }
 
 void UParticleSystemComponent::InitParticles()
