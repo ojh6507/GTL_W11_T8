@@ -861,7 +861,7 @@ void ParticleSystemViewerPanel::RenderEmitterBlockContents(int emitterIdx, UPart
 		{
 			continue;
 		}
-		RenderModuleEntry(Module, Module->GetModuleDisplayName(), emitterIdx, moduleIdxLoop);
+        RenderModuleEntry(Module, Module->GetModuleDisplayName(), emitterIdx, moduleIdxLoop);
 	}
 
 
@@ -1016,60 +1016,161 @@ void ParticleSystemViewerPanel::HandleDeleteSelectedModule(UParticleEmitter* Tar
 
 void ParticleSystemViewerPanel::RenderModuleEntry(UParticleModule* Module, const FString& DisplayName, int emitterIdx, int moduleIdentifier)
 {
-	if (!Module) return;
+    if (!Module) return;
 
-	ImGui::PushID(moduleIdentifier);
+    // moduleIdentifier가 음수 값(REQUIRED_MODULE_INDEX, TYPEDATA_MODULE_INDEX)인 경우,
+    // 이는 일반 모듈 배열의 인덱스가 아니므로 드래그 앤 드롭 대상이 아님.
+    bool bIsDraggableModule = (moduleIdentifier >= 0);
 
-	bool isThisModuleSelected = (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal == moduleIdentifier);
-	ImVec4 currentBgColorForRect = isThisModuleSelected ? GSelectedBgColor : GRegularBgColor;
-	ImU32 currentBgColorForRectU32 = ImGui::GetColorU32(currentBgColorForRect);
+    ImGui::PushID(moduleIdentifier); // 고유 ID는 moduleIdentifier를 계속 사용 (선택 로직 등과 일관성)
 
-	if (isThisModuleSelected)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Header, GSelectedBgColor);
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, GSelectedBgColor);
-		ImGui::PushStyleColor(ImGuiCol_HeaderActive, GSelectedBgColor);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Header, GRegularBgColor);
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_HeaderActive, GSelectedBgColor);
-	}
+    // --- 스타일링 및 선택 로직 시작 ---
+    bool isThisModuleSelected = (SelectedEmitterIndex_Internal == emitterIdx && SelectedModuleIndex_Internal == moduleIdentifier);
+    ImVec4 currentBgColorForRect = isThisModuleSelected ? GSelectedBgColor : GRegularBgColor;
+    ImU32 currentBgColorForRectU32 = ImGui::GetColorU32(currentBgColorForRect);
 
-	ImVec2 itemTopLeft = ImGui::GetCursorScreenPos();
-	float availableWidth = ImGui::GetContentRegionAvail().x;
-	//float itemHeight = ImGui::GetTextLineHeightWithSpacing() + ImGui::GetStyle().FramePadding.y * 2.0f;
-	float itemHeight = ImGui::GetTextLineHeightWithSpacing();
-	ImVec2 selectableSize = ImVec2(availableWidth, itemHeight);
-	//ImVec2 itemBottomRight = ImVec2(itemTopLeft.x + availableWidth, itemTopLeft.y + itemHeight);
+    if (isThisModuleSelected)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Header, GSelectedBgColor);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, GSelectedBgColor);
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, GSelectedBgColor);
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Header, GRegularBgColor);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.25f, 0.25f, 0.25f, 1.0f)); // 일반 호버 색상
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, GSelectedBgColor); // 클릭 시 선택 색상
+    }
 
-	float bgPaddingY = ImGui::GetStyle().FramePadding.y;
-	ImVec2 bgTopLeft = itemTopLeft;
-	ImVec2 bgBottomRight = ImVec2(itemTopLeft.x + availableWidth, itemTopLeft.y + itemHeight + bgPaddingY * 2.0f);
-	float totalItemHeightWithPadding = itemHeight + bgPaddingY * 2.0f;
+    ImVec2 itemTopLeft = ImGui::GetCursorScreenPos();
+    float availableWidth = ImGui::GetContentRegionAvail().x;
+    float itemHeight = ImGui::GetTextLineHeightWithSpacing();
+    // ImVec2 selectableSize = ImVec2(availableWidth, itemHeight); // Selectable 크기, 실제 사용 안 함
 
-	if (availableWidth < 1.0f) 
-	{
-		ImGui::PopStyleColor(3);
-		ImGui::PopID();
-		ImGui::SetCursorScreenPos(ImVec2(itemTopLeft.x, itemTopLeft.y + ImGui::GetTextLineHeightWithSpacing()));
-		return;
-	}
-	ImGui::GetWindowDrawList()->AddRectFilled(bgTopLeft, bgBottomRight, currentBgColorForRectU32);
-	ImGui::SetCursorScreenPos(ImVec2(itemTopLeft.x + ImGui::GetStyle().FramePadding.x, itemTopLeft.y + bgPaddingY));
-	ImVec2 actualSelectableSize = ImVec2(availableWidth - ImGui::GetStyle().FramePadding.x * 2.0f, itemHeight);
+    float bgPaddingY = ImGui::GetStyle().FramePadding.y;
+    ImVec2 bgTopLeft = itemTopLeft;
+    ImVec2 bgBottomRight = ImVec2(itemTopLeft.x + availableWidth, itemTopLeft.y + itemHeight + bgPaddingY * 2.0f);
+    // float totalItemHeightWithPadding = itemHeight + bgPaddingY * 2.0f; // 전체 높이
 
-	if (ImGui::Selectable(DisplayName.ToAnsiString().c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, actualSelectableSize)) 
-	{
-		SelectedEmitterIndex_Internal = emitterIdx;
-		SelectedModuleIndex_Internal = moduleIdentifier;
-	}
+    if (availableWidth < 1.0f)
+    {
+        ImGui::PopStyleColor(3);
+        ImGui::PopID();
+        // SetCursorScreenPos 대신 다음 항목을 위해 커서만 아래로 이동 (기존 로직 유지)
+        // ImGui::SetCursorPosY(ImGui::GetCursorPosY() + totalItemHeightWithPadding); // 이렇게 하거나 아래처럼
+        ImGui::SetCursorScreenPos(ImVec2(itemTopLeft.x, itemTopLeft.y + ImGui::GetTextLineHeightWithSpacing() + bgPaddingY * 2.0f));
+        return;
+    }
 
-	ImGui::PopStyleColor(3);
-	ImGui::PopID();
+    ImGui::GetWindowDrawList()->AddRectFilled(bgTopLeft, bgBottomRight, currentBgColorForRectU32);
+    ImGui::SetCursorScreenPos(ImVec2(itemTopLeft.x + ImGui::GetStyle().FramePadding.x, itemTopLeft.y + bgPaddingY));
+    ImVec2 actualSelectableSize = ImVec2(availableWidth - ImGui::GetStyle().FramePadding.x * 2.0f, itemHeight);
 
-	ImGui::SetCursorScreenPos(ImVec2(bgTopLeft.x, bgBottomRight.y));
+    // Selectable을 InvisibleButton으로 대체하여 커스텀 렌더링 영역 전체를 클릭 가능하게 할 수도 있음
+    // 여기서는 Selectable을 유지
+    if (ImGui::Selectable(DisplayName.ToAnsiString().c_str(), isThisModuleSelected, ImGuiSelectableFlags_DontClosePopups, actualSelectableSize))
+    {
+        SelectedEmitterIndex_Internal = emitterIdx;
+        SelectedModuleIndex_Internal = moduleIdentifier;
+    }
+    // --- 기존 스타일링 및 선택 로직 끝 ---
+
+
+    // --- 드래그 앤 드롭 로직 추가 ---
+    // 일반 모듈(moduleIdentifier >= 0)인 경우에만 드래그 앤 드롭 소스 및 타겟으로 설정
+    if (bIsDraggableModule)
+    {
+        // 드래그 소스 설정
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+        {
+            // 페이로드 설정: 이미터 인덱스와 실제 모듈 배열 인덱스(moduleIdentifier) 전달
+            FDraggedModuleInfo payload = { emitterIdx, moduleIdentifier, Module };
+            ImGui::SetDragDropPayload("PARTICLE_MODULE_DND", &payload, sizeof(FDraggedModuleInfo));
+
+            // 드래그 중 시각적 피드백
+            ImGui::Text("Moving %s", DisplayName.ToAnsiString().c_str());
+
+            // 드래그 정보 저장
+            DraggedModuleInfo_Internal.EmitterIndex = emitterIdx;
+            DraggedModuleInfo_Internal.OriginalModuleIndex = moduleIdentifier; // moduleIdentifier가 실제 배열 인덱스
+            DraggedModuleInfo_Internal.ModulePtr = Module;
+
+            ImGui::EndDragDropSource();
+        }
+
+        // 드롭 타겟 설정
+        // 주의: ImGui::Selectable 바로 다음에 BeginDragDropTarget을 호출하면 Selectable 영역이 타겟이 됨.
+        // 만약 전체 배경 영역(AddRectFilled로 그린 영역)을 타겟으로 하려면, Selectable을 InvisibleButton으로 대체하거나
+        // 커서 위치를 조정한 후 InvisibleButton을 추가하여 타겟 영역을 만들어야 함.
+        // 여기서는 Selectable 영역이 타겟이 되도록 함. (아이템 위에 드롭하는 방식)
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("PARTICLE_MODULE_DND"))
+            {
+                FDraggedModuleInfo* receivedPayload = (FDraggedModuleInfo*)payload->Data;
+
+                if (CurrentEditedSystem &&
+                    CurrentEditedSystem->Emitters.IsValidIndex(emitterIdx) &&
+                    receivedPayload->EmitterIndex == emitterIdx && DraggedModuleInfo_Internal.IsValid() &&
+                    DraggedModuleInfo_Internal.ModulePtr == receivedPayload->ModulePtr) // 자기 자신에게 드롭하는 것 방지
+                {
+                    UParticleEmitter* TargetEmitter = CurrentEditedSystem->Emitters[emitterIdx];
+                    if (TargetEmitter && !TargetEmitter->LODLevels.IsEmpty() && TargetEmitter->LODLevels[0])
+                    {
+                        UParticleLODLevel* LOD = TargetEmitter->LODLevels[0];
+                        int draggedModuleOriginalArrayIndex = DraggedModuleInfo_Internal.OriginalModuleIndex;
+                        int targetModuleActualArrayIndex = moduleIdentifier; // 현재 드롭된 위치의 모듈의 배열 인덱스
+
+                        if (draggedModuleOriginalArrayIndex != targetModuleActualArrayIndex &&
+                            LOD->Modules.IsValidIndex(draggedModuleOriginalArrayIndex) &&
+                            LOD->Modules.IsValidIndex(targetModuleActualArrayIndex))
+                        {
+                            UParticleModule* ModuleToMove = LOD->Modules[draggedModuleOriginalArrayIndex];
+
+                            // 1. 배열에서 제거
+                            LOD->Modules.RemoveAt(draggedModuleOriginalArrayIndex);
+
+                            // 2. 새 위치에 삽입 (RemoveAt으로 인해 targetModuleActualArrayIndex가 변경되었을 수 있으므로 조정)
+                            int insertionIndex = targetModuleActualArrayIndex;
+                            if (draggedModuleOriginalArrayIndex < targetModuleActualArrayIndex)
+                            {
+                                insertionIndex--;
+                            }
+                            // insertionIndex가 유효한 범위인지 확인 및 조정
+                            insertionIndex = FMath::Clamp(insertionIndex, 0, LOD->Modules.Num());
+
+                            LOD->Modules.Insert(ModuleToMove, insertionIndex);
+
+                            // 선택 상태 업데이트
+                            if (SelectedEmitterIndex_Internal == emitterIdx)
+                            {
+                                if (SelectedModuleIndex_Internal == draggedModuleOriginalArrayIndex)
+                                {
+                                    SelectedModuleIndex_Internal = insertionIndex;
+                                }
+                                //SelectedModuleIndex_Internal = NO_MODULE_SELECTED;
+                            }
+
+
+                            CurrentEditedSystem->InitializeSystem();
+                            if (SubEngine)
+                            {
+                                SubEngine->RefreshParticleComponent();
+                            }
+                        }
+                    }
+                }
+                DraggedModuleInfo_Internal.Reset();
+            }
+            ImGui::EndDragDropTarget();
+        }
+    }
+    // --- 드래그 앤 드롭 로직 끝 ---
+
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    ImGui::SetCursorScreenPos(ImVec2(bgTopLeft.x, bgBottomRight.y));
 }
 
 

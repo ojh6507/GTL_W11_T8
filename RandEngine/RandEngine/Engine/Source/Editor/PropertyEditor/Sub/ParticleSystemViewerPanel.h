@@ -13,6 +13,16 @@ class UParticleLODLevel;
 
 class UParticleSystemSubEngine;
 
+struct FDraggedModuleInfo
+{
+    int EmitterIndex = -1;
+    int OriginalModuleIndex = -1;
+    UParticleModule* ModulePtr = nullptr;
+
+    void Reset() { EmitterIndex = -1; OriginalModuleIndex = -1; ModulePtr = nullptr; }
+    bool IsValid() const { return ModulePtr != nullptr && EmitterIndex != -1 && OriginalModuleIndex != -1; }
+};
+
 class ParticleSystemViewerPanel : public UEditorPanel // UEditorPanel이 정의되어 있어야 함
 {
 public:
@@ -31,7 +41,8 @@ private:
 
     int SelectedEmitterIndex_Internal;
     int SelectedModuleIndex_Internal;
-    
+    FDraggedModuleInfo DraggedModuleInfo_Internal;
+
     void RenderMainLayout(const ImVec2& canvasContentSize);
     void RenderLeftPane(const ImVec2& panelSize, float splitterThickness, float minPanelSize);
     void RenderVerticalSplitter(const ImVec2& canvasContentSize, float splitterThickness);
