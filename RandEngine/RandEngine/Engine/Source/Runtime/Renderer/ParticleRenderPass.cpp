@@ -183,10 +183,13 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     int32 IndexCount = SpriteEmitter->GetSource().ActiveParticleCount * 6;
     
     //TODO: Texture랑 Sampler 가져와야 함
-    ID3D11ShaderResourceView* TextureSRV = SpriteEmitter->Texture->TextureSRV;
-    ID3D11SamplerState* SamplerState = SpriteEmitter->Texture->SamplerState;
-    Graphics->DeviceContext->PSSetShaderResources(0, 1, &TextureSRV);
-    Graphics->DeviceContext->PSSetSamplers(0, 1, &SamplerState);
+    if (SpriteEmitter->Texture)
+    {
+        ID3D11ShaderResourceView* TextureSRV = SpriteEmitter->Texture->TextureSRV;
+        ID3D11SamplerState* SamplerState = SpriteEmitter->Texture->SamplerState;
+        Graphics->DeviceContext->PSSetShaderResources(0, 1, &TextureSRV);
+        Graphics->DeviceContext->PSSetSamplers(0, 1, &SamplerState);
+    }
 
     Graphics->DeviceContext->DrawIndexed(IndexCount, SpriteEmitter->IndexAllocation.FirstIndex, 0);
 }
