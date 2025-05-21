@@ -34,6 +34,10 @@ void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* InDevice)
     LoadTextureFromFile(Device->Device, L"Assets/Texture/UUID_Font.png");
     LoadTextureFromFile(Device->Device, L"Assets/Texture/Wooden Crate_Crate_BaseColor.png");
     LoadTextureFromFile(Device->Device, L"Assets/Texture/spotLight.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Fire_A.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Fire_B.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Flare_A.png");
+    LoadTextureFromFile(Device->Device, L"Assets/Texture/T_Spark_B.png");
 
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_Actor.PNG");
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_LightSpot.PNG");
@@ -42,6 +46,7 @@ void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* InDevice)
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_ExpoHeightFog.PNG");
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/S_AtmosphericHeightFog.PNG");
     LoadTextureFromFile(Device->Device, L"Assets/Editor/Icon/AmbientLight_64x.png");
+
 
 }
 
