@@ -122,7 +122,7 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
            
             // 파티클 순서 정렬
             FParticleOrder* ParticleOrder = nullptr;
-            if (EmitterInstance->bRequiresSorting)
+            if (EmitterInstance->bRequiresSorting && SpriteData->Source.SortMode)
             {
                 ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
 
@@ -157,7 +157,7 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
 
             // 파티클 순서 정렬
             FParticleOrder* ParticleOrder = nullptr;
-            if (EmitterInstance->bRequiresSorting)
+            if (EmitterInstance->bRequiresSorting && SpriteData->Source.SortMode)
             {
                 ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
 
