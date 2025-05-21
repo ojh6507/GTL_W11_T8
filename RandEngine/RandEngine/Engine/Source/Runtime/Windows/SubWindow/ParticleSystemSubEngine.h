@@ -16,6 +16,7 @@ public:
     virtual void Input(float DeltaTime);
     virtual void Render();
     virtual void Release();
+    void RefreshParticleComponent();
     void OpenParticleSystemForEditing(UParticleSystem* InParticleSystem);
     UStaticMeshComponent* UnrealSphereComponent = nullptr;
     UParticleSystem* ParticleSystem = nullptr;

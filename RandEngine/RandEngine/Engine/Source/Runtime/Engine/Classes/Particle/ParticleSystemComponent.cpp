@@ -151,18 +151,21 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
 
             //UStaticMesh 관련 처리 임시로 여기에 배치
             SpriteData->StaticMesh = Cast<UParticleModuleTypeDataMesh>(EmitterInstance->CurrentLODLevel->TypeDataModule)->Mesh;
-            TArray<UMaterial*> Materials;
-            SpriteData->StaticMesh->GetUsedMaterials(Materials);
-            SpriteData->MeshMaterials = Materials;
+            if (SpriteData->StaticMesh)
+            {
+                TArray<UMaterial*> Materials;
+                SpriteData->StaticMesh->GetUsedMaterials(Materials);
+                SpriteData->MeshMaterials = Materials;
 
-            // 2) 실제 Vertex 버퍼 채우기
-            SpriteData->GetVertexData(
-                /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
-                /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
-                /* InParticleOrder: */     nullptr,
-                /* InViewOrigin: */        View->GetCameraLocation(),
-                /* InLocalToWorld: */      GetWorldMatrix()
-            );
+                // 2) 실제 Vertex 버퍼 채우기
+                SpriteData->GetVertexData(
+                    /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
+                    /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
+                    /* InParticleOrder: */     nullptr,
+                    /* InViewOrigin: */        View->GetCameraLocation(),
+                    /* InLocalToWorld: */      GetWorldMatrix()
+                );
+            }
         }
     }
 

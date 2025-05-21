@@ -7,6 +7,12 @@
 #include "Stats/ProfilerStatsManager.h"
 #include "Stats/GPUTimingManager.h"
 
+enum ESubEngineType
+{
+    Skeletal,
+    Animation,
+    Particle
+};
 
 class USubEngine;
 class FSubCamera;
@@ -70,6 +76,7 @@ public:
     void ParticleSystemSubWindowInit(HINSTANCE hInstance);
     void CleanupSubWindow();
 
+    USubEngine* GetSubEngine(ESubEngineType Type);
     
     USubEngine* SkeletalViewerSubEngine;
     USubEngine* AnimationViewerSubEngine;

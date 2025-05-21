@@ -185,6 +185,12 @@ void UParticleSystemSubEngine::Release()
     }
 }
 
+void UParticleSystemSubEngine::RefreshParticleComponent()
+{
+    if(ParticleComponent)
+        ParticleComponent->InitParticles();
+}
+
 void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InParticleSystem)
 {
     ParticleSystem = InParticleSystem;

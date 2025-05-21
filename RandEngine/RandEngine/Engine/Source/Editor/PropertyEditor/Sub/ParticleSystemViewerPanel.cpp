@@ -31,7 +31,7 @@
 #include "Particle/ParticleModuleSize.h"
 #include "Particle/ParticleModuleVelocity.h"
 
-
+#include "SubWindow/ParticleSystemSubEngine.h"
 
 
 float ParticleSystemViewerPanel::LeftAreaTotalRatio = 0.7f;
@@ -59,6 +59,11 @@ ParticleSystemViewerPanel::ParticleSystemViewerPanel()
 void ParticleSystemViewerPanel::SetEditedParticleSystem(UParticleSystem* System)
 {
 	CurrentEditedSystem = System;
+    SubEngine = static_cast<UParticleSystemSubEngine*>(GEngineLoop.GetSubEngine(ESubEngineType::Particle));
+    if (SubEngine)
+    {
+        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+    }
 	if (CurrentEditedSystem)
 	{
 		CurrentEditedSystem->InitializeSystem(); // 로드/설정 시 빌드
@@ -313,6 +318,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 				if (ImGui::DragFloat("Spawn Rate", &SpawnModule->Rate.Constant, 0.1f, 0.0f, 1000.0f))
 				{
 					if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 값 변경 시 재빌드
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
 				}
 				// BurstList 편집 UI (TArray<FParticleBurst>는 더 복잡한 UI 필요)
 				ImGui::Text("Bursts: %d", SpawnModule->BurstList.Num());
@@ -323,6 +333,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                 if (ImGui::DragFloat("Lifetime", &LifetimeModule->Lifetime.Constant, 0.1f, 0.0f, 1000.0f))
                 {
                     if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 값 변경 시 재빌드
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
                 }
 			}
 			else if (UParticleModuleRequired* RequiredMod = Cast<UParticleModuleRequired>(ActualSelectedModule))
@@ -332,10 +347,20 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 				{
 					if (CurrentEditedSystem)
 						CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
 				}
 				if (ImGui::DragInt("Emitter Loops", &RequiredMod->EmitterLoops, 1, 0, 100))
 				{
 					if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
 				}
 				ImGui::Text("SubUV (Sprite Sheet):");
 				if (ImGui::DragInt("SubImages Horizontal", &RequiredMod->SubImages_Horizontal, 1, 1, 64)) bPropertyChanged = true;
@@ -385,6 +410,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 							if (CurrentEditedSystem)
 							{
 								CurrentEditedSystem->InitializeSystem();
+                             
+                                if (SubEngine)
+                                {
+                                    SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                                }
 							}
 						}
 					}
@@ -397,6 +427,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 				{
 					if (CurrentEditedSystem)
 						CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
 				}
 			}
 			else if (UParticleModuleTypeDataSprite* SpriteTD = Cast<UParticleModuleTypeDataSprite>(ActualSelectedModule))
@@ -456,6 +491,7 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                     if (ImGui::ColorEdit4("Start Color##ColMod", &ColorModule->StartColor.R))
                     {
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+
                     }
                 }
                 if (ImGui::CollapsingHeader("End Color", ImGuiTreeNodeFlags_DefaultOpen))
@@ -482,11 +518,21 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                 {
                     LocationModule->Shape = static_cast<ELocationShape>(currentShapeIndex);
                     if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
                 }
 
                 if (ImGui::DragFloat3("Start Location", &LocationModule->StartLocation.X, 0.1f))
                 {
                     if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
                 }
 
                 switch (LocationModule->Shape)
@@ -505,6 +551,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                         LocationModule->BoxExtent.Y = FMath::Max(0.0f, LocationModule->BoxExtent.Y);
                         LocationModule->BoxExtent.Z = FMath::Max(0.0f, LocationModule->BoxExtent.Z);
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                     ImGui::TextDisabled("Half the size of the box in each axis direction from Start Location.");
                     break;
@@ -517,6 +568,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                         LocationModule->SphereRadius = FMath::Max(0.0f, LocationModule->SphereRadius);
 
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                     ImGui::TextDisabled("Radius of the sphere centered at Start Location.");
                     break;
@@ -530,6 +586,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                     if (ImGui::DragFloat3("Start Size##SizeMod", &SizeModule->StartSize.X))
                     {
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                 }
                 if (ImGui::CollapsingHeader("End Size", ImGuiTreeNodeFlags_DefaultOpen))
@@ -537,11 +598,21 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                     if (ImGui::DragFloat3("End Size##SizeMod", &SizeModule->EndSize.X))
                     {
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                 }
                 if (ImGui::Checkbox("Interpolate Size", &SizeModule->bInterpolateSize))
                 {
                     if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
                 }
             }
             else if (UParticleModuleVelocity* VelocityModule = Cast<UParticleModuleVelocity>(ActualSelectedModule))
@@ -552,6 +623,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                     if (ImGui::DragFloat3("Max Start Velocity##VelMod", &VelocityModule->MaxStartVelocity.X))
                     {
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                 }
                 if (ImGui::CollapsingHeader("Min Start Velocity", ImGuiTreeNodeFlags_DefaultOpen))
@@ -559,6 +635,11 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
                     if (ImGui::DragFloat3("Min Start Velocity##VelMod", &VelocityModule->MinStartVelocity.X))
                     {
                         if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                     
+                        if (SubEngine)
+                        {
+                            SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                        }
                     }
                 }
             }
@@ -575,12 +656,16 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 		{
 			ImGui::Text("Emitter: %s", *SelectedEmitter->EmitterName);
 			ImGui::Separator();
-			// 예: 이미터 활성화 상태 편집 (LOD 0의 bEnabled)
 			if (SelectedEmitter->GetHighestLODLevel())
 			{
 				if (ImGui::Checkbox("Enabled", &SelectedEmitter->GetHighestLODLevel()->bEnabled))
 				{
 					if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+                 
+                    if (SubEngine)
+                    {
+                        SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+                    }
 				}
 			}
 		}
@@ -804,6 +889,10 @@ void ParticleSystemViewerPanel::HandleAddEmitterMenu()
 			CurrentEditedSystem->InitializeSystem(); // 시스템 재빌드
 			SelectedEmitterIndex_Internal = CurrentEditedSystem->Emitters.Num() - 1; // 새로 추가된 이미터 선택
 			SelectedModuleIndex_Internal = -1;
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent();
+            }
 		}
 		if (ImGui::Selectable("New Particle Mesh Emitter"))
 		{
@@ -816,11 +905,15 @@ void ParticleSystemViewerPanel::HandleAddEmitterMenu()
 			LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSpawn>(LOD));
 			LOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLifetime>(LOD));
 			NewEmitter->LODLevels.Add(LOD);
-
+            
 			CurrentEditedSystem->Emitters.Add(NewEmitter);
 			CurrentEditedSystem->InitializeSystem();
 			SelectedEmitterIndex_Internal = CurrentEditedSystem->Emitters.Num() - 1;
 			SelectedModuleIndex_Internal = -1;
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent();
+            }
 		}
 		ImGui::EndPopup();
 	}
@@ -839,21 +932,41 @@ void ParticleSystemViewerPanel::HandleAddModuleMenu(UParticleEmitter* TargetEmit
 		{
 			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleColor>(TargetLOD));
 			if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem(); // 또는 TargetEmitter->Build();
+         
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+            }
 		}
 		if (ImGui::Selectable("Add Location Module"))
 		{
 			TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleLocation>(TargetLOD));
 			if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+         
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+            }
 		}
         if (ImGui::Selectable("Add Size Module"))
         {
             TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleSize>(TargetLOD));
             if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+         
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+            }
         }
         if (ImGui::Selectable("Add Velocity Module"))
         {
             TargetLOD->Modules.Add(FObjectFactory::ConstructObject<UParticleModuleVelocity>(TargetLOD));
             if (CurrentEditedSystem) CurrentEditedSystem->InitializeSystem();
+         
+            if (SubEngine)
+            {
+                SubEngine->RefreshParticleComponent(); // 컴포넌트의 InitParticles() 호출
+            }
         }
 		ImGui::EndPopup();
 	}

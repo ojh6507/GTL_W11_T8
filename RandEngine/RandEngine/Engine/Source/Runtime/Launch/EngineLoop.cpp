@@ -57,7 +57,7 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     /* must be initialized before window. */
     WindowInit(hInstance);
 
-    
+
     UnrealEditor = new UnrealEd();
     BufferManager = new FDXDBufferManager();
     FUIManager = new UImGuiManager;
@@ -97,10 +97,10 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
     PrimitiveDrawBatch.Initialize(&GraphicDevice);
     FUIManager->Initialize(AppWnd, GraphicDevice.Device, GraphicDevice.DeviceContext);
     ResourceManager.Initialize(&Renderer, &GraphicDevice);
-    
+
     GEngine = FObjectFactory::ConstructObject<UEditorEngine>(nullptr);
     GEngine->Init();
-    
+
     uint32 ClientWidth = 0;
     uint32 ClientHeight = 0;
     GetClientSize(ClientWidth, ClientHeight);
@@ -130,13 +130,13 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
         ParticleSystemViewerGD.ClearColor[1] = 0.0f;
         ParticleSystemViewerGD.ClearColor[2] = 0.0f;
     }
-    
+
     SkeletalViewerSubEngine = FObjectFactory::ConstructObject<USkeletalSubEngine>(nullptr);
-    AnimationViewerSubEngine =  FObjectFactory::ConstructObject<UAnimationSubEngine>(nullptr);
+    AnimationViewerSubEngine = FObjectFactory::ConstructObject<UAnimationSubEngine>(nullptr);
     ParticleSystemViewerSubEngine = FObjectFactory::ConstructObject<UParticleSystemSubEngine>(nullptr);
 
-    SkeletalViewerSubEngine->Initialize(SkeletalViewerWnd, &SkeletalViewerGD, BufferManager,FUIManager,UnrealEditor);
-    AnimationViewerSubEngine->Initialize(AnimationViewerWnd, &AnimationViewerGD, BufferManager,FUIManager,UnrealEditor);
+    SkeletalViewerSubEngine->Initialize(SkeletalViewerWnd, &SkeletalViewerGD, BufferManager, FUIManager, UnrealEditor);
+    AnimationViewerSubEngine->Initialize(AnimationViewerWnd, &AnimationViewerGD, BufferManager, FUIManager, UnrealEditor);
     ParticleSystemViewerSubEngine->Initialize(ParticleSystemViewerWnd, &ParticleSystemViewerGD, BufferManager, FUIManager, UnrealEditor);
 
     FSoundManager::GetInstance().Initialize();
@@ -153,7 +153,7 @@ int32 FEngineLoop::Init(HINSTANCE hInstance)
 void FEngineLoop::Render(float DeltaTime)
 {
     GraphicDevice.Prepare();
-    
+
     if (LevelEditor->IsMultiViewport())
     {
         std::shared_ptr<FEditorViewportClient> ActiveViewportCache = GetLevelEditor()->GetActiveViewportClient();
@@ -162,7 +162,7 @@ void FEngineLoop::Render(float DeltaTime)
             LevelEditor->SetActiveViewportClient(i);
             Renderer.Render(LevelEditor->GetActiveViewportClient());
         }
-        
+
         for (int i = 0; i < 4; ++i)
         {
             LevelEditor->SetActiveViewportClient(i);
@@ -173,18 +173,18 @@ void FEngineLoop::Render(float DeltaTime)
     else
     {
         Renderer.Render(LevelEditor->GetActiveViewportClient());
-        
+
         Renderer.RenderViewport(LevelEditor->GetActiveViewportClient());
     }
 
 
     FUIManager->BeginFrame();
     UnrealEditor->Render();
-    
+
     FConsole::GetInstance().Draw();
     // FDrawer::GetInstance().Render(DeltaTime);
     EngineProfiler.Render(GraphicDevice.DeviceContext, GraphicDevice.ScreenWidth, GraphicDevice.ScreenHeight);
-    
+
     FUIManager->EndFrame();
 }
 
@@ -214,7 +214,7 @@ void FEngineLoop::OpenSkeletalViewer()
 
 void FEngineLoop::OpenParticleSystemViewer()
 {
-    if( ParticleSystemViewerSubEngine->bIsShowSubWindow)
+    if (ParticleSystemViewerSubEngine->bIsShowSubWindow)
     {
         if (ParticleSystemViewerWnd)
         {
@@ -236,7 +236,7 @@ void FEngineLoop::SubEngineControl()
         GetWindowRect(SkeletalViewerWnd, &skeletalRect);
         int x = skeletalRect.left;
         int y = skeletalRect.top;
-        int width  = skeletalRect.right  - skeletalRect.left;
+        int width = skeletalRect.right - skeletalRect.left;
         int height = skeletalRect.bottom - skeletalRect.top;
 
         // 3) AnimationViewerWnd 이동
@@ -248,9 +248,9 @@ void FEngineLoop::SubEngineControl()
         );
         // Z-order
         SetWindowPos(AnimationViewerWnd,
-                     HWND_TOP,
-                     0,0,0,0,
-                     SWP_NOMOVE|SWP_NOSIZE);
+            HWND_TOP,
+            0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE);
         bRepositionAnimWindow = false;
     }
     if (bRePositionSkeletalWindow)
@@ -260,7 +260,7 @@ void FEngineLoop::SubEngineControl()
         GetWindowRect(AnimationViewerWnd, &skeletalRect);
         int x = skeletalRect.left;
         int y = skeletalRect.top;
-        int width  = skeletalRect.right  - skeletalRect.left;
+        int width = skeletalRect.right - skeletalRect.left;
         int height = skeletalRect.bottom - skeletalRect.top;
 
         // 3) AnimationViewerWnd 이동
@@ -272,9 +272,9 @@ void FEngineLoop::SubEngineControl()
         );
         // Z-order
         SetWindowPos(SkeletalViewerWnd,
-                     HWND_TOP,
-                     0,0,0,0,
-                     SWP_NOMOVE|SWP_NOSIZE);
+            HWND_TOP,
+            0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE);
         bRePositionSkeletalWindow = false;
     }
 }
@@ -345,7 +345,7 @@ void FEngineLoop::Tick()
         Input();
         GEngine->Tick(DeltaTime);
         LevelEditor->Tick(DeltaTime);
-        
+
         /** Main window render */
         Render(DeltaTime);
         if (AnimationViewerSubEngine->bIsShowing)
@@ -361,7 +361,7 @@ void FEngineLoop::Tick()
         {
             ImGui::SetCurrentContext(CurrentImGuiContext);
         }
-        
+
         // ImGui::SetCurrentContext(FUIManager->GetContext());
         // Pending 처리된 오브젝트 제거
         GUObjectArray.ProcessPendingDestroyObjects();
@@ -370,7 +370,7 @@ void FEngineLoop::Tick()
         {
             GPUTimingManager.EndFrame();        // End GPU frame timing
         }
-        
+
         // Main swap
         GraphicDevice.SwapBuffer();
 
@@ -390,7 +390,7 @@ void FEngineLoop::GetClientSize(uint32& OutWidth, uint32& OutHeight) const
 {
     RECT ClientRect = {};
     GetClientRect(AppWnd, &ClientRect);
-            
+
     OutWidth = ClientRect.right - ClientRect.left;
     OutHeight = ClientRect.bottom - ClientRect.top;
 }
@@ -401,7 +401,7 @@ void FEngineLoop::Exit()
     AnimationViewerSubEngine->Release();
     ParticleSystemViewerSubEngine->Release();
     CleanupSubWindow();
-    
+
     LevelEditor->Release();
     ResourceManager.Release(&Renderer);
     Renderer.Release();
@@ -437,11 +437,26 @@ void FEngineLoop::CleanupSubWindow()
     {
         SkeletalViewerGD.Release();
     }
-    
+
     if (AnimationViewerGD.Device)
         AnimationViewerGD.Release();
     if (ParticleSystemViewerGD.Device)
         ParticleSystemViewerGD.Release();
+}
+
+USubEngine* FEngineLoop::GetSubEngine(ESubEngineType Type)
+{
+    switch (Type)
+    {
+    case Skeletal:
+        return SkeletalViewerSubEngine;
+    case Animation:
+        return AnimationViewerSubEngine;
+    case Particle:
+        return ParticleSystemViewerSubEngine;
+    default:
+        return nullptr;
+    }
 }
 
 void FEngineLoop::WindowInit(HINSTANCE hInstance)
@@ -621,14 +636,14 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
 
                 float FullWidth = static_cast<float>(ClientRect.right - ClientRect.left);
                 float FullHeight = static_cast<float>(ClientRect.bottom - ClientRect.top);
-                
+
                 if (GEngineLoop.GetUnrealEditor())
                 {
                     SkeletalViewerGD.Resize(hWnd, FullWidth, FullHeight);
                     GEngineLoop.GetUnrealEditor()->OnResize(hWnd, EWindowType::WT_SkeletalSubWindow);
                 }
                 GEngineLoop.SkeletalViewerSubEngine->ViewportClient->AspectRatio = (FullWidth * 0.75f) / FullHeight;
-             }
+            }
             return 0;
         case WM_CLOSE:
             // GEngineLoop.SelectSkeletalMesh(nullptr);
@@ -636,9 +651,9 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             GEngineLoop.SkeletalViewerSubEngine->RequestShowWindow(false);
             ::ShowWindow(hWnd, SW_HIDE);
             return 0;
-        
+
         case WM_ACTIVATE:
-            if (ImGui::GetCurrentContext() == nullptr) break; 
+            if (ImGui::GetCurrentContext() == nullptr) break;
             ImGui::SetCurrentContext(GEngineLoop.SkeletalViewerSubEngine->SubUI->Context);
             GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
             return 0;
@@ -654,7 +669,7 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
     else if (hWnd == GEngineLoop.AnimationViewerWnd)
     {
         ImGui::SetCurrentContext(GEngineLoop.AnimationViewerSubEngine->SubUI->Context);
-     
+
         if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam)) return true;
 
         /** SubWindow Msg */
@@ -668,7 +683,7 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
 
                 float FullWidth = static_cast<float>(ClientRect.right - ClientRect.left);
                 float FullHeight = static_cast<float>(ClientRect.bottom - ClientRect.top);
-                
+
                 if (GEngineLoop.GetUnrealEditor())
                 {
                     AnimationViewerGD.Resize(hWnd, FullWidth, FullHeight);
@@ -683,9 +698,9 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
             GEngineLoop.AnimationViewerSubEngine->RequestShowWindow(false);
             ::ShowWindow(hWnd, SW_HIDE);
             return 0;
-        
+
         case WM_ACTIVATE:
-            if (ImGui::GetCurrentContext() == nullptr) break; 
+            if (ImGui::GetCurrentContext() == nullptr) break;
             ImGui::SetCurrentContext(GEngineLoop.AnimationViewerSubEngine->SubUI->Context);
             GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
             return 0;
@@ -746,57 +761,57 @@ LRESULT CALLBACK FEngineLoop::AppWndProc(HWND hWnd, uint32 Msg, WPARAM wParam, L
     }
     /** Main Window Msg */
     switch (Msg)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        if (auto LevelEditor = GEngineLoop.GetLevelEditor())
         {
-        case WM_DESTROY:
-            PostQuitMessage(0);
+            LevelEditor->SaveConfig();
+        }
+        /** Todo: 현재 PostQuitMessage의 종료 메시지가 정상적으로 수신되지 않아
+         *  `bIsExit`을 강제로 true로 만들어주었습니다. 나중에 수정이 필요합니다.
+         *
+         *  Todo: Currently PostQuitMessage's exit message is not responded to.
+         *  You can make `bIsExit` true by executing it. It will need to be fixed later.
+         */
+        GEngineLoop.bIsExit = true;
+        break;
+    case WM_SIZE:
+        if (wParam != SIZE_MINIMIZED)
+        {
             if (auto LevelEditor = GEngineLoop.GetLevelEditor())
             {
-                LevelEditor->SaveConfig();
+                FEngineLoop::GraphicDevice.Resize(hWnd);
+                // FEngineLoop::Renderer.DepthPrePass->ResizeDepthStencil();
+
+                uint32 ClientWidth = 0;
+                uint32 ClientHeight = 0;
+                GEngineLoop.GetClientSize(ClientWidth, ClientHeight);
+
+                LevelEditor->ResizeEditor(ClientWidth, ClientHeight);
+                FEngineLoop::Renderer.TileLightCullingPass->ResizeViewBuffers(
+                    static_cast<uint32>(LevelEditor->GetActiveViewportClient()->GetD3DViewport().Width),
+                    static_cast<uint32>(LevelEditor->GetActiveViewportClient()->GetD3DViewport().Height)
+                );
             }
-            /** Todo: 현재 PostQuitMessage의 종료 메시지가 정상적으로 수신되지 않아
-             *  `bIsExit`을 강제로 true로 만들어주었습니다. 나중에 수정이 필요합니다.
-             *
-             *  Todo: Currently PostQuitMessage's exit message is not responded to.
-             *  You can make `bIsExit` true by executing it. It will need to be fixed later.
-             */
-            GEngineLoop.bIsExit = true;
-            break;
-        case WM_SIZE:
-            if (wParam != SIZE_MINIMIZED)
-            {
-                if (auto LevelEditor = GEngineLoop.GetLevelEditor())
-                {
-                    FEngineLoop::GraphicDevice.Resize(hWnd);
-                    // FEngineLoop::Renderer.DepthPrePass->ResizeDepthStencil();
-                
-                    uint32 ClientWidth = 0;
-                    uint32 ClientHeight = 0;
-                    GEngineLoop.GetClientSize(ClientWidth, ClientHeight);
-            
-                    LevelEditor->ResizeEditor(ClientWidth, ClientHeight);
-                    FEngineLoop::Renderer.TileLightCullingPass->ResizeViewBuffers(
-                      static_cast<uint32>(LevelEditor->GetActiveViewportClient()->GetD3DViewport().Width),
-                        static_cast<uint32>(LevelEditor->GetActiveViewportClient()->GetD3DViewport().Height)
-                    );
-                }
-            }
-            GEngineLoop.UpdateUI();
-            break;
-        
-        case WM_ACTIVATE:
-            if (ImGui::GetCurrentContext() == nullptr) break;
-            ImGui::SetCurrentContext(GEngineLoop.FUIManager->GetContext());
-            GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
-            break;
-        default:
-            if (hWnd == GEngineLoop.AppWnd && GEngineLoop.AppMessageHandler != nullptr)
-            {
-                GEngineLoop.AppMessageHandler->ProcessMessage(hWnd, Msg, wParam, lParam);
-            }
-            
-            return DefWindowProc(hWnd, Msg, wParam, lParam);
         }
-    
+        GEngineLoop.UpdateUI();
+        break;
+
+    case WM_ACTIVATE:
+        if (ImGui::GetCurrentContext() == nullptr) break;
+        ImGui::SetCurrentContext(GEngineLoop.FUIManager->GetContext());
+        GEngineLoop.CurrentImGuiContext = ImGui::GetCurrentContext();
+        break;
+    default:
+        if (hWnd == GEngineLoop.AppWnd && GEngineLoop.AppMessageHandler != nullptr)
+        {
+            GEngineLoop.AppMessageHandler->ProcessMessage(hWnd, Msg, wParam, lParam);
+        }
+
+        return DefWindowProc(hWnd, Msg, wParam, lParam);
+    }
+
     return 0;
 }
 

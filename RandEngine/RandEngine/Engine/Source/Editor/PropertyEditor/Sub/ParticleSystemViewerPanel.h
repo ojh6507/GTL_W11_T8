@@ -11,6 +11,8 @@ class UParticleModule;
 class UParticleEmitter;
 class UParticleLODLevel;
 
+class UParticleSystemSubEngine;
+
 class ParticleSystemViewerPanel : public UEditorPanel // UEditorPanel이 정의되어 있어야 함
 {
 public:
@@ -60,4 +62,5 @@ private:
     float Height = 600.0f; // 적절한 초기값 설정
     FRenderTargetRHI* RenderTargetRHI;
     FDepthStencilRHI* DepthStencilRHI;
+    UParticleSystemSubEngine* SubEngine;
 };
