@@ -448,6 +448,7 @@ void FSubRenderer::UpdateConstants() const
     /** Lit Flag */
     FLitUnlitConstants Data;
     Data.bIsLit = false;
+    Data.bUseInputColor = 0;
     BufferManager->UpdateConstantBuffer(TEXT("FLitUnlitConstants"), Data);
 
     /** Light */
