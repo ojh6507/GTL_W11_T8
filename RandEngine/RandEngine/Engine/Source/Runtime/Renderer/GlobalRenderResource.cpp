@@ -64,9 +64,13 @@ FGlobalDynamicIndexBuffer::FAllocation FGlobalDynamicIndexBuffer::Allocate(uint3
         ? IndexBuffers16
         : IndexBuffers32;
 
-    if (IndexBuffers.IsEmpty() || IndexBuffers.Last()->AllocatedByteCount + SizeInBytes > IndexBuffers.Last()->BufferSize)
+    if (IndexBuffers.IsEmpty())
     {
         IndexBuffers.Emplace(GDynamicIndexBufferPool.Acquire(SizeInBytes, IndexStride));
+    }
+    else if (IndexBuffers.Last()->AllocatedByteCount + SizeInBytes > IndexBuffers.Last()->BufferSize)
+    {
+        IndexBuffers.Emplace(GDynamicIndexBufferPool.Acquire(IndexBuffers.Last()->AllocatedByteCount + SizeInBytes, IndexStride));
     }
 
     FDynamicIndexBuffer* IndexBuffer = IndexBuffers.Last();
