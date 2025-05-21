@@ -10,7 +10,7 @@ struct PS_Input
 
 float4 mainPS(PS_Input Input) : SV_TARGET
 {
-    return Input.Color;
+    //return Input.Color;
     float4 FinalColor = float4(0.f, 0.f, 0.f, 1.f);
     float4 TextureColor = Texture.Sample(Sampler, Input.UV);
     float threshold = 0.01f;

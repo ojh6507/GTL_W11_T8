@@ -756,6 +756,7 @@ struct FDynamicSpriteEmitterData : public FDynamicSpriteEmitterDataBase
 
     /** Uniform parameters. Most fields are filled in when updates are sent to the rendering thread, some are per-view! */
     //FParticleSpriteUniformParameters UniformParameters;
+    FTexture* Texture = nullptr;
 };
 
 

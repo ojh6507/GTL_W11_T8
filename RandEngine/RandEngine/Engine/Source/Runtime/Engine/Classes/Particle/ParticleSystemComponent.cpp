@@ -9,6 +9,7 @@
 #include "ParticleModuleTypeDataMesh.h"
 #include "Components/Mesh/StaticMeshRenderData.h"
 #include "Engine/Asset/StaticMeshAsset.h"
+#include "ParticleModuleTypeDataSprite.h"
 
 UParticleSystemComponent::UParticleSystemComponent()
 {
@@ -124,6 +125,8 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
             SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
                 SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
                 View.get(), GetWorldMatrix(), ParticleOrder);
+
+            SpriteData->Texture = Cast<UParticleModuleTypeDataSprite>(EmitterInstance->CurrentLODLevel->TypeDataModule)->CachedTexture;
 
             // 2) 실제 Vertex/Index 버퍼 채우기
             SpriteData->GetVertexAndIndexDataNonInstanced(

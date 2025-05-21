@@ -190,8 +190,11 @@ bool FDynamicSpriteEmitterData::GetVertexAndIndexDataNonInstanced(void* VertexDa
 
         const FVector2D Size = GetParticleSize(Particle, Source);
 
-        ParticlePosition = Particle.Location;
-        ParticleOldPosition = Particle.OldLocation;
+        FVector ParticleSystemPos = InLocalToWorld.GetTranslationVector();
+        FRotator Rotation = InLocalToWorld.GetRotationVector();
+
+        ParticlePosition = Rotation.RotateVector(Particle.Location) + ParticleSystemPos;
+        ParticleOldPosition = Rotation.RotateVector(Particle.OldLocation) + ParticleSystemPos;
 
         ApplyOrbitToPosition(Particle, Source, InLocalToWorld, ParticlePosition, ParticleOldPosition);
 
@@ -339,6 +342,7 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
     FVector4 DynamicParameterValue(1.0f, 1.0f, 1.0f, 1.0f);
     FVector ParticlePosition;
     FVector ParticleOldPosition;
+    FVector ParticleSize;
 
     const uint8* ParticleData = Source.DataContainer.ParticleData;
     const uint16* ParticleIndices = Source.DataContainer.ParticleIndices;
@@ -356,8 +360,13 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
             DECLARE_PARTICLE_CONST(NextParticle, ParticleData + Source.ParticleStride * ParticleIndices[NextIndex]);
         }
 
-        ParticlePosition = Particle.Location;
-        ParticleOldPosition = Particle.OldLocation;
+        FVector ParticleSystemPos = InLocalToWorld.GetTranslationVector();
+        FRotator Rotation = InLocalToWorld.GetRotationVector();
+        FVector ParticleSystemScale = InLocalToWorld.GetScaleVector();
+        
+        ParticleSize = ParticleSystemScale * Particle.Size;
+        ParticlePosition = Rotation.RotateVector(Particle.Location) + ParticleSystemPos;
+        ParticleOldPosition = Rotation.RotateVector(Particle.OldLocation) + ParticleSystemPos;
 
         ApplyOrbitToPosition(Particle, Source, InLocalToWorld, ParticlePosition, ParticleOldPosition);
 
@@ -381,9 +390,9 @@ bool FDynamicMeshEmitterData::GetVertexData(void* VertexData, void* DynamicParam
 
         FillVertex[i].Color = Particle.Color;
         //TODO : Transform은 나중에 받자
-        FillVertex[i].Transform[0] = FVector4(Particle.Size.X, 0, 0, ParticlePosition.X);
-        FillVertex[i].Transform[1] = FVector4(0, Particle.Size.Y, 0, ParticlePosition.Y);
-        FillVertex[i].Transform[2] = FVector4(0, 0, Particle.Size.Z, ParticlePosition.Z);
+        FillVertex[i].Transform[0] = FVector4(ParticleSize.X, 0, 0, ParticlePosition.X);
+        FillVertex[i].Transform[1] = FVector4(0, ParticleSize.Y, 0, ParticlePosition.Y);
+        FillVertex[i].Transform[2] = FVector4(0, 0, ParticleSize.Z, ParticlePosition.Z);
 
         FillVertex[i].Velocity = Particle.Velocity;
         //SubUV랑 SubUVLerp 건너뜀
