@@ -403,7 +403,11 @@ void FDynamicSpriteEmitterDataBase::SortSpriteParticles(int32 SortMode, bool bLo
     int32 ParticleCount, const uint8* ParticleData, int32 ParticleStride, const uint16* ParticleIndices,
     const FEditorViewportClient* View, const FMatrix& LocalToWorld, FParticleOrder* ParticleOrder) const
 {
-    if (SortMode == PSORTMODE_ViewProjDepth)
+    if (SortMode == PSORTMODE_None)
+    {
+        ParticleOrder = nullptr;
+    }
+    else if (SortMode == PSORTMODE_ViewProjDepth)
     {
         for (int32 ParticleIndex = 0; ParticleIndex < ParticleCount; ParticleIndex++)
         {

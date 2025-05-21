@@ -118,38 +118,55 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
 
         if (FDynamicSpriteEmitterData* SpriteData = dynamic_cast<FDynamicSpriteEmitterData*>(EmitterRenderData[Idx]))
         {
-            // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
-            //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
             int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
-            FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
-            SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
-                SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
-                View.get(), GetWorldMatrix(), ParticleOrder);
+           
+            // 파티클 순서 정렬
+            FParticleOrder* ParticleOrder = nullptr;
+            if (EmitterInstance->bRequiresSorting)
+            {
+                ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
 
+                SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
+                    SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
+                    View.get(), GetWorldMatrix(), ParticleOrder);
+            }
+
+            // 텍스쳐 매핑
             SpriteData->Texture = Cast<UParticleModuleTypeDataSprite>(EmitterInstance->CurrentLODLevel->TypeDataModule)->CachedTexture;
 
-            // 2) 실제 Vertex/Index 버퍼 채우기
+            // 렌더 데이터 채우기
             SpriteData->GetVertexAndIndexDataNonInstanced(
                 /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
                 /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
                 /* OutIndexData: */        SpriteData->IndexAllocation.Buffer,
-                /* InParticleOrder: */     nullptr,
+                /* InParticleOrder: */     ParticleOrder,
                 /* InViewOrigin: */        View->GetCameraLocation(),
                 /* InLocalToWorld: */      GetWorldMatrix(),
                 /* InVertsPerParticle: */  4
             );
+
+            // 메모리 할당 해제
+            if (ParticleOrder)
+            {
+                FPlatformMemory::Free<EAllocationType::EAT_Container>(ParticleOrder, sizeof(FParticleOrder) * ParticleCount);
+            }
         }
         else if (FDynamicMeshEmitterData* SpriteData = dynamic_cast<FDynamicMeshEmitterData*>(EmitterRenderData[Idx]))
         {
-            // 1) 파티클 순서 정렬 (투명 블렌딩시 뒤→앞 순서 보장을 위해)
-            //TArray<int32> ParticleOrder = EmitterInstance->GetParticleIndices();
             int32 ParticleCount = SpriteData->Source.ActiveParticleCount;
-            FParticleOrder* ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
-            SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
-                SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
-                View.get(), GetWorldMatrix(), ParticleOrder);
 
-            //UStaticMesh 관련 처리 임시로 여기에 배치
+            // 파티클 순서 정렬
+            FParticleOrder* ParticleOrder = nullptr;
+            if (EmitterInstance->bRequiresSorting)
+            {
+                ParticleOrder = (FParticleOrder*)FPlatformMemory::Malloc<EAllocationType::EAT_Container>(sizeof(FParticleOrder) * ParticleCount);
+
+                SpriteData->SortSpriteParticles(SpriteData->Source.SortMode, SpriteData->Source.bUseLocalSpace, SpriteData->Source.ActiveParticleCount,
+                    SpriteData->Source.DataContainer.ParticleData, SpriteData->Source.ParticleStride, SpriteData->Source.DataContainer.ParticleIndices,
+                    View.get(), GetWorldMatrix(), ParticleOrder);
+            }
+
+            // UStaticMesh 관련 처리 임시로 여기에 배치
             SpriteData->StaticMesh = Cast<UParticleModuleTypeDataMesh>(EmitterInstance->CurrentLODLevel->TypeDataModule)->Mesh;
             if (SpriteData->StaticMesh)
             {
@@ -165,6 +182,12 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
                     /* InViewOrigin: */        View->GetCameraLocation(),
                     /* InLocalToWorld: */      GetWorldMatrix()
                 );
+            }
+
+            // 메모리 할당 해제
+            if (ParticleOrder)
+            {
+                FPlatformMemory::Free<EAllocationType::EAT_Container>(ParticleOrder, sizeof(FParticleOrder) * ParticleCount);
             }
         }
     }

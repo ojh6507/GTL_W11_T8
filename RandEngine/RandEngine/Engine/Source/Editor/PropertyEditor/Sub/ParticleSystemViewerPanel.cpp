@@ -375,7 +375,7 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 				if (ImGui::Checkbox("Requires Sorting", &RequiredMod->bRequiresSorting)) bPropertyChanged = true;
 				if (RequiredMod->bRequiresSorting)
 				{
-					const char* sortModeItems[] = { "None", "View Depth", "View Distance" /*, ... */ };
+					const char* sortModeItems[] = { "None", "View Depth", "View Distance", "Oldest First", "Newest First" /*, ... */};
 					int currentSortMode = RequiredMod->SortMode; // 또는 static_cast<int>(RequiredMod->SortModeEnum);
 					if (ImGui::Combo("Sort Mode", &currentSortMode, sortModeItems, IM_ARRAYSIZE(sortModeItems))) {
 						RequiredMod->SortMode = currentSortMode; // 또는 static_cast<EParticleSortMode>(currentSortMode);
