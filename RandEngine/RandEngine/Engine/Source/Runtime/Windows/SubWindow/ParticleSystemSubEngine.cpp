@@ -32,21 +32,17 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>(this);
     EditorPlayer->SetCoordMode(CDM_LOCAL);
 
-
-    //UnrealSphereComponent = FObjectFactory::ConstructObject<UStaticMeshComponent>(this);
-    //UnrealSphereComponent->SetStaticMesh(UAssetManager::Get().GetStaticMesh(L"Contents/Sphere.obj"));
-    //UnrealSphereComponent->SetRelativeScale3D(FVector(4.f, 4.f, 4.f));
-    //UnrealSphereComponent->SetRelativeLocation(FVector(0, 0, 0));
     ViewportClient->ViewFOV = 60.f;
     ParticleComponent = FObjectFactory::ConstructObject<UParticleSystemComponent>(this);
-    ParticleComponent->SetRelativeLocation(FVector(0, 0, 0));
-    FVector compLoc = ParticleComponent->GetRelativeLocation();
-
+   
     FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+    ViewportClient->PerspectiveCamera.SetLocation(FVector(0, 0, 0));
+    ViewportClient->PerspectiveCamera.SetRotation(FVector(0, 0, 0));
     ViewTransform.SetLocation(
-        compLoc - (ViewTransform.GetForwardVector() * 50.0f)
+        FVector(0,0,0) - (ViewTransform.GetForwardVector() * 100.0f)
     );
-
+    ViewportClient->CameraRotateYaw(20);
+    ViewportClient->CameraRotatePitch(15);
 }
 
 void UParticleSystemSubEngine::Tick(float DeltaTime)
@@ -132,9 +128,15 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
         if (GetAsyncKeyState('F') & 0x8000)
         {
             FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+
+            ViewportClient->PerspectiveCamera.SetLocation(FVector(0, 0, 0));
+            ViewportClient->PerspectiveCamera.SetRotation(FVector(0, 0, 0));
+
             ViewTransform.SetLocation(
-                FVector(0, 0, 0) - (ViewTransform.GetForwardVector() * 50.0f)
+                FVector(0, 0, 0) - (ViewTransform.GetForwardVector() * 100.0f)
             );
+            ViewportClient->CameraRotateYaw(20);
+            ViewportClient->CameraRotatePitch(15);
 
         }
 
@@ -198,5 +200,14 @@ void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InP
     ParticleComponent->InitParticles();
     ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
     particlePanel->SetEditedParticleSystem(ParticleSystem);
+ 
+    FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
+    ViewportClient->PerspectiveCamera.SetLocation(FVector(0, 0, 0));
+    ViewportClient->PerspectiveCamera.SetRotation(FVector(0, 0, 0));
+    ViewTransform.SetLocation(
+        FVector(0,0,0) - (ViewTransform.GetForwardVector() * 180.0f)
+    );
+    ViewportClient->CameraRotateYaw(20);
+    ViewportClient->CameraRotatePitch(15);
 
 }
