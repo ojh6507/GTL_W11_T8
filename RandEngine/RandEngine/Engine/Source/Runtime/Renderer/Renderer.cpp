@@ -435,9 +435,12 @@ void FRenderer::RenderWorldScene(const std::shared_ptr<FEditorViewportClient>& V
         }
     }
 
-    QUICK_SCOPE_CYCLE_COUNTER(ParticlePass_CPU)
-    QUICK_GPU_SCOPE_CYCLE_COUNTER(ParticlePass_GPU, *GPUTimingManager)
-    ParticleRenderPass->Render(Viewport);
+    if (ShowFlag & EEngineShowFlags::SF_Particle)
+    {
+        QUICK_SCOPE_CYCLE_COUNTER(ParticlePass_CPU)
+        QUICK_GPU_SCOPE_CYCLE_COUNTER(ParticlePass_GPU, *GPUTimingManager)
+        ParticleRenderPass->Render(Viewport);
+    }
     
     // Render World Billboard
     if (ShowFlag & EEngineShowFlags::SF_BillboardText)

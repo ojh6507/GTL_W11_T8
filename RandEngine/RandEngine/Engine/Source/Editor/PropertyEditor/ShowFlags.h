@@ -19,6 +19,7 @@ namespace EEngineShowFlags
         SF_Collision = 1ULL << 8,
         SF_CollisionSelectedOnly = 1ULL << 9,
         SF_Bone = 1ULL << 10,
+        SF_Particle = 1ULL <<11,
     };
 }
 
