@@ -468,6 +468,7 @@ void ParticleSystemViewerPanel::RenderPropertiesPanel(const ImVec2& panelSize, U
 								std::shared_ptr<FTexture> TexSharedPtr = FEngineLoop::ResourceManager.GetTexture(Pair.Key);
 								SpriteTD->CachedTexture = TexSharedPtr ? TexSharedPtr.get() : nullptr;
 								bPropertyChanged = true;
+                                if (SubEngine) SubEngine->RefreshParticleComponent();
 							}
 						}
 						if (is_selected) ImGui::SetItemDefaultFocus();

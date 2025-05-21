@@ -187,6 +187,7 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
     //TODO: Texture랑 Sampler 가져와야 함
     if (SpriteEmitter->Texture)
     {
+        UpdateSpriteParticleConstant(Viewport, 1);
         ID3D11ShaderResourceView* TextureSRV = SpriteEmitter->Texture->TextureSRV;
         ID3D11SamplerState* SamplerState = SpriteEmitter->Texture->SamplerState;
         Graphics->DeviceContext->PSSetShaderResources(0, 1, &TextureSRV);
