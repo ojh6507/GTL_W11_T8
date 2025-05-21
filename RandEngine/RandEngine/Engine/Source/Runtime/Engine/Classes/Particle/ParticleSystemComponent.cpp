@@ -178,7 +178,7 @@ void UParticleSystemComponent::FillRenderData(const std::shared_ptr<FEditorViewp
                 SpriteData->GetVertexData(
                     /* OutVertexData: */       SpriteData->VertexAllocation.Buffer,
                     /* OutParamData: */        SpriteData->ParamAllocation.Buffer,
-                    /* InParticleOrder: */     nullptr,
+                    /* InParticleOrder: */     ParticleOrder,
                     /* InViewOrigin: */        View->GetCameraLocation(),
                     /* InLocalToWorld: */      GetWorldMatrix()
                 );
