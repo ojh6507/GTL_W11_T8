@@ -6,7 +6,7 @@ ACapsuleActor::ACapsuleActor()
 {
     CapsuleComponent = AddComponent<UCapsuleComponent>();
     RootComponent = CapsuleComponent;
-    UParticleSystemComponent* ParticleSystem = AddComponent<UParticleSystemComponent>("ParticleSystemComponent_0");
+    UParticleSystemComponent* ParticleSystem = AddComponent<UParticleSystemComponent>();
     ParticleSystem->SetupAttachment(RootComponent);
 }
 

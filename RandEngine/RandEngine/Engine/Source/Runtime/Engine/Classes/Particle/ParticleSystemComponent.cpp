@@ -20,7 +20,6 @@ UParticleSystemComponent::UParticleSystemComponent()
 void UParticleSystemComponent::InitializeComponent()
 {
     Super::InitializeComponent();
-    InitParticles();
 }
 
 void UParticleSystemComponent::TickComponent(float DeltaTime)

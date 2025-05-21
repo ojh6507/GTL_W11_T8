@@ -134,6 +134,9 @@ void FParticleRenderPass::Render(const std::shared_ptr<FEditorViewportClient>& V
     PrepareRender(Viewport);
     for (const auto& Particle : ParticleComps)
     {
+        Particle->PrepareRenderData();
+        Particle->FillRenderData(Viewport);
+
         TArray<FDynamicMeshEmitterData*> MeshRenderDatas;
         TArray<FDynamicSpriteEmitterData*> SpriteRenderDatas;
         for (const auto& RenderData : Particle->EmitterRenderData)   
@@ -289,11 +292,6 @@ void FParticleRenderPass::PrepareRender(const std::shared_ptr<FEditorViewportCli
     FDepthStencilRHI* DepthStencilRHI = ViewportResource->GetDepthStencil(ResourceType);
 
     Graphics->DeviceContext->OMSetRenderTargets(1, &RenderTargetRHI->RTV, DepthStencilRHI->DSV);
-    for (UParticleSystemComponent* ParticleComp : ParticleComps)
-    {
-        ParticleComp->PrepareRenderData();
-        ParticleComp->FillRenderData(Viewport);
-    }
 }
 
 void FParticleRenderPass::PrepareSpriteParticleShader() const
