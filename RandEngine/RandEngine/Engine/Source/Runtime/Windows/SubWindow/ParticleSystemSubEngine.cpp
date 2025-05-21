@@ -9,6 +9,7 @@
 #include "Particle/ParticleSystem.h"
 #include "Particle/ParticleSystemComponent.h"
 
+#include "UserInterface/Drawer.h"
 #include "Engine/AssetManager.h"
 #include "PropertyEditor/Sub/ParticleSystemViewerPanel.h"
 
@@ -39,12 +40,12 @@ void UParticleSystemSubEngine::Initialize(HWND& hWnd, FGraphicsDevice* InGraphic
     ViewportClient->ViewFOV = 60.f;
     ParticleComponent = FObjectFactory::ConstructObject<UParticleSystemComponent>(this);
     ParticleComponent->SetRelativeLocation(FVector(0, 0, 0));
-    FVector compLoc=  ParticleComponent->GetRelativeLocation();
+    FVector compLoc = ParticleComponent->GetRelativeLocation();
 
     FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
-   ViewTransform.SetLocation(
-       compLoc - (ViewTransform.GetForwardVector() * 50.0f)
-   );
+    ViewTransform.SetLocation(
+        compLoc - (ViewTransform.GetForwardVector() * 50.0f)
+    );
 
 }
 
@@ -114,18 +115,25 @@ void UParticleSystemSubEngine::Input(float DeltaTime)
     }
     else
     {
-        if (bCtrlPressed && (GetAsyncKeyState('S') & 0x8000))
+        if (bCtrlPressed)
         {
-            if (ParticleSystem)
+            if (GetAsyncKeyState('S') & 0x8000)
             {
-                ParticleSystem->SaveParticleSystemToBinary();
+                if (ParticleSystem)
+                {
+                    ParticleSystem->SaveParticleSystemToBinary();
+                }
+            }
+            if (GetAsyncKeyState('O') & 0x8000)
+            {
+                static_cast<FDrawer*>(GEngineLoop.GetUnrealEditor()->GetSubParticlePanel("Drawer").get())->Toggle();
             }
         }
         if (GetAsyncKeyState('F') & 0x8000)
         {
             FViewportCamera& ViewTransform = ViewportClient->PerspectiveCamera;
             ViewTransform.SetLocation(
-                FVector(0,0,0) - (ViewTransform.GetForwardVector() * 50.0f)
+                FVector(0, 0, 0) - (ViewTransform.GetForwardVector() * 50.0f)
             );
 
         }
@@ -146,7 +154,7 @@ void UParticleSystemSubEngine::Render()
         SubUI->BeginFrame();
 
         ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
-        if (particlePanel) 
+        if (particlePanel)
         {
             particlePanel->PrepareRender(ViewportClient.get()); // 내부적으로 멤버 변수 RenderTargetRHI 설정
 
@@ -184,5 +192,5 @@ void UParticleSystemSubEngine::OpenParticleSystemForEditing(UParticleSystem* InP
     ParticleComponent->InitParticles();
     ParticleSystemViewerPanel* particlePanel = reinterpret_cast<ParticleSystemViewerPanel*>(UnrealEditor->GetSubParticlePanel("SubParticleViewerPanel").get());
     particlePanel->SetEditedParticleSystem(ParticleSystem);
-    
+
 }

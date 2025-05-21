@@ -83,30 +83,6 @@ void ControlEditorPanel::Render()
             CreateMenuButton(IconSize, IconFont);
             ImGui::EndMenu();
         }
-
-        if (ImGui::BeginMenu("Demo"))
-        {
-            if (ImGui::MenuItem("ImGui Demo Window"))
-            {
-                bShowImGuiDemoWindow = !bShowImGuiDemoWindow;
-            }
-
-            if (bShowImGuiDemoWindow)
-            {
-                ImGui::ShowDemoWindow(&bShowImGuiDemoWindow); // 창이 닫힐 때 상태를 업데이트
-            }
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("View"))
-        {
-            if (ImGui::MenuItem("Skeletal Mesh Viewer"))
-            {
-                GEngineLoop.SkeletalViewerSubEngine->RequestShowWindow(true);
-            }
-            ImGui::EndMenu();
-        }
-        
         ImGui::EndMenuBar();
     }
 

@@ -12,6 +12,7 @@
 
 #include "SubWindow/SubEngine.h"
 
+#include "UserInterface/Drawer.h"
 
 #include "Components/Material/Material.h"
 
@@ -72,10 +73,30 @@ void ParticleSystemViewerPanel::Render()
 	ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
 	ImGui::SetNextWindowSize(ImVec2(Width, Height)); // 클래스 멤버 Width, Height 사용
 
-	ImGuiWindowFlags mainCanvasFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
-
+    ImGuiWindowFlags mainCanvasFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    // Add the MenuBar flag to the main window
+    mainCanvasFlags |= ImGuiWindowFlags_MenuBar;
 	if (ImGui::Begin("CascadeModifiedCanvas", nullptr, mainCanvasFlags))
 	{
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                // Add menu items here. For example:
+                if (ImGui::MenuItem("Open Content Drawer", "Ctrl+O"))
+                {
+                    static_cast<FDrawer*>(GEngineLoop.GetUnrealEditor()->GetSubParticlePanel("Drawer").get())->Toggle();
+                }
+                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                {
+                    if(CurrentEditedSystem)
+                        CurrentEditedSystem->SaveParticleSystemToBinary();
+
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
 		RenderMainLayout(ImGui::GetContentRegionAvail());
 		ImGui::End();
 	}
@@ -97,10 +118,11 @@ void ParticleSystemViewerPanel::RenderMainLayout(const ImVec2& canvasContentSize
 	float splitterThickness = 5.0f;
 	float minPanelSize = 50.0f;
 
-	// 왼쪽 패널 너비 계산
+    // 왼쪽 패널 너비 계산
 	float leftPaneActualWidth = canvasContentSize.x * LeftAreaTotalRatio - splitterThickness / 2.0f;
 	leftPaneActualWidth = FMath::Max(minPanelSize, leftPaneActualWidth);
 	leftPaneActualWidth = FMath::Min(leftPaneActualWidth, canvasContentSize.x - splitterThickness - minPanelSize);
+	
 
 	// 왼쪽 패널 렌더링
 	RenderLeftPane(ImVec2(leftPaneActualWidth, canvasContentSize.y), splitterThickness, minPanelSize);

@@ -54,9 +54,10 @@ void UnrealEd::Initialize()
     auto SubParticleViewerPanel = std::make_shared<ParticleSystemViewerPanel>();
     SubParticleViewerPanel->WindowType = WT_ParticleSubWindow;
     AddEditorPanel("SubParticleViewerPanel", SubParticleViewerPanel, EWindowType::WT_ParticleSubWindow);
-    auto SubParticleViewerControlPanel = std::make_shared<FDrawer>();
-    SubParticleViewerControlPanel->WindowType = WT_ParticleSubWindow;
-    AddEditorPanel("SubParticleViewerControlPanel", SubParticleViewerControlPanel, EWindowType::WT_ParticleSubWindow);
+
+    auto  ParticleDrawer = std::make_shared<FDrawer>();
+    ParticleDrawer->WindowType = WT_ParticleSubWindow;
+    AddEditorPanel("Drawer", ParticleDrawer, EWindowType::WT_ParticleSubWindow);
 }
 
 void UnrealEd::Render(EWindowType WindowType) const
