@@ -70,10 +70,20 @@ void UParticleSystemComponent::InitParticles()
 void UParticleSystemComponent::PrepareRenderData()
 {
     EmitterRenderData.Empty();
+    //int ActiveEmitterCount = 0;
+    //for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
+    //{
+    //    if (!EmitterInstance->bEmitterIsDone)
+    //    {
+    //        ActiveEmitterCount++;
+    //    }
+    //}
     EmitterRenderData.Reserve(EmitterInstances.Num());
 
     for (FParticleEmitterInstance* EmitterInstance : EmitterInstances)
     {
+        //if (EmitterInstance->bEmitterIsDone) continue;
+
         EModuleType ModuleType = EmitterInstance->CurrentLODLevel->TypeDataModule->GetModuleType();
         if (ModuleType == EModuleType::TypeDataSprite)
         {
