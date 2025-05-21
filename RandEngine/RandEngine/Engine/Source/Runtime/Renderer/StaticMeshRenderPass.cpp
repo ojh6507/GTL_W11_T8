@@ -265,6 +265,7 @@ void FStaticMeshRenderPass::UpdateLitUnlitConstant(int32 isLit) const
 {
     FLitUnlitConstants Data;
     Data.bIsLit = isLit;
+    Data.bUseInputColor = 0;
     BufferManager->UpdateConstantBuffer(TEXT("FLitUnlitConstants"), Data);
 }
 

@@ -431,8 +431,9 @@ struct FSubUVConstant
 
 struct FLitUnlitConstants
 {
-    int bIsLit; // 1 = Lit, 0 = Unlit 
-    FVector pad;
+    int bIsLit; // 1 = Lit, 0 = Unlit
+    int bUseInputColor; // 1 = true, 0 = false
+    FVector2D pad;
 };
 
 struct FIsShadowConstants

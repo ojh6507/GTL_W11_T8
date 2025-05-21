@@ -9,7 +9,8 @@ cbuffer MaterialConstants : register(b1)
 cbuffer FlagConstants : register(b2)
 {
     bool IsLit;
-    float3 flagPad0;
+    bool UseInputColor;
+    float2 flagPad0;
 }
 
 cbuffer SubMeshConstants : register(b3)
@@ -145,5 +146,8 @@ float4 mainPS(PS_INPUT_StaticMesh Input) : SV_Target
         FinalColor += float4(0.01, 0.01, 0.0, 1);
     }
 
+    if (UseInputColor)
+        FinalColor = FinalColor * Input.Color;
+    
     return FinalColor;
 }

@@ -6,11 +6,13 @@ struct PS_Input
     float4 Position : SV_POSITION;
     float2 UV : TEXCOORD;
     float4 Color : COLOR;
+    bool hasTexture : TEXCOORD1;
 };
 
 float4 mainPS(PS_Input Input) : SV_TARGET
 {
-    //return Input.Color;
+    if (!Input.hasTexture)
+        return Input.Color;
     float4 FinalColor = float4(0.f, 0.f, 0.f, 1.f);
     float4 TextureColor = Texture.Sample(Sampler, Input.UV);
     float threshold = 0.01f;

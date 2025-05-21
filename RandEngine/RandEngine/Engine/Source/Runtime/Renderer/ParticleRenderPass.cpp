@@ -51,9 +51,9 @@ void FParticleRenderPass::PrepareRenderArr()
     }
 }
 
-void FParticleRenderPass::UpdateCameraConstant(const std::shared_ptr<FEditorViewportClient>& Viewport) const
+void FParticleRenderPass::UpdateSpriteParticleConstant(const std::shared_ptr<FEditorViewportClient>& Viewport, int32 hasTexture) const
 {
-    FSpriteParticleCameraConstants CameraData = {};
+    FSpriteParticleConstants SpriteParticleData = {};
     FVector CameraUp, CameraRight;
     if (Viewport->IsPerspective())
     {
@@ -65,10 +65,11 @@ void FParticleRenderPass::UpdateCameraConstant(const std::shared_ptr<FEditorView
         CameraUp = Viewport->OrthogonalCamera.GetUpVector();
         CameraRight = Viewport->OrthogonalCamera.GetRightVector();
     }
-    CameraData.CameraUp = CameraUp;
-    CameraData.CameraRight = CameraRight;
+    SpriteParticleData.CameraUp = CameraUp;
+    SpriteParticleData.CameraRight = CameraRight;
+    SpriteParticleData.bHasTexture = hasTexture;
 
-    BufferManager->UpdateConstantBuffer(TEXT("FSpriteParticleCameraConstantBuffer"), CameraData);
+    BufferManager->UpdateConstantBuffer(TEXT("FSpriteParticleCameraConstantBuffer"), SpriteParticleData);
 }
 
 void FParticleRenderPass::UpdateObjectConstant(const FVector4& UUIDColor, bool bIsSelected) const
@@ -87,6 +88,7 @@ void FParticleRenderPass::UpdateLitUnlitConstant(int32 isLit) const
 {
     FLitUnlitConstants Data;
     Data.bIsLit = isLit;
+    Data.bUseInputColor = 1;
     BufferManager->UpdateConstantBuffer(TEXT("FLitUnlitConstants"), Data);
 }
 
@@ -94,7 +96,7 @@ void FParticleRenderPass::PrepareSpriteParticleRender(const std::shared_ptr<FEdi
 {
     Graphics->DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     PrepareSpriteParticleShader();
-    UpdateCameraConstant(Viewport);
+    UpdateSpriteParticleConstant(Viewport);
     BufferManager->BindConstantBuffer(TEXT("FSpriteParticleCameraConstantBuffer"), 0, EShaderStage::Vertex);
     const float BlendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
     UINT SampleMask = 0xffffffff;
@@ -189,6 +191,10 @@ void FParticleRenderPass::RenderSpriteParticle(const std::shared_ptr<FEditorView
         ID3D11SamplerState* SamplerState = SpriteEmitter->Texture->SamplerState;
         Graphics->DeviceContext->PSSetShaderResources(0, 1, &TextureSRV);
         Graphics->DeviceContext->PSSetSamplers(0, 1, &SamplerState);
+    }
+    else
+    {
+        UpdateSpriteParticleConstant(Viewport, 0);
     }
 
     Graphics->DeviceContext->DrawIndexed(IndexCount, SpriteEmitter->IndexAllocation.FirstIndex, 0);

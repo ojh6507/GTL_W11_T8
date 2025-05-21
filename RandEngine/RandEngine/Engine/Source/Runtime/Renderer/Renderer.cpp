@@ -191,8 +191,8 @@ void FRenderer::CreateConstantBuffers()
     UINT BonesBufferSize = sizeof(FBonesConstants);
     BufferManager->CreateBufferGeneric<FBonesConstants>("FBonesConstants", nullptr, BonesBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
-    UINT SpriteCameraBufferSize = sizeof(FSpriteParticleCameraConstants);
-    BufferManager->CreateBufferGeneric<FSpriteParticleCameraConstants>("FSpriteParticleCameraConstantBuffer", nullptr, SpriteCameraBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+    UINT SpriteCameraBufferSize = sizeof(FSpriteParticleConstants);
+    BufferManager->CreateBufferGeneric<FSpriteParticleConstants>("FSpriteParticleCameraConstantBuffer", nullptr, SpriteCameraBufferSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 
     // TODO: 함수로 분리
     ID3D11Buffer* ObjectBuffer = BufferManager->GetConstantBuffer(TEXT("FObjectConstantBuffer"));

@@ -6,10 +6,10 @@
 #include "Classes/Particle/ParticleSystemComponent.h"
 #include "Classes/Particle/ParticleHelper.h"
 
-struct FSpriteParticleCameraConstants
+struct FSpriteParticleConstants
 {
     FVector CameraUp;
-    float pad;
+    int32 bHasTexture;
     FVector CameraRight;
     float pad1;
 };
@@ -24,7 +24,7 @@ public:
 
     virtual void PrepareRenderArr() override;
 
-    void UpdateCameraConstant(const std::shared_ptr<FEditorViewportClient>& Viewport) const;
+    void UpdateSpriteParticleConstant(const std::shared_ptr<FEditorViewportClient>& Viewport, int32 hasTexture = 1) const;
 
     void UpdateObjectConstant(const FVector4& UUIDColor, bool bIsSelected) const;
 

@@ -18,12 +18,13 @@ struct PS_Input
     float4 Position : SV_POSITION;
     float2 UV : TEXCOORD;   
     float4 Color : COLOR;
+    bool hasTexture : TEXCOORD1;
 };
 
 cbuffer SpriteCameraConstant : register(b0)
 {
     float3 CameraUp;
-    float Pad1;
+    bool hasTexture;
     float3 CameraRight;
     float Pad2;
 }
@@ -58,6 +59,8 @@ PS_Input mainVS(VS_Input Input, uint VertexID : SV_VertexID)
     Output.Position = mul(ViewPos, ProjectionMatrix);
     Output.UV = Input.UV;
     Output.Color = Input.Color;
+    
+    Output.hasTexture = hasTexture;
     
     return Output;
 }
